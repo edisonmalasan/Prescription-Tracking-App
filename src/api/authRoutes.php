@@ -1,7 +1,7 @@
 <?php
 require_once '../controllers/AuthController.php';
 
-$route = $_GET['route'] ?? 'index.html';
+$route = $_GET['route'] ?? 'login';
 $auth = new AuthController();
 
 switch ($route) {
@@ -17,11 +17,10 @@ switch ($route) {
     case 'doRegister':
         $auth->register($_POST);
         break;
+    case 'logout':
+        $auth->logout();
+        break;
 
-    // Protected routes
-
-
-
-    default: include './pages/index.html';
+    default: include './src/views/auth/login.php';
     break;
 }
