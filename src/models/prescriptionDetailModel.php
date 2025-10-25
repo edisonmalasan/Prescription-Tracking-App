@@ -17,6 +17,8 @@ class PrescriptionDetailModel {
             $this->duration = $data['duration'] ?? 0;
             $this->dosage = $data['dosage'] ?? '';
             $this->frequency = $data['frequency'] ?? '';
+            $this->special_instructions = $data['special_instructions'] ?? '';
+            $this->refills = $data['refills'] ?? 0;
             $this->created_at = $data['created_at'] ?? null;
         }
     }
@@ -29,6 +31,8 @@ class PrescriptionDetailModel {
             'duration' => $this->duration,
             'dosage' => $this->dosage,
             'frequency' => $this->frequency,
+            'special_instructions' => $this->special_instructions,
+            'refills' => $this->refills,
             'created_at' => $this->created_at,
         ];
     }
