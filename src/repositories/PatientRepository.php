@@ -14,44 +14,71 @@ class PatientRepository {
 
     // Create a new patient
     public function create($patient) {
-        // TODO: Implement create patient
-        return;
+        //insert patient into database
+        $sql = "INSERT INTO " . $this->table_name . " (user_id, medical_history, allergies, created_at) VALUES (:user_id, :medical_history, :allergies, :created_at)";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([
+            ':user_id' => $patient['user_id'] ?? null,
+            ':medical_history' => $patient['medical_history'] ?? null,
+            ':allergies' => $patient['allergies'] ?? null,
+            ':created_at' => $patient['created_at'] ?? null,
+        ]);
+        return $this->conn->lastInsertId();
     }
 
     // Get patient by user ID
     public function findByUserId($userId) {
-        // TODO: Implement find patient by user ID
-        return;
+        $sql = "SELECT * FROM " . $this->table_name . " WHERE user_id = :user_id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([':user_id' => $userId]);
+        return $stmt->fetch();
     }
+
+    
 
     // Get all patients
     public function findAll() {
-        // TODO: Implement find all patients
-        return; 
+        $sql = "SELECT * FROM " . $this->table_name;
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
     }
 
     // Update patient
     public function update($patient) {
-        // TODO: Implement update patient
+        $sql = "UPDATE " . $this->table_name . " SET medical_history = :medical_history, allergies = :allergies, created_at = :created_at WHERE user_id = :user_id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([
+            ':medical_history' => $patient['medical_history'] ?? null,
+            ':allergies' => $patient['allergies'] ?? null,
+            ':created_at' => $patient['created_at'] ?? null,
+            ':user_id' => $patient['user_id'] ?? null,
+        ]);
         return;
     }
 
     // Delete patient
     public function delete($userId) {
-        // TODO: Implement delete patient
+        $sql = "DELETE FROM PATIENT WHERE user_id = :user_id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([':user_id' => $userId]);
         return;
     }
 
     // Search patients
     public function search($searchTerm) {
-        // TODO: Implement search patients
-        return;
+        $sql = "SELECT * FROM PATIENT WHERE name LIKE :searchTerm";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([':searchTerm' => "%$searchTerm%"]);
+    return $stmt->fetchAll();
     }
 
     // Check if patient exists
     public function exists($userId) {
-        // TODO: Implement check if patient exists
-        return;
+        $sql = "SELECT COUNT(*) FROM PATIENT WHERE user_id = :user_id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([':user_id' => $userId]);
+        return $stmt->fetchColumn() > 0;
     }
 }
 ?>
