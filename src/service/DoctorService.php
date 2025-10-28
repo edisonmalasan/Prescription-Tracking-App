@@ -1,8 +1,4 @@
 <?php
-/**
- * Doctor Service
- * Business logic for doctor operations
- */
 
 require_once '../repositories/DoctorRepository.php';
 require_once '../repositories/UserRepository.php';
@@ -17,39 +13,68 @@ class DoctorService {
         $this->userRepository = new UserRepository();
     }
 
-    public function registerDoctor($doctorData) {
-        // TODO: Implement doctor registration logic
-        return "TODO: Implement registerDoctor";
+    public function createDoctor($doctorData) {
+        if (empty($doctorData['email']) || empty($doctorData['password'])) {
+            return ['error' => 'Email and password are required'];
+        }
+
+        $existingUser = $this->userRepository->findByEmail($doctorData['email']);
+        if ($existingUser) {
+            return ['error' => 'Doctor with this email already exists'];
+        }
+
+        $doctorData['pass_hash'] = password_hash($doctorData['password'], PASSWORD_BCRYPT);
+        unset($doctorData['password']);
+
+        $doctorData['role'] = 'DOCTOR';
+        $doctorData['created_at'] = date('Y-m-d H:i:s');
+
+        $userId = $this->doctorRepository->create($doctorData);
+
+        if ($userId) {
+            return [
+                'success' => true,
+                'message' => 'Doctor registered successfully',
+                'user_id' => $userId
+            ];
+        } else {
+            return ['error' => 'Failed to register doctor'];
+        }
     }
 
-    public function verifyDoctor($doctorId) {
-        // TODO: Implement doctor verification logic
-        return "TODO: Implement verifyDoctor";
+    public function getDoctorProfile($userId) {
+        //TODO
+        return;
     }
 
-    public function getDoctorProfile($doctorId) {
-        // TODO: Implement get doctor profile logic
-        return "TODO: Implement getDoctorProfile";
+    public function updateDoctorProfile($userId, $doctorData) {
+        //TODO
+        return;
     }
 
-    public function updateDoctorProfile($doctorId, $doctorData) {
-        // TODO: Implement doctor profile update logic
-        return "TODO: Implement updateDoctorProfile";
+    public function getAllDoctors() {
+        //TODO
+        return;
     }
 
-    public function searchDoctorsBySpecialization($specialization) {
-        // TODO: Implement doctor search by specialization
-        return "TODO: Implement searchDoctorsBySpecialization";
+    public function getVerifiedDoctors() {
+        //TODO
+        return;
     }
 
-    // public function getDoctorStatistics($doctorId) {
-    //     // TODO: Implement doctor statistics logic
-    //     return "TODO: Implement getDoctorStatistics";
-    // }
+    public function getDoctorsBySpecialization($specialization) {
+        //TODO
+        return;
+    }
 
-    public function getDoctorPatients($doctorId) {
-        // TODO: Implement get doctor's patients logic
-        return "TODO: Implement getDoctorPatients";
+    public function verifyDoctor($userId) {
+        //TODO
+        return;
+    }
+
+    public function deleteDoctor($userId) {
+        //TODO
+        return;
     }
 }
 ?>

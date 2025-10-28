@@ -8,7 +8,6 @@ class DrugModel {
     public $category;
     public $expiry_date;
     public $isControlled;
-    public $created_at;
 
     public function __construct($data = []) {
         if (!empty($data)) {
@@ -19,7 +18,6 @@ class DrugModel {
             $this->category = $data['category'] ?? '';
             $this->expiry_date = $data['expiry_date'] ?? null;
             $this->isControlled = $data['isControlled'] ?? false;
-            $this->created_at = $data['created_at'] ?? null;
         }
     }
 
@@ -31,8 +29,7 @@ class DrugModel {
             'chemical_name' => $this->chemical_name,
             'category' => $this->category,
             'expiry_date' => $this->expiry_date,
-            'isControlled' => $this->isControlled,
-            'created_at' => $this->created_at
+            'isControlled' => $this->isControlled
         ];
     }
 

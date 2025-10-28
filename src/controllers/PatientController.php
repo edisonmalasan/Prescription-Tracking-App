@@ -10,48 +10,133 @@ class PatientController {
     }
 
     public function register() {
-        // TODO: Implement patient registration endpoint
-        return json_encode(['message' => 'TODO: Implement patient registration endpoint']);
+        $data = json_decode(file_get_contents("php://input"), true);
+        
+        if (empty($data)) {
+            $data = $_POST;
+        }
+        
+        $result = $this->patientService->createPatient($data);
+        
+        header('Content-Type: application/json');
+        http_response_code(isset($result['error']) ? 400 : 201);
+        return json_encode($result);
     }
 
     public function getProfile() {
-        // TODO: Implement get patient profile endpoint
-        return json_encode(['message' => 'TODO: Implement get patient profile endpoint']);
+        $userId = $_GET['user_id'] ?? null;
+        
+        if (!$userId) {
+            http_response_code(400);
+            return json_encode(['error' => 'User ID is required']);
+        }
+        
+        $result = $this->patientService->getPatientProfile($userId);
+        
+        header('Content-Type: application/json');
+        http_response_code(isset($result['error']) ? 404 : 200);
+        return json_encode($result);
     }
 
     public function updateProfile() {
-        // TODO: Implement update patient profile endpoint
-        return json_encode(['message' => 'TODO: Implement update patient profile endpoint']);
+        $userId = $_GET['user_id'] ?? null;
+        
+        if (!$userId) {
+            http_response_code(400);
+            return json_encode(['error' => 'User ID is required']);
+        }
+                
+        // validate if json data is empty if true then it will get form dataa
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        if (empty($data)) {
+            $data = $_POST;
+        }
+        
+        $result = $this->patientService->updatePatientProfile($userId, $data);
+        
+        header('Content-Type: application/json');
+        http_response_code(isset($result['error']) ? 400 : 200);
+        return json_encode($result);
     }
 
-    public function getPrescriptions() {
-        // TODO: Implement get patient prescriptions endpoint
-        return json_encode(['message' => 'TODO: Implement get patient prescriptions endpoint']);
+    public function getAllPatients() {
+        $result = $this->patientService->getAllPatients();
+        
+        header('Content-Type: application/json');
+        return json_encode($result);
     }
 
-    public function getPrescriptionDetails() {
-        // TODO: Implement get prescription details endpoint
-        return json_encode(['message' => 'TODO: Implement get prescription details endpoint']);
+    public function createMedicalRecord() {
+        $userId = $_GET['user_id'] ?? null;
+        
+        if (!$userId) {
+            http_response_code(400);
+            return json_encode(['error' => 'User ID is required']);
+        }
+        
+        $data = json_decode(file_get_contents("php://input"), true);
+   
+        if (empty($data)) {
+            $data = $_POST;
+        }
+        
+        $result = $this->patientService->createMedicalRecord($userId, $data);
+        
+        header('Content-Type: application/json');
+        http_response_code(isset($result['error']) ? 400 : 201);
+        return json_encode($result);
     }
 
-    public function getMedicalHistory() {
-        // TODO: Implement get medical history endpoint
-        return json_encode(['message' => 'TODO: Implement get medical history endpoint']);
+    public function getMedicalRecord() {
+        $userId = $_GET['user_id'] ?? null;
+        
+        if (!$userId) {
+            http_response_code(400);
+            return json_encode(['error' => 'User ID is required']);
+        }
+        
+        $result = $this->patientService->getMedicalRecord($userId);
+        
+        header('Content-Type: application/json');
+        http_response_code(isset($result['error']) ? 404 : 200);
+        return json_encode($result);
     }
 
-    public function getPrescriptionStatus() {
-        // TODO: Implement get prescription status endpoint
-        return json_encode(['message' => 'TODO: Implement get prescription status endpoint']);
+    public function updateMedicalRecord() {
+        $recordId = $_GET['record_id'] ?? null;
+        
+        if (!$recordId) {
+            http_response_code(400);
+            return json_encode(['error' => 'Record ID is required']);
+        }
+        
+        $data = json_decode(file_get_contents("php://input"), true);
+        
+        if (empty($data)) {
+            $data = $_POST;
+        }
+        
+        $result = $this->patientService->updateMedicalRecord($recordId, $data);
+        
+        header('Content-Type: application/json');
+        http_response_code(isset($result['error']) ? 400 : 200);
+        return json_encode($result);
     }
 
-    public function updateContactInfo() {
-        // TODO: Implement update contact info endpoint
-        return json_encode(['message' => 'TODO: Implement update contact info endpoint']);
-    }
-
-    public function getDashboard() {
-        // TODO: Implement get patient dashboard endpoint
-        return json_encode(['message' => 'TODO: Implement get patient dashboard endpoint']);
+    public function deletePatient() {
+        $userId = $_GET['user_id'] ?? null;
+        
+        if (!$userId) {
+            http_response_code(400);
+            return json_encode(['error' => 'User ID is required']);
+        }
+        
+        $result = $this->patientService->deletePatient($userId);
+        
+        header('Content-Type: application/json');
+        http_response_code(isset($result['error']) ? 404 : 200);
+        return json_encode($result);
     }
 }
 ?>

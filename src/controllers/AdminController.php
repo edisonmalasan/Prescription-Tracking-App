@@ -10,69 +10,151 @@ class AdminController {
     }
 
     public function login() {
-        // TODO: Implement admin login endpoint
-        return json_encode(['message' => 'TODO: Implement admin login endpoint']);
+        $data = json_decode(file_get_contents("php://input"), true);
+        
+        
+        if (empty($data)) {
+            $data = $_POST;
+        }
+        
+        $result = $this->adminService->adminLogin($data);
+        
+        header('Content-Type: application/json');
+        http_response_code(isset($result['error']) ? 401 : 200);
+        return json_encode($result);
     }
 
     public function getDashboard() {
-        // TODO: Implement get dashboard data endpoint
-        return json_encode(['message' => 'TODO: Implement get dashboard data endpoint']);
+        $result = $this->adminService->getDashboardData();
+        
+        header('Content-Type: application/json');
+        http_response_code(isset($result['error']) ? 500 : 200);
+        return json_encode($result);
     }
 
     public function getAllUsers() {
-        // TODO: Implement get all users endpoint
-        return json_encode(['message' => 'TODO: Implement get all users endpoint']);
+        $role = $_GET['role'] ?? null;
+        $result = $this->adminService->getAllUsers($role);
+        
+        header('Content-Type: application/json');
+        http_response_code(isset($result['error']) ? 500 : 200);
+        return json_encode($result);
     }
 
-    // Optional
-    // public function createUser() {
-    //     // TODO: Implement create user endpoint
-    //     return json_encode(['message' => 'TODO: Implement create user endpoint']);
-    // }
+    public function createUser() {
+        $data = json_decode(file_get_contents("php://input"), true);
+        
+        
+        if (empty($data)) {
+            $data = $_POST;
+        }
+        
+        $result = $this->adminService->createUser($data);
+        
+        header('Content-Type: application/json');
+        http_response_code(isset($result['error']) ? 400 : 201);
+        return json_encode($result);
+    }
 
-    // public function modifyUser() {
-    //     // TODO: Implement modify user endpoint
-    //     return json_encode(['message' => 'TODO: Implement modify user endpoint']);
-    // }
+    public function modifyUser() {
+        $userId = $_GET['user_id'] ?? null;
+        
+        if (!$userId) {
+            http_response_code(400);
+            return json_encode(['error' => 'User ID is required']);
+        }
+        
+        $data = json_decode(file_get_contents("php://input"), true);
+        
+        
+        if (empty($data)) {
+            $data = $_POST;
+        }
+        
+        $result = $this->adminService->modifyUser($userId, $data);
+        
+        header('Content-Type: application/json');
+        http_response_code(isset($result['error']) ? 400 : 200);
+        return json_encode($result);
+    }
 
     public function deleteUser() {
-        // TODO: Implement delete user endpoint
-        return json_encode(['message' => 'TODO: Implement delete user endpoint']);
+        $userId = $_GET['user_id'] ?? null;
+        
+        if (!$userId) {
+            http_response_code(400);
+            return json_encode(['error' => 'User ID is required']);
+        }
+        
+        $result = $this->adminService->deleteUser($userId);
+        
+        header('Content-Type: application/json');
+        http_response_code(isset($result['error']) ? 404 : 200);
+        return json_encode($result);
     }
 
     public function verifyDoctor() {
-        // TODO: Implement verify doctor endpoint
-        return json_encode(['message' => 'TODO: Implement verify doctor endpoint']);
+        $doctorId = $_GET['doctor_id'] ?? null;
+        
+        if (!$doctorId) {
+            http_response_code(400);
+            return json_encode(['error' => 'Doctor ID is required']);
+        }
+        
+        $result = $this->adminService->verifyDoctor($doctorId);
+        
+        header('Content-Type: application/json');
+        http_response_code(isset($result['error']) ? 400 : 200);
+        return json_encode($result);
     }
 
     public function getPendingVerifications() {
-        // TODO: Implement get pending verifications endpoint
-        return json_encode(['message' => 'TODO: Implement get pending verifications endpoint']);
+        $result = $this->adminService->getPendingVerifications();
+        
+        header('Content-Type: application/json');
+        http_response_code(isset($result['error']) ? 500 : 200);
+        return json_encode($result);
     }
 
     public function viewDatabaseTables() {
-        // TODO: Implement view database tables endpoint
-        return json_encode(['message' => 'TODO: Implement view database tables endpoint']);
+        header('Content-Type: application/json');
+        return json_encode([
+            'success' => true,
+            'message' => 'Database tables view - implementation needed',
+            'tables' => ['users', 'doctor', 'patient', 'pharmacy', 'admin', 'medicalrecord', 'drug', 'prescription', 'prescriptiondetails']
+        ]);
     }
 
     public function createDatabaseRecord() {
-        // TODO: Implement create database record endpoint
-        return json_encode(['message' => 'TODO: Implement create database record endpoint']);
+        header('Content-Type: application/json');
+        return json_encode([
+            'success' => true,
+            'message' => 'Generic database record creation - implementation needed'
+        ]);
     }
 
     public function modifyDatabaseRecord() {
-        // TODO: Implement modify database record endpoint
-        return json_encode(['message' => 'TODO: Implement modify database record endpoint']);
+        header('Content-Type: application/json');
+        return json_encode([
+            'success' => true,
+            'message' => 'Generic database record modification - implementation needed'
+        ]);
     }
 
     public function getSystemStatistics() {
-        // TODO: Implement get system statistics endpoint
-        return json_encode(['message' => 'TODO: Implement get system statistics endpoint']);
+        $result = $this->adminService->getSystemStatistics();
+        
+        header('Content-Type: application/json');
+        http_response_code(isset($result['error']) ? 500 : 200);
+        return json_encode($result);
     }
 
     public function manageDrugDatabase() {
-        // TODO: Implement manage drug database endpoint
-        return json_encode(['message' => 'TODO: Implement manage drug database endpoint']);
+        header('Content-Type: application/json');
+        return json_encode([
+            'success' => true,
+            'message' => 'Drug database management - implementation needed'
+        ]);
     }
 }
 ?>

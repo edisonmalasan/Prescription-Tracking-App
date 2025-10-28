@@ -1,61 +1,75 @@
 <?php
-/**
- * Prescription Service
- * Business logic for prescription operations
- */
 
 require_once '../repositories/PrescriptionRepository.php';
 require_once '../repositories/DrugRepository.php';
+require_once '../repositories/MedicalRecordRepository.php';
 require_once '../models/prescriptionModel.php';
+require_once '../models/prescriptionDetailModel.php';
 
 class PrescriptionService {
     private $prescriptionRepository;
     private $drugRepository;
+    private $medicalRecordRepository;
 
     public function __construct() {
         $this->prescriptionRepository = new PrescriptionRepository();
         $this->drugRepository = new DrugRepository();
+        $this->medicalRecordRepository = new MedicalRecordRepository();
     }
 
     public function createPrescription($prescriptionData) {
-        // TODO: Implement prescription creation logic
+       //TODO
         return;
     }
 
-    public function getPrescriptionDetails($prescriptionId) {
-        // TODO: Implement get prescription details logic
+    public function getPrescription($prescriptionId) {
+        //TODO
+        return;
+    }
+
+    public function getPrescriptionsByPatient($patientId) {
+        //TODO
+        return;
+    }
+
+    public function getPrescriptionsByDoctor($doctorId) {
+        //TODO
+        return;
+    }
+
+    public function getAllPrescriptions() {
+        //TODO
         return;
     }
 
     public function updatePrescription($prescriptionId, $prescriptionData) {
-        // TODO: Implement prescription update logic
+        //TODO
         return;
     }
 
-    public function cancelPrescription($prescriptionId, $reason) {
-        // TODO: Implement prescription cancellation logic
+    public function addPrescriptionDetail($prescriptionId, $detailData) {
+        //TODO
         return;
     }
 
-    public function getDoctorPrescriptions($doctorId) {
-        // TODO: Implement get doctor prescriptions logic
+    public function getPrescriptionDetails($prescriptionId) {
+        //TODO
         return;
     }
 
-    public function getPatientPrescriptions($patientId) {
-        // TODO: Implement get patient prescriptions logic
+    public function updatePrescriptionStatus($prescriptionId, $status) {
+        //TODO
         return;
     }
 
-    public function checkDuplicatePrescription($prescriptionData) {
-        // TODO: Implement duplicate prescription check logic
+    public function deletePrescription($prescriptionId) {
+        //TODO
         return;
     }
 
-    public function filterPrescriptions($filters) {
-        // TODO: Implement prescription filtering logic
+    public function getPrescriptionsByStatus($status) {
+        //TODO
         return;
     }
-
 }
 ?>
