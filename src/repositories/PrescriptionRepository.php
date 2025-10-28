@@ -15,7 +15,7 @@ class PrescriptionRepository {
     }
 
     // Create a new prescription
-    public function create($prescription) {
+ public function create($prescription) {
         $sql = "INSERT INTO PRESCRIPTION (doctor_id, patient_id, date, status) VALUES (:doctor_id, :patient_id, :date, :status)";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([
@@ -25,19 +25,22 @@ class PrescriptionRepository {
             ':status' => $prescription['status'] ?? null,
         ]);
         return $this->conn->lastInsertId();
-    }
+    }        
+    
 
     // Get prescription by ID
     public function findById($id) {
-        $sql = "SELECT * FROM PRESCRIPTION WHERE id = :id";
+        $sql = "SELECT * FROM " . $this->table_name . " WHERE id = :id";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([':id' => $id]);
         return $stmt->fetch();
     }
 
+
+    
     // Get prescriptions by patient
     public function findByPatient($patientId) {
-        $sql = "SELECT * FROM PRESCRIPTION WHERE patient_id = :patient_id";
+        $sql = "SELECT * FROM " . $this->table_name . " WHERE patient_id = :patient_id";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([':patient_id' => $patientId]);
         return $stmt->fetchAll();
@@ -45,7 +48,7 @@ class PrescriptionRepository {
 
     // Get prescriptions by doctor
     public function findByDoctor($doctorId) {
-        $sql = "SELECT * FROM PRESCRIPTION WHERE doctor_id = :doctor_id";
+        $sql = "SELECT * FROM " . $this->table_name . " WHERE doctor_id = :doctor_id";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([':doctor_id' => $doctorId]);
         return $stmt->fetchAll();
@@ -53,7 +56,7 @@ class PrescriptionRepository {
 
     // Get all prescriptions
     public function findAll() {
-        $sql = "SELECT * FROM PRESCRIPTION";
+        $sql = "SELECT * FROM " . $this->table_name;
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll();
@@ -61,7 +64,7 @@ class PrescriptionRepository {
 
     // Update prescription
     public function update($prescription) {
-        $sql = "UPDATE PRESCRIPTION SET doctor_id = :doctor_id, patient_id = :patient_id, date = :date, status = :status WHERE id = :id";
+        $sql = "UPDATE " . $this->table_name . " SET doctor_id = :doctor_id, patient_id = :patient_id, date = :date, status = :status WHERE id = :id";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([
             ':doctor_id' => $prescription['doctor_id'] ?? null,
@@ -75,7 +78,7 @@ class PrescriptionRepository {
 
     // Delete prescription
     public function delete($id) {
-        $sql = "DELETE FROM PRESCRIPTION WHERE id = :id";
+        $sql = "DELETE FROM " . $this->table_name . " WHERE id = :id";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([':id' => $id]);
         return;
@@ -83,15 +86,14 @@ class PrescriptionRepository {
 
     // Get prescription details
     public function getPrescriptionDetails($prescriptionId) {
-        $sql = "SELECT * FROM PRESCRIPTIONDETAILS WHERE prescription_id = :prescription_id";
+        $sql = "SELECT * FROM " . $this->details_table . " WHERE prescription_id = :prescription_id";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([':prescription_id' => $prescriptionId]);
         return $stmt->fetchAll();
     }
 
     // Add prescription detail
-    public function addPrescriptionDetail($detail) {
-        // Insert prescription detail record (prescription_id, drug_id,duration, dosage, frequency, refills, special_instructions)
+     public function addPrescriptionDetail($detail) {
         $sql = "INSERT INTO PRESCRIPTIONDETAILS (prescription_id, drug_id, duration, dosage, frequency, refills, special_instructions) VALUES (:prescription_id, :drug_id, :duration, :dosage, :frequency, :refills, :special_instructions)";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([
@@ -109,10 +111,11 @@ class PrescriptionRepository {
 
     // Get prescriptions by status
     public function findByStatus($status) {
-        $sql = "SELECT * FROM PRESCRIPTION WHERE status = :status";
+        $sql = "SELECT * FROM " . $this->table_name . " WHERE status = :status";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([':status' => $status]);
         return $stmt->fetchAll();
     }
 }
+
 ?>

@@ -11,7 +11,6 @@ class PrescriptionDetailModel {
 
     public function __construct($data = []) {
         if (!empty($data)) {
-            $this->detail_id = $data['detail_id'] ?? null;
             $this->prescription_id = $data['prescription_id'] ?? null;
             $this->drug_id = $data['drug_id'] ?? null;
             $this->duration = $data['duration'] ?? 0;
@@ -25,7 +24,6 @@ class PrescriptionDetailModel {
 
     public function toArray() {
         return [
-            'detail_id' => $this->detail_id,
             'prescription_id' => $this->prescription_id,
             'drug_id' => $this->drug_id,
             'duration' => $this->duration,

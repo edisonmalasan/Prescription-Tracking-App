@@ -22,6 +22,7 @@ class UserModel {
             $this->pass_hash = $data['pass_hash'] ?? '';
             $this->address = $data['address'] ?? '';
             $this->created_at = $data['created_at'] ?? null;
+            $this->updated_at = $data['updated_at'] ?? null;
         }
     }
 
@@ -38,7 +39,8 @@ class UserModel {
             'email' => $this->email,
             'contactno' => $this->contactno,
             'address' => $this->address,
-            'created_at' => $this->created_at
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at
         ];
     }
 }

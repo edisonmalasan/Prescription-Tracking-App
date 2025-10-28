@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Oct 25, 2025 at 09:13 AM
+-- Generation Time: Oct 28, 2025 at 01:18 PM
 -- Server version: 9.1.0
 -- PHP Version: 8.3.14
 
@@ -73,6 +73,7 @@ CREATE TABLE IF NOT EXISTS `drug` (
   `category` varchar(100) DEFAULT NULL,
   `expiry_date` date DEFAULT NULL,
   `isControlled` tinyint(1) DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`drug_id`),
   UNIQUE KEY `generic_name` (`generic_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -90,6 +91,8 @@ CREATE TABLE IF NOT EXISTS `medicalrecord` (
   `height` varchar(20) DEFAULT NULL,
   `weight` varchar(20) DEFAULT NULL,
   `allergies` text,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`record_id`),
   KEY `fk_medicalrecord_patient` (`user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -98,8 +101,8 @@ CREATE TABLE IF NOT EXISTS `medicalrecord` (
 -- Dumping data for table `medicalrecord`
 --
 
-INSERT INTO `medicalrecord` (`record_id`, `user_id`, `height`, `weight`, `allergies`) VALUES
-(1, 6, '180 cm', '75 kg', 'None');
+INSERT INTO `medicalrecord` (`record_id`, `user_id`, `height`, `weight`, `allergies`, `created_at`, `updated_at`) VALUES
+(1, 6, '180 cm', '75 kg', 'None', '2025-10-28 12:37:23', '2025-10-28 12:37:23');
 
 -- --------------------------------------------------------
 
