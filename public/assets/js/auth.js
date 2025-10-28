@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Prepare data for API call
+    // data for api call
     const formData = {
       first_name: firstName,
       last_name: lastName,
@@ -61,7 +61,6 @@ document.addEventListener("DOMContentLoaded", () => {
       contactno: phoneNumber,
     };
 
-    // Add role-specific fields
     if (role === "PATIENT") {
       formData.birth_date = document.getElementById("patientBirthDate").value;
     } else if (role === "DOCTOR") {
@@ -105,7 +104,6 @@ document.addEventListener("DOMContentLoaded", () => {
           false
         );
 
-        // After registration, consider the user logged in and store their basic info.
         const user = {
           email: formData.email,
           role: formData.role,
@@ -171,23 +169,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const password = document.getElementById("loginPassword").value;
     const rememberMe = document.getElementById("rememberMe").checked;
 
-    // Prepare data for API call
+    // prepare input data for api call
     const formData = {
       email: email,
       password: password,
     };
 
     try {
-      const response = await fetch(
-        "../src/api/authRoutes.php?action=login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch("../src/api/authRoutes.php?action=login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
       const result = await response.json();
 
@@ -199,7 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
           sessionStorage.setItem("loggedInUser", JSON.stringify(result.user));
         }
 
-        // Redirect to the appropriate dashboard based on the role
+        // redirect depends on role
         setTimeout(() => {
           const role = result.user.role;
           let redirectUrl;
