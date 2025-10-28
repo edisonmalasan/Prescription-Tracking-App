@@ -61,7 +61,21 @@ class DoctorRepository {
         return $userId;
     }
 
-    // Get doctor by user ID
+    // Create doctor-specific record only (user already exists)
+    public function createDoctorRecord($userId, $data) {
+        $sql = "INSERT INTO " . $this->table_name . " (user_id, birth_date, specialization, prc_license, clinic_name, isVerified) VALUES (:user_id, :birth_date, :specialization, :prc_license, :clinic_name, :isVerified)";
+        $stmt = $this->conn->prepare($sql);
+        $result = $stmt->execute([
+            ':user_id' => $userId,
+            ':birth_date' => $data['birth_date'] ?? ($data['birthDate'] ?? null),
+            ':specialization' => $data['specialization'] ?? null,
+            ':prc_license' => $data['prc_license'] ?? ($data['prcLicense'] ?? null),
+            ':clinic_name' => $data['clinic_name'] ?? ($data['clinicName'] ?? null),
+            ':isVerified' => isset($data['isVerified']) ? (int)$data['isVerified'] : (isset($data['verified']) ? (int)$data['verified'] : 0)
+        ]);
+
+        return $result;
+    }
     public function findByUserId($userId) {
         $sql = "SELECT * FROM " . $this->table_name . " WHERE user_id = :user_id";
         $stmt = $this->conn->prepare($sql);

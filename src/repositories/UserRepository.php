@@ -14,7 +14,6 @@ class UserRepository {
 
     // Create a new user
         public function create(array $data) {
-            // Schema has created_at but no updated_at column; insert without updated_at
             $sql = "INSERT INTO " . $this->table_name . " (last_name, first_name, role, email, contactno, pass_hash, address, created_at) VALUES (:last_name, :first_name, :role, :email, :contactno, :pass_hash, :address, :created_at)";
         $stmt = $this->conn->prepare($sql);
         
@@ -77,7 +76,7 @@ class UserRepository {
 
     // Update user
     public function update($user) {
-        $sql = "UPDATE " . $this->table_name . " SET last_name = :last_name, first_name = :first_name, role = :role, email = :email, contactno = :contactno, pass_hash = :pass_hash, address = :address, updated_at = :updated_at WHERE user_id = :user_id";
+        $sql = "UPDATE " . $this->table_name . " SET last_name = :last_name, first_name = :first_name, role = :role, email = :email, contactno = :contactno, pass_hash = :pass_hash, address = :address WHERE user_id = :user_id";
         $stmt = $this->conn->prepare($sql);
         $result = $stmt->execute([
             ':last_name' => $user['last_name'] ?? null,
@@ -87,7 +86,6 @@ class UserRepository {
             ':contactno' => $user['contactno'] ?? null,
             ':pass_hash' => $user['pass_hash'] ?? null,
             ':address' => $user['address'] ?? null,
-            ':updated_at' => $user['updated_at'] ?? null,
             ':user_id' => $user['user_id'] ?? $user['id']
         ]);
         

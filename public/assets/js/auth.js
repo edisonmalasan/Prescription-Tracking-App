@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const response = await fetch(
-        "../../../src/api/authRoutes.php?action=register",
+        "../src/api/authRoutes.php?action=register",
         {
           method: "POST",
           headers: {
@@ -179,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const response = await fetch(
-        "/Prescription-Tracking-App/src/api/authRoutes.php?action=login",
+        "../src/api/authRoutes.php?action=login",
         {
           method: "POST",
           headers: {

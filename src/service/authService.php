@@ -25,40 +25,51 @@ class AuthService {
     }
 
     public function register($data) {
-        
-        if (empty($data['email']) || empty($data['password'])) {
-            return ['error' => 'Email & password required'];
+        try {
+            if (empty($data['email']) || empty($data['password'])) {
+                return ['error' => 'Email & password required'];
+            }
+
+            $exists = $this->userRepo->findByEmail($data['email']);
+            if ($exists) {
+                return ['error' => 'Email already exists'];
+            }
+
+            $hash = password_hash($data['password'], PASSWORD_BCRYPT);
+
+            $payload = [
+                'last_name'   => $data['last_name'] ?? '',
+                'first_name'  => $data['first_name'] ?? '',
+                'email'       => $data['email'],
+                'role'        => $data['role'] ?? 'PATIENT', // default to patient
+                'contactno'   => $data['contactno'] ?? '',
+                'address'     => $data['address'] ?? '',
+                'pass_hash'   => $hash,
+                'created_at'  => date('Y-m-d H:i:s'),
+            ];
+            
+            $id = $this->userRepo->create($payload);
+            
+            if (!$id) {
+                return ['error' => 'Failed to create user'];
+            }
+
+            $roleResult = $this->createRoleSpecificRecord($id, $data['role'] ?? 'PATIENT', $data);
+            
+            if ($roleResult === false) {
+                $this->userRepo->delete($id);
+                return ['error' => 'Failed to create role-specific record'];
+            }
+
+            return [
+                'success' => true,
+                'message' => 'Registered successfully',
+                'user_id' => $id
+            ];
+        } catch (Exception $e) {
+            error_log("Registration error: " . $e->getMessage());
+            return ['error' => 'Registration failed: ' . $e->getMessage()];
         }
-
-        $exists = $this->userRepo->findByEmail($data['email']);
-        if ($exists) {
-            return ['error' => 'Email already exists'];
-        }
-
-        $hash = password_hash($data['password'], PASSWORD_BCRYPT);
-
-        $payload = [
-            'last_name'   => $data['last_name'] ?? '',
-            'first_name'  => $data['first_name'] ?? '',
-            'email'       => $data['email'],
-            'role'        => $data['role'] ?? 'PATIENT', // default to patient
-            'contactno'   => $data['contactno'] ?? '',
-            'address'     => $data['address'] ?? '',
-            'pass_hash'   => $hash,
-            'created_at'  => date('Y-m-d H:i:s'),
-        ];
-        $id = $this->userRepo->create($payload);
-        
-        if (!$id) {
-            return ['error' => 'Failed to create user'];
-        }
-    
-        $this->createRoleSpecificRecord($id, $data['role'] ?? 'PATIENT', $data);
-
-        return [
-            'message' => 'Registered successfully',
-            'user_id' => $id
-        ];
     }
 
     public function login($data) {
@@ -85,17 +96,23 @@ class AuthService {
     }
     
     private function createRoleSpecificRecord($userId, $role, $data) {
-        switch ($role) {
-            case 'DOCTOR':
-                return $this->doctorRepo->create($data);
-            case 'PATIENT':
-                return $this->patientRepo->create($userId, $data);
-            case 'PHARMACY':
-                return $this->pharmacyRepo->create($userId, $data);
-            case 'ADMIN':
-                return $this->adminRepo->create($userId);
+        try {
+            switch ($role) {
+                case 'DOCTOR':
+                    // Create doctor-specific record only (user already exists)
+                    return $this->doctorRepo->createDoctorRecord($userId, $data);
+                case 'PATIENT':
+                    return $this->patientRepo->create($userId, $data);
+                case 'PHARMACY':
+                    return $this->pharmacyRepo->create($userId, $data);
+                case 'ADMIN':
+                    return $this->adminRepo->create($userId);
+            }
+            return false;
+        } catch (Exception $e) {
+            error_log("Error creating role-specific record: " . $e->getMessage());
+            return false;
         }
-        return false;
     }
     
     private function getRoleSpecificData($userId, $role) {
