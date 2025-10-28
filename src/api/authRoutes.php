@@ -1,6 +1,4 @@
 <?php
-
-// Set JSON header first
 header('Content-Type: application/json');
 
 try {
