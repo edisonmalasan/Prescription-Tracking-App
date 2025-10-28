@@ -67,7 +67,6 @@ class AuthService {
                 'user_id' => $id
             ];
         } catch (Exception $e) {
-            error_log("Registration error: " . $e->getMessage());
             return ['error' => 'Registration failed: ' . $e->getMessage()];
         }
     }
@@ -110,7 +109,6 @@ class AuthService {
             }
             return false;
         } catch (Exception $e) {
-            error_log("Error creating role-specific record: " . $e->getMessage());
             return false;
         }
     }
