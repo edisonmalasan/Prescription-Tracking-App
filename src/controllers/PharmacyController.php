@@ -9,53 +9,53 @@ class PharmacyController {
     }
 
     public function register() {
-        // TODO: Implement pharmacy registration endpoint
-        return json_encode(['message' => 'TODO: Implement pharmacy registration endpoint']);
+        //TODO
+        return;
     }
 
     public function getProfile() {
-        // TODO: Implement get pharmacy profile endpoint
-        return json_encode(['message' => 'TODO: Implement get pharmacy profile endpoint']);
+        //TODO
+        return;
     }
 
     public function updateProfile() {
-        // TODO: Implement update pharmacy profile endpoint
-        return json_encode(['message' => 'TODO: Implement update pharmacy profile endpoint']);
+        //TODO
+        return;
     }
 
     public function getPrescriptions() {
-        // TODO: Implement get pharmacy prescriptions endpoint
-        return json_encode(['message' => 'TODO: Implement get pharmacy prescriptions endpoint']);
+        //TODO
+        return;
     }
 
     public function updatePrescriptionStatus() {
-        // TODO: Implement update prescription status endpoint
-        return json_encode(['message' => 'TODO: Implement update prescription status endpoint']);
+        //TODO
+        return;
     }
 
     public function filterPrescriptions() {
-        // TODO: Implement filter prescriptions endpoint
-        return json_encode(['message' => 'TODO: Implement filter prescriptions endpoint']);
+        //TODO
+        return;
     }
 
     public function getStatistics() {
-        // TODO: Implement get pharmacy statistics endpoint
-        return json_encode(['message' => 'TODO: Implement get pharmacy statistics endpoint']);
+        //TODO
+        return;
     }
 
     public function getPrescriptionDetails() {
-        // TODO: Implement get prescription details endpoint
-        return json_encode(['message' => 'TODO: Implement get prescription details endpoint']);
+        //TODO
+        return;
     }
 
     public function searchByPatient() {
-        // TODO: Implement search prescriptions by patient endpoint
-        return json_encode(['message' => 'TODO: Implement search prescriptions by patient endpoint']);
+        //TODO
+        return;
     }
 
     public function searchByDrug() {
-        // TODO: Implement search prescriptions by drug endpoint
-        return json_encode(['message' => 'TODO: Implement search prescriptions by drug endpoint']);
+        //TODO
+        return;
     }
 }
 ?>

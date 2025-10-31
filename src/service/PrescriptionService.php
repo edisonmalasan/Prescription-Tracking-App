@@ -18,6 +18,7 @@ class PrescriptionService {
     }
 
     public function createPrescription($prescriptionData) {
+<<<<<<< HEAD
         // Validate required fields
         if (empty($prescriptionData['prescribing_doctor']) || empty($prescriptionData['record_id'])) {
             return ['error' => 'Prescribing doctor and medical record are required'];
@@ -165,6 +166,60 @@ class PrescriptionService {
             'success' => true,
             'prescriptions' => $prescriptions
         ];
+=======
+       //TODO
+        return;
+    }
+
+    public function getPrescription($prescriptionId) {
+        //TODO
+        return;
+    }
+
+    public function getPrescriptionsByPatient($patientId) {
+        //TODO
+        return;
+    }
+
+    public function getPrescriptionsByDoctor($doctorId) {
+        //TODO
+        return;
+    }
+
+    public function getAllPrescriptions() {
+        //TODO
+        return;
+    }
+
+    public function updatePrescription($prescriptionId, $prescriptionData) {
+        //TODO
+        return;
+    }
+
+    public function addPrescriptionDetail($prescriptionId, $detailData) {
+        //TODO
+        return;
+    }
+
+    public function getPrescriptionDetails($prescriptionId) {
+        //TODO
+        return;
+    }
+
+    public function updatePrescriptionStatus($prescriptionId, $status) {
+        //TODO
+        return;
+    }
+
+    public function deletePrescription($prescriptionId) {
+        //TODO
+        return;
+    }
+
+    public function getPrescriptionsByStatus($status) {
+        //TODO
+        return;
+>>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
     }
 }
 ?>

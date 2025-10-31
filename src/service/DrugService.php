@@ -1,8 +1,11 @@
 <?php
+<<<<<<< HEAD
 /**
  * Drug Service
  * Business logic for drug operations
  */
+=======
+>>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
 
 require_once '../repositories/DrugRepository.php';
 require_once '../models/drugModel.php';
@@ -15,6 +18,7 @@ class DrugService {
     }
 
     public function createDrug($drugData) {
+<<<<<<< HEAD
         // Validate required fields
         if (empty($drugData['generic_name'])) {
             return ['error' => 'Generic name is required'];
@@ -114,6 +118,45 @@ class DrugService {
         } else {
             return ['error' => 'Failed to delete drug'];
         }
+=======
+        //TODO
+        return;
+    }
+
+    public function getDrug($drugId) {
+        //TODO
+        return;
+    }
+
+    public function getAllDrugs() {
+        //TODO
+        return;
+    }
+
+    public function getDrugsByCategory($category) {
+        //TODO
+        return;
+    }
+
+    public function getControlledDrugs() {
+        //TODO
+        return;
+    }
+
+    public function searchDrugs($searchTerm) {
+        //TODO
+        return;
+    }
+
+    public function updateDrug($drugId, $drugData) {
+        //TODO
+        return;
+    }
+
+    public function deleteDrug($drugId) {
+        //TODO
+        return;
+>>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
     }
 }
 ?>

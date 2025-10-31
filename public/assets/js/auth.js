@@ -51,7 +51,11 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+<<<<<<< HEAD
     // Prepare data for API call
+=======
+    // data for api call
+>>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
     const formData = {
       first_name: firstName,
       last_name: lastName,
@@ -61,7 +65,10 @@ document.addEventListener("DOMContentLoaded", () => {
       contactno: phoneNumber,
     };
 
+<<<<<<< HEAD
     // Add role-specific fields
+=======
+>>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
     if (role === "PATIENT") {
       formData.birth_date = document.getElementById("patientBirthDate").value;
     } else if (role === "DOCTOR") {
@@ -82,7 +89,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const response = await fetch(
+<<<<<<< HEAD
         "../../../src/api/authRoutes.php?action=register",
+=======
+        "../src/api/authRoutes.php?action=register",
+>>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
         {
           method: "POST",
           headers: {
@@ -105,7 +116,10 @@ document.addEventListener("DOMContentLoaded", () => {
           false
         );
 
+<<<<<<< HEAD
         // After registration, consider the user logged in and store their basic info.
+=======
+>>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
         const user = {
           email: formData.email,
           role: formData.role,
@@ -139,7 +153,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 "/Prescription-Tracking-App/public/views/admin/dashboard.html";
               break;
             default:
+<<<<<<< HEAD
               // Default redirect to login page if role is unknown
+=======
+>>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
               redirectUrl = "login.html";
               redirectUrl =
                 "/Prescription-Tracking-App/public/views/auth/login.html";
@@ -172,13 +189,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const password = document.getElementById("loginPassword").value;
     const rememberMe = document.getElementById("rememberMe").checked;
 
+<<<<<<< HEAD
     // Prepare data for API call
+=======
+    // prepare input data for api call
+>>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
     const formData = {
       email: email,
       password: password,
     };
 
     try {
+<<<<<<< HEAD
       const response = await fetch(
         "/Prescription-Tracking-App/src/api/authRoutes.php?action=login",
         {
@@ -203,6 +225,27 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // Redirect to the appropriate dashboard based on the role
+=======
+      const response = await fetch("../src/api/authRoutes.php?action=login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        showMessage("loginMessage", "Login successful! Redirecting...", false);
+
+        // Store user data in sessionStorage
+        if (rememberMe) {
+          sessionStorage.setItem("loggedInUser", JSON.stringify(result.user));
+        }
+
+        // redirect depends on role
+>>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
         setTimeout(() => {
           const role = result.user.role;
           let redirectUrl;
@@ -234,6 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 });
+<<<<<<< HEAD
 
 // Export functions for use in other scripts
 async function registerUser(userData) {
@@ -264,3 +308,5 @@ async function loginUser(credentials) {
 
   return await response.json();
 }
+=======
+>>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94

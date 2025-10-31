@@ -101,7 +101,10 @@ class AdminService {
                 $users = $this->userRepository->findAll();
             }
             
+<<<<<<< HEAD
             // Remove password hashes
+=======
+>>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
             foreach ($users as &$user) {
                 unset($user['pass_hash']);
             }

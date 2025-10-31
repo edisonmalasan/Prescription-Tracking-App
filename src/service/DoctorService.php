@@ -26,11 +26,17 @@ class DoctorService {
         $doctorData['pass_hash'] = password_hash($doctorData['password'], PASSWORD_BCRYPT);
         unset($doctorData['password']);
 
+<<<<<<< HEAD
         // Set default values
         $doctorData['role'] = 'DOCTOR';
         $doctorData['created_at'] = date('Y-m-d H:i:s');
 
         // Create doctor
+=======
+        $doctorData['role'] = 'DOCTOR';
+        $doctorData['created_at'] = date('Y-m-d H:i:s');
+
+>>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
         $userId = $this->doctorRepository->create($doctorData);
 
         if ($userId) {
@@ -45,6 +51,7 @@ class DoctorService {
     }
 
     public function getDoctorProfile($userId) {
+<<<<<<< HEAD
         $user = $this->userRepository->findById($userId);
         $doctor = $this->doctorRepository->findByUserId($userId);
         
@@ -134,6 +141,40 @@ class DoctorService {
         } else {
             return ['error' => 'Failed to delete doctor'];
         }
+=======
+        //TODO
+        return;
+    }
+
+    public function updateDoctorProfile($userId, $doctorData) {
+        //TODO
+        return;
+    }
+
+    public function getAllDoctors() {
+        //TODO
+        return;
+    }
+
+    public function getVerifiedDoctors() {
+        //TODO
+        return;
+    }
+
+    public function getDoctorsBySpecialization($specialization) {
+        //TODO
+        return;
+    }
+
+    public function verifyDoctor($userId) {
+        //TODO
+        return;
+    }
+
+    public function deleteDoctor($userId) {
+        //TODO
+        return;
+>>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
     }
 }
 ?>
