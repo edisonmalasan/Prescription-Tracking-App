@@ -1,74 +1,152 @@
 <?php
-/**
- * Patient Service
- * Business logic for patient operations
- */
 
 require_once '../repositories/PatientRepository.php';
 require_once '../repositories/UserRepository.php';
+require_once '../repositories/MedicalRecordRepository.php';
 require_once '../models/patientModel.php';
 
 class PatientService {
     private $patientRepository;
     private $userRepository;
+    private $medicalRecordRepository;
 
     public function __construct() {
         $this->patientRepository = new PatientRepository();
         $this->userRepository = new UserRepository();
+        $this->medicalRecordRepository = new MedicalRecordRepository();
     }
 
-    // Register a new patient
-    public function registerPatient($patientData) {
-        // TODO: Implement patient registration logic
-        return "TODO: Implement registerPatient";
+    public function createPatient($patientData) {
+        if (empty($patientData['email']) || empty($patientData['password'])) {
+            return ['error' => 'Email and password are required'];
+        }
+
+        $existingUser = $this->userRepository->findByEmail($patientData['email']);
+        if ($existingUser) {
+            return ['error' => 'Patient with this email already exists'];
+        }
+
+        $patientData['pass_hash'] = password_hash($patientData['password'], PASSWORD_BCRYPT);
+        unset($patientData['password']); 
+
+        $patientData['role'] = 'PATIENT';
+        $patientData['created_at'] = date('Y-m-d H:i:s');
+
+        $userId = $this->userRepository->create($patientData);
+
+        if ($userId) {
+            $this->patientRepository->create($userId, $patientData);
+            
+            return [
+                'success' => true,
+                'message' => 'Patient registered successfully',
+                'user_id' => $userId
+            ];
+        } else {
+            return ['error' => 'Failed to register patient'];
+        }
     }
 
-    // Get patient profile
-    public function getPatientProfile($patientId) {
-        // TODO: Implement get patient profile logic
-        return;
+    public function getPatientProfile($userId) {
+        $user = $this->userRepository->findById($userId);
+        $patient = $this->patientRepository->findByUserId($userId);
+        
+        if ($user && $patient) {
+            unset($user['pass_hash']);
+            return [
+                'success' => true,
+                'patient' => array_merge($user, $patient)
+            ];
+        } else {
+            return ['error' => 'Patient not found'];
+        }
     }
 
-    // Update patient profile
-    public function updatePatientProfile($patientId, $patientData) {
-        // TODO: Implement patient profile update logic
-        return;
+    public function updatePatientProfile($userId, $patientData) {
+        $existingPatient = $this->patientRepository->findByUserId($userId);
+        if (!$existingPatient) {
+            return ['error' => 'Patient not found'];
+        }
+
+        $patientData['user_id'] = $userId;
+        $result = $this->patientRepository->update($patientData);
+        
+        if ($result !== false) {
+            return [
+                'success' => true,
+                'message' => 'Patient profile updated successfully'
+            ];
+        } else {
+            return ['error' => 'Failed to update patient profile'];
+        }
     }
 
-    // Search patients
-    public function searchPatients($searchTerm) {
-        // TODO: Implement patient search logic
-        return;
+    public function getAllPatients() {
+        $patients = $this->patientRepository->findAll();
+        return [
+            'success' => true,
+            'patients' => $patients
+        ];
     }
 
-    // Get patient medical history
-    public function getPatientMedicalHistory($patientId) {
-        // TODO: Implement get medical history logic
-        return;
+    public function createMedicalRecord($userId, $medicalRecordData) {
+        $medicalRecordData['user_id'] = $userId;
+        $recordId = $this->medicalRecordRepository->create($medicalRecordData);
+        
+        if ($recordId) {
+            return [
+                'success' => true,
+                'message' => 'Medical record created successfully',
+                'record_id' => $recordId
+            ];
+        } else {
+            return ['error' => 'Failed to create medical record'];
+        }
     }
 
-    // Add medical record
-    public function addMedicalRecord($patientId, $medicalData) {
-        // TODO: Implement add medical record logic
-        return;
+    public function getMedicalRecord($userId) {
+        $medicalRecord = $this->medicalRecordRepository->findByUserId($userId);
+        
+        if ($medicalRecord) {
+            return [
+                'success' => true,
+                'medical_record' => $medicalRecord
+            ];
+        } else {
+            return ['error' => 'Medical record not found'];
+        }
     }
 
-    // Get patient prescriptions
-    public function getPatientPrescriptions($patientId) {
-        // TODO: Implement get patient prescriptions logic
-        return;
+    public function updateMedicalRecord($recordId, $medicalRecordData) {
+        $medicalRecordData['record_id'] = $recordId;
+        $result = $this->medicalRecordRepository->update($medicalRecordData);
+        
+        if ($result !== false) {
+            return [
+                'success' => true,
+                'message' => 'Medical record updated successfully'
+            ];
+        } else {
+            return ['error' => 'Failed to update medical record'];
+        }
     }
 
-    // Check for duplicate patients
-    public function checkDuplicatePatient($patientData) {
-        // TODO: Implement duplicate check logic
-        return;
-    }
+    public function deletePatient($userId) {
+        $patient = $this->patientRepository->findByUserId($userId);
+        if (!$patient) {
+            return ['error' => 'Patient not found'];
+        }
 
-    // Get patient notifications
-    public function getPatientNotifications($patientId) {
-        // TODO: Implement get patient notifications logic
-        return;
+        $result = $this->patientRepository->delete($userId);
+        
+        if ($result !== false) {
+            return [
+                'success' => true,
+                'message' => 'Patient deleted successfully'
+            ];
+        } else {
+            return ['error' => 'Failed to delete patient'];
+        }
     }
 }
 ?>

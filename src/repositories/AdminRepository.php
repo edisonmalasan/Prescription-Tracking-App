@@ -1,24 +1,24 @@
 <?php
 
 require_once '../config/db.php';
-require_once '../models/patientModel.php';
+require_once '../models/adminModel.php';
 require_once 'UserRepository.php';
 
-class PatientRepository {
+class AdminRepository {
     private $conn;
-    private $table_name = "patient";
+    private $table_name = "admin";
 
     public function __construct() {
         $database = new Database();
         $this->conn = $database->getConnection();
     }
 
-    public function create($userId, $data = []) {
-        $sql = "INSERT INTO " . $this->table_name . " (user_id, birth_date) VALUES (:user_id, :birth_date)";
+    public function create($userId) {
+        $sql = "INSERT INTO " . $this->table_name . " (user_id, isAdmin) VALUES (:user_id, :isAdmin)";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([
             ':user_id' => $userId,
-            ':birth_date' => $data['birth_date'] ?? ($data['birthDate'] ?? null)
+            ':isAdmin' => 1
         ]);
         return $stmt->rowCount() > 0;
     }
@@ -30,6 +30,7 @@ class PatientRepository {
         return $stmt->fetch();
     }
 
+
     public function findAll() {
         $sql = "SELECT * FROM " . $this->table_name;
         $stmt = $this->conn->prepare($sql);
@@ -37,12 +38,12 @@ class PatientRepository {
         return $stmt->fetchAll();
     }
 
-    public function update($patient) {
-        $sql = "UPDATE " . $this->table_name . " SET birth_date = :birth_date WHERE user_id = :user_id";
+    public function update($admin) {
+        $sql = "UPDATE " . $this->table_name . " SET isAdmin = :isAdmin WHERE user_id = :user_id";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([
-            ':birth_date' => $patient['birth_date'] ?? null,
-            ':user_id' => $patient['user_id'] ?? null,
+            ':isAdmin' => $admin['isAdmin'] ?? 1,
+            ':user_id' => $admin['user_id'] ?? null,
         ]); 
         return $stmt->rowCount() > 0;
     }

@@ -1,17 +1,21 @@
 <?php
 
-require_once '../controllers/DoctorController.php';
+require_once '../controllers/PrescriptionController.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
 // create instance of controller to handle http requests
-$doctorController = new DoctorController();
+$prescriptionController = new PrescriptionController();
 
+// routes
 switch ($method) {
     case 'POST':
         switch ($action) {
-            case 'register':
-                echo $doctorController->register();
+            case 'create':
+                echo $prescriptionController->createPrescription();
+                break;
+            case 'add-detail':
+                echo $prescriptionController->addPrescriptionDetail();
                 break;
             default:
                 http_response_code(404);
@@ -21,17 +25,23 @@ switch ($method) {
         break;
     case 'GET':
         switch ($action) {
-            case 'profile':
-                echo $doctorController->getProfile();
+            case 'get':
+                echo $prescriptionController->getPrescription();
+                break;
+            case 'by-patient':
+                echo $prescriptionController->getPrescriptionsByPatient();
+                break;
+            case 'by-doctor':
+                echo $prescriptionController->getPrescriptionsByDoctor();
                 break;
             case 'all':
-                echo $doctorController->getAllDoctors();
+                echo $prescriptionController->getAllPrescriptions();
                 break;
-            case 'verified':
-                echo $doctorController->getVerifiedDoctors();
+            case 'details':
+                echo $prescriptionController->getPrescriptionDetails();
                 break;
-            case 'specialization':
-                echo $doctorController->getDoctorsBySpecialization();
+            case 'by-status':
+                echo $prescriptionController->getPrescriptionsByStatus();
                 break;
             default:
                 http_response_code(404);
@@ -41,11 +51,11 @@ switch ($method) {
         break;
     case 'PUT':
         switch ($action) {
-            case 'profile':
-                echo $doctorController->updateProfile();
+            case 'update':
+                echo $prescriptionController->updatePrescription();
                 break;
-            case 'verify':
-                echo $doctorController->verifyDoctor();
+            case 'update-status':
+                echo $prescriptionController->updatePrescriptionStatus();
                 break;
             default:
                 http_response_code(404);
@@ -56,7 +66,7 @@ switch ($method) {
     case 'DELETE':
         switch ($action) {
             case 'delete':
-                echo $doctorController->deleteDoctor();
+                echo $prescriptionController->deletePrescription();
                 break;
             default:
                 http_response_code(404);

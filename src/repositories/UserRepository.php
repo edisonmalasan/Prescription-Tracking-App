@@ -1,11 +1,11 @@
 <?php
 
-require_once '../config/db.php';
-require_once '../models/userModel.php';
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../models/userModel.php';
 
 class UserRepository {
     private $conn;
-    private $table_name = "USERS";
+    private $table_name = "users";
 
     public function __construct() {
         $database = new Database();
@@ -17,7 +17,8 @@ class UserRepository {
             // Schema has created_at but no updated_at column; insert without updated_at
             $sql = "INSERT INTO " . $this->table_name . " (last_name, first_name, role, email, contactno, pass_hash, address, created_at) VALUES (:last_name, :first_name, :role, :email, :contactno, :pass_hash, :address, :created_at)";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([
+        
+        $result = $stmt->execute([
             ':last_name' => $data['last_name'] ?? null,
             ':first_name' => $data['first_name'] ?? null,
             ':role' => $data['role'] ?? null,
@@ -27,7 +28,13 @@ class UserRepository {
             ':address' => $data['address'] ?? null,
                 ':created_at' => $data['created_at'] ?? null,
         ]);
-        return $this->conn->lastInsertId();
+        
+        if ($result) {
+            $id = $this->conn->lastInsertId();
+            return $id;
+        } else {
+            return false;
+        }
     }
 
     // Get user by ID
@@ -36,7 +43,8 @@ class UserRepository {
         $sql = "SELECT * FROM " . $this->table_name . " WHERE user_id = :user_id";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([':user_id' => $id]);
-        return $stmt->fetch();
+        $result = $stmt->fetch();
+        return $result;
     }
 
     // Get user by email
@@ -44,14 +52,16 @@ class UserRepository {
         $sql = "SELECT * FROM " . $this->table_name . " WHERE email = :email";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([':email' => $email]);
-        return $stmt->fetch();
+        $result = $stmt->fetch();
+        return $result;
     }
     // Get all users
     public function findAll() {
         $sql = "SELECT * FROM " . $this->table_name;
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
-        return $stmt->fetchAll();
+        $result = $stmt->fetchAll();
+        return $result;
      
     }
 
@@ -60,15 +70,16 @@ class UserRepository {
         $sql = "SELECT * FROM " . $this->table_name . " WHERE role = :role";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([':role' => $role]);
-        return $stmt->fetchAll();
+        $result = $stmt->fetchAll();
+        return $result;
        
     }
 
     // Update user
     public function update($user) {
-        $sql = "UPDATE " . $this->table_name . " SET last_name = :last_name, first_name = :first_name, role = :role, email = :email, contactno = :contactno, pass_hash = :pass_hash, address = :address, updated_at = :updated_at WHERE id = :id";
+        $sql = "UPDATE " . $this->table_name . " SET last_name = :last_name, first_name = :first_name, role = :role, email = :email, contactno = :contactno, pass_hash = :pass_hash, address = :address, updated_at = :updated_at WHERE user_id = :user_id";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([
+        $result = $stmt->execute([
             ':last_name' => $user['last_name'] ?? null,
             ':first_name' => $user['first_name'] ?? null,
             ':role' => $user['role'] ?? null,
@@ -77,19 +88,27 @@ class UserRepository {
             ':pass_hash' => $user['pass_hash'] ?? null,
             ':address' => $user['address'] ?? null,
             ':updated_at' => $user['updated_at'] ?? null,
-            ':id' => $user['id']
+            ':user_id' => $user['user_id'] ?? $user['id']
         ]);
-        return;
-       
+        
+        if ($result) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     // Delete user
     public function delete($id) {
-        $sql = "DELETE FROM " . $this->table_name . " WHERE id = :id";
+        $sql = "DELETE FROM " . $this->table_name . " WHERE user_id = :user_id";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([':id' => $id]);
-        return;
-    
+        $result = $stmt->execute([':user_id' => $id]);
+        
+        if ($result) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     // Search users
@@ -97,7 +116,8 @@ class UserRepository {
         $sql = "SELECT * FROM " . $this->table_name . " WHERE last_name LIKE :searchTerm OR first_name LIKE :searchTerm OR email LIKE :searchTerm";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([':searchTerm' => "%$searchTerm%"]);
-        return $stmt->fetchAll();
+        $result = $stmt->fetchAll();
+        return $result;
     }
 }
 ?>

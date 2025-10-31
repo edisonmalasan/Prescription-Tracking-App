@@ -1,8 +1,4 @@
 <?php
-/**
- * Doctor Service
- * Business logic for doctor operations
- */
 
 require_once '../repositories/DoctorRepository.php';
 require_once '../repositories/UserRepository.php';
@@ -17,39 +13,127 @@ class DoctorService {
         $this->userRepository = new UserRepository();
     }
 
-    public function registerDoctor($doctorData) {
-        // TODO: Implement doctor registration logic
-        return "TODO: Implement registerDoctor";
+    public function createDoctor($doctorData) {
+        if (empty($doctorData['email']) || empty($doctorData['password'])) {
+            return ['error' => 'Email and password are required'];
+        }
+
+        $existingUser = $this->userRepository->findByEmail($doctorData['email']);
+        if ($existingUser) {
+            return ['error' => 'Doctor with this email already exists'];
+        }
+
+        $doctorData['pass_hash'] = password_hash($doctorData['password'], PASSWORD_BCRYPT);
+        unset($doctorData['password']);
+
+        // Set default values
+        $doctorData['role'] = 'DOCTOR';
+        $doctorData['created_at'] = date('Y-m-d H:i:s');
+
+        // Create doctor
+        $userId = $this->doctorRepository->create($doctorData);
+
+        if ($userId) {
+            return [
+                'success' => true,
+                'message' => 'Doctor registered successfully',
+                'user_id' => $userId
+            ];
+        } else {
+            return ['error' => 'Failed to register doctor'];
+        }
     }
 
-    public function verifyDoctor($doctorId) {
-        // TODO: Implement doctor verification logic
-        return "TODO: Implement verifyDoctor";
+    public function getDoctorProfile($userId) {
+        $user = $this->userRepository->findById($userId);
+        $doctor = $this->doctorRepository->findByUserId($userId);
+        
+        if ($user && $doctor) {
+            // Remove password hash from response
+            unset($user['pass_hash']);
+            return [
+                'success' => true,
+                'doctor' => array_merge($user, $doctor)
+            ];
+        } else {
+            return ['error' => 'Doctor not found'];
+        }
     }
 
-    public function getDoctorProfile($doctorId) {
-        // TODO: Implement get doctor profile logic
-        return "TODO: Implement getDoctorProfile";
+    public function updateDoctorProfile($userId, $doctorData) {
+        // Get existing doctor data
+        $existingDoctor = $this->doctorRepository->findByUserId($userId);
+        if (!$existingDoctor) {
+            return ['error' => 'Doctor not found'];
+        }
+
+        // Update doctor-specific data
+        $doctorData['user_id'] = $userId;
+        $result = $this->doctorRepository->update($doctorData);
+        
+        if ($result !== false) {
+            return [
+                'success' => true,
+                'message' => 'Doctor profile updated successfully'
+            ];
+        } else {
+            return ['error' => 'Failed to update doctor profile'];
+        }
     }
 
-    public function updateDoctorProfile($doctorId, $doctorData) {
-        // TODO: Implement doctor profile update logic
-        return "TODO: Implement updateDoctorProfile";
+    public function getAllDoctors() {
+        $doctors = $this->doctorRepository->findAll();
+        return [
+            'success' => true,
+            'doctors' => $doctors
+        ];
     }
 
-    public function searchDoctorsBySpecialization($specialization) {
-        // TODO: Implement doctor search by specialization
-        return "TODO: Implement searchDoctorsBySpecialization";
+    public function getVerifiedDoctors() {
+        $doctors = $this->doctorRepository->findVerified();
+        return [
+            'success' => true,
+            'doctors' => $doctors
+        ];
     }
 
-    // public function getDoctorStatistics($doctorId) {
-    //     // TODO: Implement doctor statistics logic
-    //     return "TODO: Implement getDoctorStatistics";
-    // }
+    public function getDoctorsBySpecialization($specialization) {
+        $doctors = $this->doctorRepository->findBySpecialization($specialization);
+        return [
+            'success' => true,
+            'doctors' => $doctors
+        ];
+    }
 
-    public function getDoctorPatients($doctorId) {
-        // TODO: Implement get doctor's patients logic
-        return "TODO: Implement getDoctorPatients";
+    public function verifyDoctor($userId) {
+        $result = $this->doctorRepository->verifyDoctor($userId);
+        
+        if ($result !== false) {
+            return [
+                'success' => true,
+                'message' => 'Doctor verified successfully'
+            ];
+        } else {
+            return ['error' => 'Failed to verify doctor'];
+        }
+    }
+
+    public function deleteDoctor($userId) {
+        $doctor = $this->doctorRepository->findByUserId($userId);
+        if (!$doctor) {
+            return ['error' => 'Doctor not found'];
+        }
+
+        $result = $this->doctorRepository->delete($userId);
+        
+        if ($result !== false) {
+            return [
+                'success' => true,
+                'message' => 'Doctor deleted successfully'
+            ];
+        } else {
+            return ['error' => 'Failed to delete doctor'];
+        }
     }
 }
 ?>

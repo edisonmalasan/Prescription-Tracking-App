@@ -5,7 +5,7 @@ require_once '../models/drugModel.php';
 
 class DrugRepository {
     private $conn;
-    private $table_name = "DRUG";
+    private $table_name = "drug";
 
     public function __construct() {
         $database = new Database();
@@ -14,18 +14,17 @@ class DrugRepository {
 
     // Create a new drug
     public function create($drug) {
-        $sql = "INSERT INTO " . $this->table_name . " (generic_name, brand_name, category, is_controlled, expiration_date, created_at) VALUES (:generic_name, :brand_name, :category, :is_controlled, :expiration_date, :created_at)";
+        $sql = "INSERT INTO " . $this->table_name . " (generic_name, brand, chemical_name, category, expiry_date, isControlled) VALUES (:generic_name, :brand, :chemical_name, :category, :expiry_date, :isControlled)";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([
-            ':generic_name' => $drug->generic_name,
-            ':brand_name' => $drug->brand_name,
-            ':category' => $drug->category,
-            ':is_controlled' => $drug->is_controlled,
-            ':expiration_date' => $drug->expiration_date,
-            ':created_at' => $drug->created_at
+            ':generic_name' => $drug['generic_name'] ?? '',
+            ':brand' => $drug['brand'] ?? '',
+            ':chemical_name' => $drug['chemical_name'] ?? '',
+            ':category' => $drug['category'] ?? '',
+            ':expiry_date' => $drug['expiry_date'] ?? null,
+            ':isControlled' => $drug['isControlled'] ?? 0
         ]);
         return $this->conn->lastInsertId();
-       
     }
 
     // Get drug by ID
@@ -34,7 +33,6 @@ class DrugRepository {
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([':drug_id' => $id]);
         return $stmt->fetch();
-      
     }
 
     // Get drug by generic name
@@ -43,7 +41,6 @@ class DrugRepository {
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([':generic_name' => $genericName]);
         return $stmt->fetch();
-        
     }
 
     // Get all drugs
@@ -62,9 +59,9 @@ class DrugRepository {
         return $stmt->fetchAll();
     }
 
-    // Get controlled substances
+    // Get controlled drugs
     public function findControlled() {
-        $sql = "SELECT * FROM " . $this->table_name . " WHERE is_controlled = 1";
+        $sql = "SELECT * FROM " . $this->table_name . " WHERE isControlled = 1";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll();
@@ -72,18 +69,18 @@ class DrugRepository {
 
     // Update drug
     public function update($drug) {
-        $sql = "UPDATE " . $this->table_name . " SET generic_name = :generic_name, brand_name = :brand_name, category = :category, is_controlled = :is_controlled, expiration_date = :expiration_date WHERE drug_id = :drug_id";
+        $sql = "UPDATE " . $this->table_name . " SET generic_name = :generic_name, brand = :brand, chemical_name = :chemical_name, category = :category, expiry_date = :expiry_date, isControlled = :isControlled WHERE drug_id = :drug_id";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([
-            ':generic_name' => $drug['generic_name'] ?? null,
-            ':brand_name' => $drug['brand_name'] ?? null,
-            ':category' => $drug['category'] ?? null,
-            ':is_controlled' => $drug['is_controlled'] ?? null,
-            ':expiration_date' => $drug['expiration_date'] ?? null,
+            ':generic_name' => $drug['generic_name'] ?? '',
+            ':brand' => $drug['brand'] ?? '',
+            ':chemical_name' => $drug['chemical_name'] ?? '',
+            ':category' => $drug['category'] ?? '',
+            ':expiry_date' => $drug['expiry_date'] ?? null,
+            ':isControlled' => $drug['isControlled'] ?? 0,
             ':drug_id' => $drug['drug_id'] ?? null,
         ]);
-        return;
-     
+        return $stmt->rowCount() > 0;
     }
 
     // Delete drug
@@ -91,25 +88,15 @@ class DrugRepository {
         $sql = "DELETE FROM " . $this->table_name . " WHERE drug_id = :drug_id";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([':drug_id' => $id]);
-        return;
+        return $stmt->rowCount() > 0;
     }
 
     // Search drugs
     public function search($searchTerm) {
-        $sql = "SELECT * FROM " . $this->table_name . " WHERE generic_name LIKE :searchTerm OR brand_name LIKE :searchTerm";
+        $sql = "SELECT * FROM " . $this->table_name . " WHERE generic_name LIKE :searchTerm OR brand LIKE :searchTerm OR chemical_name LIKE :searchTerm";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([':searchTerm' => '%' . $searchTerm . '%']);
+        $stmt->execute([':searchTerm' => "%$searchTerm%"]);
         return $stmt->fetchAll();
     }
-
-    // Get non-expired drugs
-    public function findNonExpired() {
-        $sql = "SELECT * FROM " . $this->table_name . " WHERE expiration_date > NOW()";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
-
 }
-
 ?>

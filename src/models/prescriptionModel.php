@@ -6,8 +6,6 @@ class PrescriptionModel {
     public $record_id;
     public $prescription_date;
     public $status;
-    public $created_at;
-    public $updated_at;
 
     public function __construct($data = []) {
         if (!empty($data)) {
@@ -16,8 +14,6 @@ class PrescriptionModel {
             $this->record_id = $data['record_id'] ?? null;
             $this->prescription_date = $data['prescription_date'] ?? null;
             $this->status = $data['status'] ?? 'pending';
-            $this->created_at = $data['created_at'] ?? null;
-            $this->updated_at = $data['updated_at'] ?? null;
         }
     }
 
@@ -27,9 +23,7 @@ class PrescriptionModel {
             'prescribing_doctor' => $this->prescribing_doctor,
             'record_id' => $this->record_id,
             'prescription_date' => $this->prescription_date,
-            'status' => $this->status,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'status' => $this->status
         ];
     }
 

@@ -6,7 +6,7 @@ require_once 'UserRepository.php';
 
 class DoctorRepository {
     private $conn;
-    private $table_name = "DOCTOR";
+    private $table_name = "doctor";
 
     public function __construct() {
         $database = new Database();
@@ -96,15 +96,17 @@ class DoctorRepository {
 
     // Update doctor
     public function update($doctor) {
-        $sql = "UPDATE DOCTOR SET name = :name, specialization = :specialization, prc_license = :prc_license WHERE user_id = :user_id";
+        $sql = "UPDATE " . $this->table_name . " SET birth_date = :birth_date, specialization = :specialization, prc_license = :prc_license, clinic_name = :clinic_name, isVerified = :isVerified WHERE user_id = :user_id";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([
-            ':name' => $doctor['name'] ?? null,
+            ':birth_date' => $doctor['birth_date'] ?? null,
             ':specialization' => $doctor['specialization'] ?? null,
             ':prc_license' => $doctor['prc_license'] ?? null,
+            ':clinic_name' => $doctor['clinic_name'] ?? null,
+            ':isVerified' => $doctor['isVerified'] ?? 0,
             ':user_id' => $doctor['user_id'] ?? null,
         ]); 
-        return;
+        return $stmt->rowCount() > 0;
     }
 
     // Delete doctor
@@ -112,7 +114,7 @@ class DoctorRepository {
         $sql = "DELETE FROM " . $this->table_name . " WHERE user_id = :user_id";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([':user_id' => $userId]);
-        return;
+        return $stmt->rowCount() > 0;
     }
 
     
@@ -130,7 +132,7 @@ class DoctorRepository {
         $sql = "UPDATE " . $this->table_name . " SET isVerified = 1 WHERE user_id = :user_id";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([':user_id' => $userId]);
-        return;
+        return $stmt->rowCount() > 0;
     }
 
 }
