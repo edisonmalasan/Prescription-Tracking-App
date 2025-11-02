@@ -13,14 +13,51 @@ class PatientRepository {
         $this->conn = $database->getConnection();
     }
 
-    public function create($userId, $data = []) {
+    // Create a new patient. Accepts array, stdClass, or PatientModel.
+    // If caller provides user_id it will be reused; otherwise a users record will be created.
+    // Returns the user_id on success, or false on failure.
+    public function create($patient) {
+        $data = [];
+        if (is_array($patient)) {
+            $data = $patient;
+        } elseif ($patient instanceof \stdClass) {
+            $data = (array)$patient;
+        } elseif ($patient instanceof PatientModel) {
+            $data = $patient->toArray();
+        }
+
+        $now = date('Y-m-d H:i:s');
+        $userData = [
+            'last_name' => $data['last_name'] ?? null,
+            'first_name' => $data['first_name'] ?? null,
+            'role' => isset($data['role']) ? strtoupper($data['role']) : 'PATIENT',
+            'email' => $data['email'] ?? null,
+            'contactno' => $data['contactno'] ?? null,
+            'pass_hash' => $data['pass_hash'] ?? null,
+            'address' => $data['address'] ?? null,
+            'created_at' => $data['created_at'] ?? $now
+        ];
+
+        // Use provided user_id if available
+        if (!empty($data['user_id'])) {
+            $userId = $data['user_id'];
+        } else {
+            $userRepo = new UserRepository();
+            $userId = $userRepo->create($userData);
+        }
+
         $sql = "INSERT INTO " . $this->table_name . " (user_id, birth_date) VALUES (:user_id, :birth_date)";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([
+        $ok = $stmt->execute([
             ':user_id' => $userId,
             ':birth_date' => $data['birth_date'] ?? ($data['birthDate'] ?? null)
         ]);
-        return $stmt->rowCount() > 0;
+
+        if ($ok && $stmt->rowCount() > 0) {
+            return $userId;
+        }
+
+        return false;
     }
 
     public function findByUserId($userId) {
