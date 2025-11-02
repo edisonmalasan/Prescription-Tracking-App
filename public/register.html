@@ -4,121 +4,122 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Register - Prescription Tracking App</title>
+    <!-- Link to the external CSS file -->
     <link rel="stylesheet" href="./assets/css/register.css" />
   </head>
-  <body>
-    <div class="container">
+  <body class="registration-page">
+    <div class="registration-container">
       <h1>Prescription Tracking App</h1>
+      <p class="subtitle">Register</p>
 
-      <div class="form-section">
-        <h2>Register</h2>
+      <div class="registration-form-container">
         <form id="registrationForm">
-          <input
-            type="text"
-            id="firstName"
-            placeholder="First Name"
-            required
-          /><br />
-          <input
-            type="text"
-            id="lastName"
-            placeholder="Last Name"
-            required
-          /><br />
-          <input
-            type="email"
-            id="regEmail"
-            placeholder="Email"
-            required
-          /><br />
-          <input
-            type="password"
-            id="regPassword"
-            placeholder="Password"
-            required
-          /><br />
-          <input
-            type="password"
-            id="confirmPassword"
-            placeholder="Confirm Password"
-            required
-          /><br />
-          <select id="regRole">
-            <option value="PATIENT">Patient</option>
-            <option value="DOCTOR">Doctor</option>
-            <option value="PHARMACY">Pharmacy</option>
-            <option value="ADMIN">Admin</option></select
-          ><br />
-          <input
-            type="text"
-            id="phoneNumber"
-            placeholder="Phone Number"
-          /><br />
-          <!-- Role-specific fields (hidden by default) -->
-          <div id="patientFields" class="role-fields">
-            <label
-              >Birth Date: <input type="date" id="patientBirthDate" /></label
-            ><br />
+          <div class="form-section">
+            <h2>Create Your Account</h2>
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <input type="text" id="firstName" placeholder="First Name" required />
+            </div>
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input type="text" id="lastName" placeholder="Last Name" required />
+            </div>
+            <div class="form-group">
+              <label for="regEmail">Email</label>
+              <input type="email" id="regEmail" placeholder="Email" required />
+            </div>
+            <div class="form-group">
+              <label for="regPassword">Password</label>
+              <input type="password" id="regPassword" placeholder="Password" required />
+            </div>
+            <div class="form-group">
+              <label for="confirmPassword">Confirm Password</label>
+              <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+            </div>
+            <div class="form-group">
+              <label for="phoneNumber">Phone Number</label>
+              <input type="tel" id="phoneNumber" placeholder="Phone Number" />
+            </div>
+            <div class="form-group">
+              <label for="regRole">Register as:</label>
+              <select id="regRole">
+                <option value="PATIENT">Patient</option>
+                <option value="DOCTOR">Doctor</option>
+                <option value="PHARMACY">Pharmacy</option>
+
+              </select>
+            </div>
           </div>
-          <div id="doctorFields" class="role-fields" style="display: none">
-            <label>Birth Date: <input type="date" id="doctorBirthDate" /></label
-            ><br />
-            <label
-              >Specialization:
-              <input
-                type="text"
-                id="doctorSpecialization"
-                placeholder="Specialization" /></label
-            ><br />
-            <label
-              >PRC License:
-              <input
-                type="text"
-                id="doctorLicense"
-                placeholder="PRC License" /></label
-            ><br />
-            <label
-              >Clinic Name:
-              <input
-                type="text"
-                id="clinicName"
-                placeholder="Clinic Name" /></label
-            ><br />
+
+          <hr class="section-divider" />
+
+          <!-- Role-specific fields -->
+          <div class="form-section role-fields" id="patientFields">
+            <h2>Patient Details</h2>
+            <div class="form-group">
+              <label for="patientBirthDate">Birth Date:</label>
+              <input type="date" id="patientBirthDate" />
+            </div>
           </div>
-          <div id="pharmacyFields" class="role-fields" style="display: none">
-            <label
-              >Pharmacy Name:
-              <input
-                type="text"
-                id="pharmacyName"
-                placeholder="Pharmacy Name" /></label
-            ><br />
-            <label
-              >Pharmacy License:
-              <input
-                type="text"
-                id="pharmacyLicense"
-                placeholder="Pharmacy License" /></label
-            ><br />
-            <label>Open Time: <input type="time" id="openTime" /></label><br />
-            <label>Close Time: <input type="time" id="closeTime" /></label
-            ><br />
+
+          <div class="form-section role-fields" id="doctorFields" style="display: none">
+            <h2>Doctor Details</h2>
+            <div class="form-group">
+              <label for="doctorBirthDate">Birth Date:</label>
+              <input type="date" id="doctorBirthDate" />
+            </div>
+            <div class="form-group">
+              <label for="doctorSpecialization">Specialization:</label>
+              <input type="text" id="doctorSpecialization" placeholder="Specialization" />
+            </div>
+            <div class="form-group">
+              <label for="doctorLicense">PRC License:</label>
+              <input type="text" id="doctorLicense" placeholder="PRC License" />
+            </div>
+            <div class="form-group">
+              <label for="clinicName">Clinic Name:</label>
+              <input type="text" id="clinicName" placeholder="Clinic Name" />
+            </div>
           </div>
-          <label>
+
+          <div class="form-section role-fields" id="pharmacyFields" style="display: none">
+            <h2>Pharmacy Details</h2>
+            <div class="form-group">
+              <label for="pharmacyName">Pharmacy Name:</label>
+              <input type="text" id="pharmacyName" placeholder="Pharmacy Name" />
+            </div>
+            <div class="form-group">
+              <label for="pharmacyLicense">Pharmacy License:</label>
+              <input type="text" id="pharmacyLicense" placeholder="Pharmacy License" />
+            </div>
+            <div class="form-group">
+              <label for="openTime">Open Time:</label>
+              <input type="time" id="openTime" />
+            </div>
+            <div class="form-group">
+              <label for="closeTime">Close Time:</label>
+              <input type="time" id="closeTime" />
+            </div>
+          </div>
+
+          <div class="terms-container">
             <input type="checkbox" id="agreeTerms" required />
-            I agree to the Terms of Service and Privacy Policy </label
-          ><br />
-          <button type="submit">Register</button>
+            <label for="agreeTerms" class="terms-label">I agree to the Terms of Service and Privacy Policy</label>
+          </div>
+
+          <div class="button-group">
+            <button type="button" class="cancel-btn">Cancel</button>
+            <button type="submit" class="register-btn">Register</button>
+          </div>
         </form>
         <div id="registrationMessage"></div>
       </div>
 
-      <div class="form-section">
+      <div class="form-section" style="text-align: center; margin-top: 20px;">
         <p>Already have an account? <a href="login.html">Login here</a></p>
       </div>
     </div>
 
-    <script src="./assets/js/auth.js"></script>
     <script>
       document
         .getElementById("regRole")
@@ -137,5 +138,6 @@
           }
         });
     </script>
+    <script src="./assets/js/auth.js"></script>
   </body>
 </html>
