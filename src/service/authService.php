@@ -15,52 +15,22 @@ class AuthService {
     private $conn;
 
     public function __construct() {
-        $this->userRepo = new UserRepository();
-        $this->doctorRepo = new DoctorRepository();
-        $this->patientRepo = new PatientRepository();
-        $this->pharmacyRepo = new PharmacyRepository();
-        $this->adminRepo = new AdminRepository();
-        $database = new Database();
-        $this->conn = $database->getConnection();
+        try {
+            $this->userRepo = new UserRepository();
+            $this->doctorRepo = new DoctorRepository();
+            $this->patientRepo = new PatientRepository();
+            $this->pharmacyRepo = new PharmacyRepository();
+            $this->adminRepo = new AdminRepository();
+            $database = new Database();
+            $this->conn = $database->getConnection();
+        } catch (PDOException $e) {
+            throw new Exception("Database connection failed");
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     public function register($data) {
-<<<<<<< HEAD
-        
-        if (empty($data['email']) || empty($data['password'])) {
-            return ['error' => 'Email & password required'];
-        }
-
-        $exists = $this->userRepo->findByEmail($data['email']);
-        if ($exists) {
-            return ['error' => 'Email already exists'];
-        }
-
-        $hash = password_hash($data['password'], PASSWORD_BCRYPT);
-
-        $payload = [
-            'last_name'   => $data['last_name'] ?? '',
-            'first_name'  => $data['first_name'] ?? '',
-            'email'       => $data['email'],
-            'role'        => $data['role'] ?? 'PATIENT', // default to patient
-            'contactno'   => $data['contactno'] ?? '',
-            'address'     => $data['address'] ?? '',
-            'pass_hash'   => $hash,
-            'created_at'  => date('Y-m-d H:i:s'),
-        ];
-        $id = $this->userRepo->create($payload);
-        
-        if (!$id) {
-            return ['error' => 'Failed to create user'];
-        }
-    
-        $this->createRoleSpecificRecord($id, $data['role'] ?? 'PATIENT', $data);
-
-        return [
-            'message' => 'Registered successfully',
-            'user_id' => $id
-        ];
-=======
         try {
             if (empty($data['email']) || empty($data['password'])) {
                 return ['error' => 'Email & password required'];
@@ -105,50 +75,41 @@ class AuthService {
         } catch (Exception $e) {
             return ['error' => 'Registration failed: ' . $e->getMessage()];
         }
->>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
     }
 
     public function login($data) {
+        try {
+            if (empty($data['email']) || empty($data['password'])) {
+                return ['error' => 'Email & password required'];
+            }
+            
+            $user = $this->userRepo->findByEmail($data['email']);
+            if (!$user) {
+                return ['error' => 'Account not found'];
+            }
 
-        if (empty($data['email']) || empty($data['password'])) {
-            return ['error' => 'Email & password required'];
-        }
-        
-        $user = $this->userRepo->findByEmail($data['email']);
-        if (!$user) {
-            return ['error' => 'Account not found'];
-        }
+            if (!password_verify($data['password'], $user['pass_hash'])) {
+                return ['error' => 'Invalid password'];
+            }
 
-        if (!password_verify($data['password'], $user['pass_hash'])) {
-            return ['error' => 'Invalid password'];
+            unset($user['pass_hash']);
+            
+            $roleData = $this->getRoleSpecificData($user['user_id'], $user['role']);
+            
+            return [
+                'success' => true,
+                'message' => 'Logged in',
+                'user' => array_merge($user, $roleData)
+            ];
+        } catch (Exception $e) {
+            return ['error' => 'Login failed: ' . $e->getMessage()];
         }
-
-        $roleData = $this->getRoleSpecificData($user['user_id'], $user['role']);
-        
-        return [
-            'message' => 'Logged in',
-            'user' => array_merge($user, $roleData)
-        ];
     }
     
     private function createRoleSpecificRecord($userId, $role, $data) {
-<<<<<<< HEAD
-        switch ($role) {
-            case 'DOCTOR':
-                return $this->doctorRepo->create($data);
-            case 'PATIENT':
-                return $this->patientRepo->create($userId, $data);
-            case 'PHARMACY':
-                return $this->pharmacyRepo->create($userId, $data);
-            case 'ADMIN':
-                return $this->adminRepo->create($userId);
-        }
-        return false;
-=======
         try {
             switch ($role) {
                 case 'DOCTOR':
-                    // Create doctor-specific record only (user already exists)
                     return $this->doctorRepo->createDoctorRecord($userId, $data);
                 case 'PATIENT':
                     return $this->patientRepo->create($userId, $data);
@@ -161,7 +122,6 @@ class AuthService {
         } catch (Exception $e) {
             return false;
         }
->>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
     }
     
     private function getRoleSpecificData($userId, $role) {
