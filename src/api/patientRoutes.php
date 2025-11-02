@@ -4,8 +4,7 @@ require_once '../controllers/PatientController.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
-// create instance of controller to handle http requests
-$patientController = new PatientController()
+$patientController = new PatientController();
 
 switch ($method) {
     case 'POST':

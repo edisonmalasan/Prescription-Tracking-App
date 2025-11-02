@@ -24,6 +24,27 @@ class AdminController {
         return json_encode($result);
     }
 
+    public function getAllPharmacies() {
+        require_once '../repositories/PharmacyRepository.php';
+        $pharmacyRepo = new PharmacyRepository();
+
+        try {
+            $pharmacies = $pharmacyRepo->findAll();
+            $result = [
+                'success' => true,
+                'pharmacies' => $pharmacies
+            ];
+        } catch (Exception $e) {
+            $result = [
+                'success' => false,
+                'error' => 'Error fetching pharmacy data: ' . $e->getMessage()
+            ];
+        }
+        header('Content-Type: application/json');
+        http_response_code(isset($result['error']) ? 500 : 200);
+        return json_encode($result);
+    }
+
     public function getDashboard() {
         $result = $this->adminService->getDashboardData();
         

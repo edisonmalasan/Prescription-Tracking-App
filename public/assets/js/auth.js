@@ -51,11 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-<<<<<<< HEAD
-    // Prepare data for API call
-=======
     // data for api call
->>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
     const formData = {
       first_name: firstName,
       last_name: lastName,
@@ -65,10 +61,6 @@ document.addEventListener("DOMContentLoaded", () => {
       contactno: phoneNumber,
     };
 
-<<<<<<< HEAD
-    // Add role-specific fields
-=======
->>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
     if (role === "PATIENT") {
       formData.birth_date = document.getElementById("patientBirthDate").value;
     } else if (role === "DOCTOR") {
@@ -89,11 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const response = await fetch(
-<<<<<<< HEAD
-        "../../../src/api/authRoutes.php?action=register",
-=======
         "../src/api/authRoutes.php?action=register",
->>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
         {
           method: "POST",
           headers: {
@@ -109,17 +97,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const result = await response.json();
       console.log("Response data:", result);
 
-      if (response.ok) {
+      if (response.ok && result.success) {
         showMessage(
           "registrationMessage",
           "Registration successful! Redirecting to your dashboard...",
           false
         );
 
-<<<<<<< HEAD
-        // After registration, consider the user logged in and store their basic info.
-=======
->>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
         const user = {
           email: formData.email,
           role: formData.role,
@@ -134,32 +118,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
           switch (role) {
             case "PATIENT":
-              redirectUrl = "../patient/dashboard.html";
-              redirectUrl = "./views/patient/dashboard.html";
+              redirectUrl = "../src/views/patient/PatientDashboard.php";
               break;
             case "DOCTOR":
-              redirectUrl = "../doctor/dashboard.html";
-              redirectUrl =
-                "/Prescription-Tracking-App/public/views/doctor/dashboard.html";
+              redirectUrl = "../src/views/doctor/DoctorDashboard.php";
               break;
             case "PHARMACY":
-              redirectUrl = "../pharmacy/dashboard.html";
-              redirectUrl =
-                "/Prescription-Tracking-App/public/views/pharmacy/dashboard.html";
+              redirectUrl = "../src/views/pharmacy/PharmacyDashboard.php";
               break;
             case "ADMIN":
-              redirectUrl = "../admin/dashboard.html";
-              redirectUrl =
-                "/Prescription-Tracking-App/public/views/admin/dashboard.html";
+              redirectUrl = "../src/views/admin/AdminDashboard.php";
               break;
             default:
-<<<<<<< HEAD
-              // Default redirect to login page if role is unknown
-=======
->>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
               redirectUrl = "login.html";
-              redirectUrl =
-                "/Prescription-Tracking-App/public/views/auth/login.html";
               break;
           }
           window.location.href = redirectUrl;
@@ -189,43 +160,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const password = document.getElementById("loginPassword").value;
     const rememberMe = document.getElementById("rememberMe").checked;
 
-<<<<<<< HEAD
-    // Prepare data for API call
-=======
     // prepare input data for api call
->>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
     const formData = {
       email: email,
       password: password,
     };
 
     try {
-<<<<<<< HEAD
-      const response = await fetch(
-        "/Prescription-Tracking-App/src/api/authRoutes.php?action=login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-
-      const result = await response.json();
-
-      if (response.ok) {
-        showMessage("loginMessage", "Login successful! Redirecting...", false);
-
-        // Store user data in localStorage or sessionStorage
-        if (rememberMe) {
-          localStorage.setItem("loggedInUser", JSON.stringify(result.user));
-        } else {
-          sessionStorage.setItem("loggedInUser", JSON.stringify(result.user));
-        }
-
-        // Redirect to the appropriate dashboard based on the role
-=======
       const response = await fetch("../src/api/authRoutes.php?action=login", {
         method: "POST",
         headers: {
@@ -236,32 +177,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const result = await response.json();
 
-      if (response.ok) {
+      if (response.ok && result.success && result.user) {
         showMessage("loginMessage", "Login successful! Redirecting...", false);
 
         // Store user data in sessionStorage
-        if (rememberMe) {
-          sessionStorage.setItem("loggedInUser", JSON.stringify(result.user));
-        }
+        sessionStorage.setItem("loggedInUser", JSON.stringify(result.user));
 
         // redirect depends on role
->>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
         setTimeout(() => {
           const role = result.user.role;
           let redirectUrl;
 
           switch (role) {
             case "PATIENT":
-              redirectUrl = "./views/patient/dashboard.html";
+              redirectUrl = "../src/views/patient/PatientDashboard.php";
               break;
             case "DOCTOR":
-              redirectUrl = "./views/doctor/dashboard.html";
+              redirectUrl = "../src/views/doctor/DoctorDashboard.php";
               break;
             case "PHARMACY":
-              redirectUrl = "./views/pharmacy/dashboard.html";
+              redirectUrl = "../src/views/pharmacy/PharmacyDashboard.php";
               break;
             case "ADMIN":
-              redirectUrl = "./views/admin/dashboard.html";
+              redirectUrl = "../src/views/admin/AdminDashboard.php";
               break;
             default:
               redirectUrl = "./index.html";
@@ -273,40 +211,11 @@ document.addEventListener("DOMContentLoaded", () => {
         showMessage("loginMessage", result.error || "Login failed!", true);
       }
     } catch (error) {
-      showMessage("loginMessage", "An error occurred during login!", true);
+      showMessage(
+        "loginMessage",
+        "An error occurred during login: " + error.message,
+        true
+      );
     }
   }
 });
-<<<<<<< HEAD
-
-// Export functions for use in other scripts
-async function registerUser(userData) {
-  console.log("registerUser called with:", userData);
-
-  const response = await fetch(
-    "../../../src/api/authRoutes.php?action=register",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    }
-  );
-
-  return await response.json();
-}
-
-async function loginUser(credentials) {
-  const response = await fetch("../../../src/api/authRoutes.php?action=login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(credentials),
-  });
-
-  return await response.json();
-}
-=======
->>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94

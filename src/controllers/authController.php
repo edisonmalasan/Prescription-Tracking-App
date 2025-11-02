@@ -9,6 +9,10 @@ class AuthController {
     }
 
     public function register() {
+        if (!headers_sent()) {
+            header('Content-Type: application/json');
+        }
+        
         $data = json_decode(file_get_contents("php://input"), true);
 
         if (empty($data)) {
@@ -17,19 +21,24 @@ class AuthController {
         
         if (empty($data)) {
             http_response_code(400);
-            header('Content-Type: application/json');
-            echo json_encode(['error' => 'No data received']);
-            return;
+            return json_encode(['error' => 'No data received']);
         }
         
-        $result = $this->authService->register($data);
-        
-        header('Content-Type: application/json');
-        http_response_code(isset($result['error']) ? 400 : 201);
-        echo json_encode($result);
+        try {
+            $result = $this->authService->register($data);
+            http_response_code(isset($result['error']) ? 400 : 201);
+            return json_encode($result);
+        } catch (Exception $e) {
+            http_response_code(500);
+            return json_encode(['error' => 'Registration failed: ' . $e->getMessage()]);
+        }
     }
 
     public function login() {
+        if (!headers_sent()) {
+            header('Content-Type: application/json');
+        }
+        
         $data = json_decode(file_get_contents("php://input"), true);
         
         if (empty($data)) {
@@ -38,16 +47,17 @@ class AuthController {
         
         if (empty($data)) {
             http_response_code(400);
-            header('Content-Type: application/json');
-            echo json_encode(['error' => 'No data received']);
-            return;
+            return json_encode(['error' => 'No data received']);
         }
         
-        $result = $this->authService->login($data);
-        
-        header('Content-Type: application/json');
-        http_response_code(isset($result['error']) ? 401 : 200);
-        echo json_encode($result);
+        try {
+            $result = $this->authService->login($data);
+            http_response_code(isset($result['error']) ? 401 : 200);
+            return json_encode($result);
+        } catch (Exception $e) {
+            http_response_code(500);
+            return json_encode(['error' => 'Login failed: ' . $e->getMessage()]);
+        }
     }
 }
 ?>

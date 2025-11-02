@@ -18,16 +18,13 @@ class PrescriptionService {
     }
 
     public function createPrescription($prescriptionData) {
-        // Validate required fields
         if (empty($prescriptionData['prescribing_doctor']) || empty($prescriptionData['record_id'])) {
             return ['error' => 'Prescribing doctor and medical record are required'];
         }
 
-        // Set default values
         $prescriptionData['prescription_date'] = $prescriptionData['prescription_date'] ?? date('Y-m-d');
         $prescriptionData['status'] = $prescriptionData['status'] ?? 'pending';
 
-        // Create prescription
         $prescriptionId = $this->prescriptionRepository->create($prescriptionData);
 
         if ($prescriptionId) {
@@ -45,7 +42,6 @@ class PrescriptionService {
         $prescription = $this->prescriptionRepository->findById($prescriptionId);
         
         if ($prescription) {
-            // Get prescription details
             $details = $this->prescriptionRepository->getPrescriptionDetails($prescriptionId);
             $prescription['details'] = $details;
             
@@ -100,7 +96,6 @@ class PrescriptionService {
     }
 
     public function addPrescriptionDetail($prescriptionId, $detailData) {
-        // Validate required fields
         if (empty($detailData['drug_id'])) {
             return ['error' => 'Drug ID is required'];
         }

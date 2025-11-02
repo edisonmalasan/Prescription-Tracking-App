@@ -3,7 +3,6 @@
 require_once '../controllers/AdminController.php';
 $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
-// create instance of controller to handle http requests
 $adminController = new AdminController();
 
 // routes
@@ -29,6 +28,9 @@ switch ($method) {
         switch ($action) {
             case 'dashboard':
                 echo $adminController->getDashboard();
+                break;
+            case 'all-pharmacies':
+                echo $adminController->getAllPharmacies();
                 break;
             case 'all-users':
                 echo $adminController->getAllUsers();

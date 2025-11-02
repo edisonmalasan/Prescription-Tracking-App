@@ -47,7 +47,6 @@ class DoctorService {
         $doctor = $this->doctorRepository->findByUserId($userId);
         
         if ($user && $doctor) {
-            // Remove password hash from response
             unset($user['pass_hash']);
             return [
                 'success' => true,
@@ -59,13 +58,11 @@ class DoctorService {
     }
 
     public function updateDoctorProfile($userId, $doctorData) {
-        // Get existing doctor data
         $existingDoctor = $this->doctorRepository->findByUserId($userId);
         if (!$existingDoctor) {
             return ['error' => 'Doctor not found'];
         }
 
-        // Update doctor-specific data
         $doctorData['user_id'] = $userId;
         $result = $this->doctorRepository->update($doctorData);
         

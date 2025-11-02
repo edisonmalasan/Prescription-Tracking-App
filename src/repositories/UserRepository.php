@@ -76,11 +76,7 @@ class UserRepository {
 
     // Update user
     public function update($user) {
-<<<<<<< HEAD
-        $sql = "UPDATE " . $this->table_name . " SET last_name = :last_name, first_name = :first_name, role = :role, email = :email, contactno = :contactno, pass_hash = :pass_hash, address = :address, updated_at = :updated_at WHERE user_id = :user_id";
-=======
         $sql = "UPDATE " . $this->table_name . " SET last_name = :last_name, first_name = :first_name, role = :role, email = :email, contactno = :contactno, pass_hash = :pass_hash, address = :address WHERE user_id = :user_id";
->>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
         $stmt = $this->conn->prepare($sql);
         $result = $stmt->execute([
             ':last_name' => $user['last_name'] ?? null,
@@ -90,10 +86,6 @@ class UserRepository {
             ':contactno' => $user['contactno'] ?? null,
             ':pass_hash' => $user['pass_hash'] ?? null,
             ':address' => $user['address'] ?? null,
-<<<<<<< HEAD
-            ':updated_at' => $user['updated_at'] ?? null,
-=======
->>>>>>> 4658ee03da5d1374ed709d9794f9e156e7665d94
             ':user_id' => $user['user_id'] ?? $user['id']
         ]);
         
