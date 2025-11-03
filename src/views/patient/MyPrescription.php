@@ -7,21 +7,22 @@
     <link rel="stylesheet" href="../../../public/assets/css/patient.css">
 </head>
 <body>
-    <div class="container">
-        <nav class="sidebar">
-            <h2 class="sidebar-header">Patient</h2>
-            <ul class="nav-list">
-                <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'PatientDashboard.php') echo ' active'; ?>">
-                    <a href="PatientDashboard.php">Dashboard</a>
-                </li>
-                <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'MyPrescription.php') echo ' active'; ?>">
-                    <a href="MyPrescription.php">My Prescriptions</a>
-                </li>
-                <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'PatientProfile.php') echo ' active'; ?>">
-                    <a href="PatientProfile.php">Profile</a>
-                </li>
-            </ul>
-        </nav>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <h2>Patient Portal</h2>
+        </div>
+        <ul class="nav-list">
+            <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'PatientDashboard.php') echo ' active'; ?>">
+                <a href="PatientDashboard.php">Dashboard</a>
+            </li>
+            <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'MyPrescription.php') echo ' active'; ?>">
+                <a href="MyPrescription.php">My Prescriptions</a>
+            </li>
+            <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'PatientProfile.php') echo ' active'; ?>">
+                <a href="PatientProfile.php">Profile</a>
+            </li>
+        </ul>
+    </nav>
         
         <main class="main-content">
             <header class="header">
@@ -90,4 +91,5 @@
     <script src="../../../public/assets/js/patient/prescriptions.js"></script>
 </body>
 </html>
+
 
