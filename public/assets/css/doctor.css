@@ -1,0 +1,433 @@
+/* --- Base Styles --- */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #f5f7fb;
+    color: #333;
+}
+
+/* --- Header & Navigation --- */
+header nav {
+    background-color: #004aad;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 40px;
+    align-items: center;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 25px;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+nav ul li a.active,
+nav ul li a:hover {
+    text-decoration: underline;
+}
+
+/* --- Layout --- */
+main {
+    padding: 30px 50px;
+}
+
+h2 {
+    margin-bottom: 20px;
+    color: #004aad;
+}
+
+/* --- Dashboard Stat Cards --- */
+.stats-container, .database-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.stat-card h3 {
+    color: #555;
+}
+
+.stat-card p {
+    font-size: 1.5em;
+    margin-top: 10px;
+    color: #004aad;
+}
+
+/* --- Table Styling --- */
+table, .patient-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td, .patient-table th, .patient-table td {
+    border: 1px solid #ccc;
+    padding: 10px 12px;
+    text-align: center;
+    color: #333;
+}
+
+th, .patient-table th {
+    background-color: #004aad;
+    color: white;
+    font-weight: 600;
+}
+
+.patient-table th {
+    background-color: #e9eef5;
+    color: #1e293b;
+}
+
+.patient-table tbody tr:nth-child(even) {
+    background-color: #f7f9fc;
+}
+
+.patient-table tbody tr:hover {
+    background-color: #eef3fa;
+    transition: 0.2s ease-in-out;
+}
+
+/* --- Buttons --- */
+button, .primary-btn, .secondary-btn, .cancel-btn, .view-btn {
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s ease-in-out;
+}
+
+button {
+    background-color: #004aad;
+    color: white;
+}
+
+button:hover {
+    background-color: #00337a;
+}
+
+.primary-btn {
+    background-color: #007bff;
+    color: white;
+}
+
+.secondary-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.cancel-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+.view-btn {
+    padding: 6px 12px;
+    background-color: #1e88e5;
+    color: white;
+    border-radius: 4px;
+}
+
+.primary-btn:hover,
+.secondary-btn:hover,
+.cancel-btn:hover,
+.view-btn:hover {
+    opacity: 0.9;
+}
+
+/* --- Action Buttons --- */
+.action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-bottom: 20px;
+}
+
+/* --- Patient Management Section --- */
+.patient-management {
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    margin: 2rem;
+}
+
+.search-container {
+    text-align: right;
+    margin-bottom: 1rem;
+}
+
+.search-container input {
+    padding: 8px 14px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 250px;
+    transition: 0.3s;
+}
+
+.search-container input:focus {
+    border-color: #1e88e5;
+    outline: none;
+}
+
+/* --- Status Colors --- */
+.status {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    color: white;
+}
+
+.status.active { background-color: #43a047; }
+.status.pending { background-color: #fbc02d; color: #333; }
+.status.closed { background-color: #e53935; }
+
+/* --- Modals (unified and fixed) --- */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    margin: 6% auto;
+    padding: 25px 30px;
+    border-radius: 10px;
+    width: 420px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.modal-content h3 {
+    margin-bottom: 15px;
+}
+
+.close {
+    float: right;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: red;
+}
+
+/* --- Form Layouts --- */
+.form-actions {
+    margin-top: 15px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* --- Profile Styling (for Doctor Profile page) --- */
+.profile-container {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.profile-info p {
+    margin: 5px 0;
+}
+
+/* --- Utility --- */
+.hidden {
+    display: none;
+}
+/* --- Prescription Management --- */
+.prescription-management {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 25px;
+    margin: 25px auto;
+    width: 90%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.prescription-form label {
+    display: block;
+    font-weight: 600;
+    margin-top: 12px;
+    color: #1e293b;
+}
+
+.prescription-form select,
+.prescription-form input,
+.prescription-form textarea {
+    width: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-top: 6px;
+    font-size: 14px;
+}
+
+.patient-details, .prescription-details {
+    margin-top: 20px;
+    background-color: #f7f9fc;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.hidden {
+    display: none;
+}
+
+.btn-group {
+    margin-top: 15px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.create-btn {
+    background-color: #2563eb;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.cancel-btn {
+    background-color: #dc2626;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.create-btn:hover {
+    background-color: #1e40af;
+}
+
+.cancel-btn:hover {
+    background-color: #b91c1c;
+}
+.form-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1em;
+}
+
+.patient-select-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.add-btn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.add-btn:hover {
+    background-color: #0056b3;
+}
+
+.patient-details {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 1em;
+    margin-bottom: 1.5em;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 0.5em 1em;
+}
+
+.prescription-form .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 1em;
+}
+
+.hidden {
+    display: none;
+}
+
+.button-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.create-btn, .cancel-btn {
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+}
+
+.create-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.cancel-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Modal styling */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.close {
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+}
