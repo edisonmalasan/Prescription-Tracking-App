@@ -13,13 +13,13 @@
     --border-accent: #a0c5d4;
     --border-focus: #6b9fb0;
     
-    /* Spacing */
-    --spacing-xs: 5px;
-    --spacing-sm: 8px;
-    --spacing-md: 15px;
-    --spacing-lg: 20px;
-    --spacing-xl: 25px;
-    --spacing-xxl: 30px;
+    /* Spacing (reduced for tighter layout) */
+    --spacing-xs: 4px;
+    --spacing-sm: 6px;
+    --spacing-md: 10px;
+    --spacing-lg: 12px;
+    --spacing-xl: 16px;
+    --spacing-xxl: 20px;
     
     /* Font Sizes */
     --text-sm: 13px;
@@ -40,54 +40,42 @@ body {
     padding: var(--spacing-lg);
 }
 
-/* Layout */
-.container {
-    max-width: 1400px;
-    margin: 0 auto;
-    background-color: var(--bg-container);
-    border: 2px solid var(--border-main);
+/* Navbar */
+.navbar {
+    background-color: var(--bg-sidebar);
+    border-bottom: 2px solid var(--border-main);
     display: flex;
-    min-height: 600px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--spacing-md);
+    height: 56px;
+    margin-bottom: var(--spacing-md);
 }
 
-/* Navigation */
+.navbar-brand h2 {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: #333;
+}
+
 .nav-list {
+    display: flex;
     list-style: none;
     padding: 0;
     margin: 0;
-}
-
-.sidebar h2.sidebar-header {
-    font-size: var(--text-lg);
-    font-weight: 500;
-    margin: 0;
-    padding: var(--spacing-md);
-}
-
-
-/* Sidebar */
-.sidebar {
-    width: 200px;
-    background-color: var(--bg-sidebar);
-    border-right: 2px solid var(--border-main);
-    padding: var(--spacing-lg);
-}
-
-.sidebar-header {
-    background-color: var(--bg-hover);
-    border: 1px solid var(--border-accent);
-    padding: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
-    font-weight: 600;
-    font-size: var(--text-lg);
+    gap: var(--spacing-md);
 }
 
 .nav-item {
-    padding: 12px var(--spacing-md);
-    margin-bottom: var(--spacing-sm);
-    cursor: pointer;
+    padding: var(--spacing-sm) var(--spacing-md);
     border-radius: 4px;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
+}
+
+.nav-item a {
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
 }
 
 .nav-item.active {
@@ -99,18 +87,39 @@ body {
     background-color: var(--bg-hover);
 }
 
+.navbar-user {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+}
+
+.user-name {
+    font-weight: 500;
+    color: #333;
+}
+
+/* Layout */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background-color: var(--bg-container);
+    border: 2px solid var(--border-main);
+    min-height: calc(100vh - 120px); /* Account for navbar and padding */
+    padding: var(--spacing-lg);
+}
+
 /* Main Content Area */
 .main-content {
     flex: 1;
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md);
     background-color: #f5f5f5;
 }
 
 .header {
     background-color: var(--bg-main);
     border: 1px solid var(--border-light);
-    padding: var(--spacing-md) var(--spacing-lg);
-    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin-bottom: var(--spacing-md);
     font-size: var(--text-lg);
     font-weight: 500;
 }
@@ -126,7 +135,7 @@ body {
     flex: 1;
     background-color: white;
     border: 1px solid #b0b0b0;
-    padding: 20px;
+    padding: var(--spacing-md);
     text-align: center;
     font-size: 14px;
 }
@@ -134,33 +143,25 @@ body {
 .prescription-section {
     background-color: #e3f0f5;
     border: 1px solid #a0c5d4;
-    padding: 20px;
+    padding: var(--spacing-md);
 }
 
 .prescription-title {
     font-weight: 600;
-    margin-bottom: 15px;
+    margin-bottom: calc(var(--spacing-sm) + 4px);
     font-size: 14px;
 }
-
 .prescription-item {
     background-color: white;
     border: 1px solid #b0b0b0;
-    padding: 15px;
+    padding: var(--spacing-sm);
     font-size: 14px;
-}
-
-/* Prescription Section */
-.tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
 }
 
 .tab {
     background-color: white;
     border: 1px solid #a0c5d4;
-    padding: 10px 20px;
+    padding: 8px 14px;
     font-size: 14px;
     cursor: pointer;
     border-radius: 4px;
@@ -179,14 +180,14 @@ body {
 .prescriptions-list {
     background-color: #e3f0f5;
     border: 1px solid #a0c5d4;
-    padding: 20px;
+    padding: var(--spacing-md);
 }
 
 .prescription-card {
     background-color: white;
     border: 1px solid #b0b0b0;
-    padding: 20px;
-    margin-bottom: 15px;
+    padding: var(--spacing-md);
+    margin-bottom: calc(var(--spacing-md) + 4px);
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -206,23 +207,17 @@ body {
     margin-bottom: 10px;
 }
 
-.prescription-details {
-    font-size: 14px;
-    line-height: 1.6;
-}
-
 .prescription-status {
-    margin-left: 20px;
+    margin-left: calc(var(--spacing-md));
 }
-
 .status-badge {
     background-color: #d4e9f0;
     border: 1px solid #a0c5d4;
-    padding: 8px 20px;
+    padding: 6px 14px;
     font-size: 14px;
     cursor: pointer;
     border-radius: 4px;
-    min-width: 100px;
+    min-width: 80px;
 }
 
 .status-badge:hover {
@@ -233,14 +228,14 @@ body {
 .profile-section {
     background-color: var(--bg-section);
     border: 1px solid var(--border-accent);
-    padding: var(--spacing-xl);
-    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
 }
 
 .profile-header {
     display: flex;
     align-items: center;
-    margin-bottom: var(--spacing-xxl);
+    margin-bottom: var(--spacing-xl);
 }
 
 .profile-photo {
