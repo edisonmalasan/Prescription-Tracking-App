@@ -11,9 +11,15 @@
         <nav class="sidebar">
             <h2 class="sidebar-header">Patient</h2>
             <ul class="nav-list">
-                <li class="nav-item active" data-page="PatientDashboard.php">Dashboard</li>
-                <li class="nav-item" data-page="MyPrescriptions.php">My Prescriptions</li>
-                <li class="nav-item" data-page="PatientProfile.php">Profile</li>
+                <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'PatientDashboard.php') echo ' active'; ?>">
+                    <a href="PatientDashboard.php">Dashboard</a>
+                </li>
+                <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'MyPrescription.php') echo ' active'; ?>">
+                    <a href="MyPrescription.php">My Prescriptions</a>
+                </li>
+                <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'PatientProfile.php') echo ' active'; ?>">
+                    <a href="PatientProfile.php">Profile</a>
+                </li>
             </ul>
         </nav>
         
@@ -84,3 +90,4 @@
     <script src="../../../public/assets/js/patient/prescriptions.js"></script>
 </body>
 </html>
+
