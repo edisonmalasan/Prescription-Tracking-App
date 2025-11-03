@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Oct 28, 2025 at 01:18 PM
+-- Generation Time: Oct 29, 2025 at 03:27 AM
 -- Server version: 9.1.0
 -- PHP Version: 8.3.14
 
@@ -48,7 +48,8 @@ CREATE TABLE IF NOT EXISTS `doctor` (
   `prc_license` varchar(100) DEFAULT NULL,
   `clinic_name` varchar(100) DEFAULT NULL,
   `isVerified` tinyint(1) DEFAULT '0',
-  PRIMARY KEY (`user_id`)
+  PRIMARY KEY (`user_id`),
+  UNIQUE KEY `prc_license` (`prc_license`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
@@ -141,7 +142,8 @@ CREATE TABLE IF NOT EXISTS `pharmacy` (
   `close_time` time DEFAULT NULL,
   `dates_open` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`user_id`),
-  UNIQUE KEY `pharmacy_name` (`pharmacy_name`)
+  UNIQUE KEY `pharmacy_name` (`pharmacy_name`),
+  UNIQUE KEY `phar_license` (`phar_license`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
@@ -200,25 +202,26 @@ CREATE TABLE IF NOT EXISTS `users` (
   `first_name` varchar(50) NOT NULL,
   `role` enum('DOCTOR','PATIENT','PHARMACY','ADMIN') NOT NULL,
   `email` varchar(100) NOT NULL,
-  `contactno` varchar(20) DEFAULT NULL,
+  `contactno` int DEFAULT NULL,
   `pass_hash` varchar(255) DEFAULT NULL,
   `address` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`),
-  UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `contactno` (`contactno`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`user_id`, `last_name`, `first_name`, `role`, `email`, `contactno`, `pass_hash`, `address`, `created_at`) VALUES
-(1, 'Gud', 'Fyll', 'DOCTOR', 'feelgood@gmail.com', '0918514237', '111', 'Goodville', '2025-10-25 03:06:32'),
-(2, 'Doe', 'Jane', 'PATIENT', 'jane.doe@example.com', '0918123456', '222', 'Health Street', '2025-10-25 03:06:32'),
-(3, 'Smith', 'John', 'PHARMACY', 'john.smith@pharma.com', '0918111222', '333', 'Pharma Town', '2025-10-25 03:06:32'),
-(4, 'Adams', 'Grace', 'ADMIN', 'grace.adams@sys.com', '0918999888', '444', 'Admin City', '2025-10-25 03:06:32'),
-(5, 'White', 'Ella', 'PATIENT', 'ella.white@example.com', '0918777666', '555', 'Wellness Village', '2025-10-25 03:06:32'),
-(6, 'Strong', 'Jack', 'PATIENT', 'jack.strong@example.com', '0918123123', 'hashedpassword006', 'Resilient Avenue', '2025-10-25 03:13:46');
+(1, 'Gud', 'Fyll', 'DOCTOR', 'feelgood@gmail.com', 918514237, '111', 'Goodville', '2025-10-25 03:06:32'),
+(2, 'Doe', 'Jane', 'PATIENT', 'jane.doe@example.com', 918123456, '222', 'Health Street', '2025-10-25 03:06:32'),
+(3, 'Smith', 'John', 'PHARMACY', 'john.smith@pharma.com', 918111222, '333', 'Pharma Town', '2025-10-25 03:06:32'),
+(4, 'Adams', 'Grace', 'ADMIN', 'grace.adams@sys.com', 918999888, '444', 'Admin City', '2025-10-25 03:06:32'),
+(5, 'White', 'Ella', 'PATIENT', 'ella.white@example.com', 918777666, '555', 'Wellness Village', '2025-10-25 03:06:32'),
+(6, 'Strong', 'Jack', 'PATIENT', 'jack.strong@example.com', 918123123, 'hashedpassword006', 'Resilient Avenue', '2025-10-25 03:13:46');
 
 --
 -- Constraints for dumped tables
