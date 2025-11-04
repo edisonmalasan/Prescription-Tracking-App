@@ -7,68 +7,56 @@
     <link rel="stylesheet" href="../../../public/assets/css/patient.css">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-brand">
-            <h2>Patient Portal</h2>
-        </div>
-        <ul class="nav-list">
-            <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'PatientDashboard.php') echo ' active'; ?>">
-                <a href="PatientDashboard.php">Dashboard</a>
-            </li>
-            <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'MyPrescription.php') echo ' active'; ?>">
-                <a href="MyPrescription.php">My Prescriptions</a>
-            </li>
-            <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'PatientProfile.php') echo ' active'; ?>">
-                <a href="PatientProfile.php">Profile</a>
-            </li>
-        </ul>
-    </nav>
-        
-        <main class="main-content">
-            <header class="header">
-                <?php 
-                // Later you can replace this with actual user data
-                echo "Juan Dela Cruz"; 
-                ?>
-            </header>
-            
+    <header>
+        <nav class="navbar">
+            <h1>Prescription Tracking System</h1>
+            <ul class="nav-links">
+                <li><a href="PatientDashboard.php" class="active">Dashboard</a></li>
+                <li><a href="MyPrescription.php">My Prescriptions</a></li>
+                <li><a href="PatientProfile.php">Profile</a></li>
+                <li><a href="../../../public/login.html">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="dashboard">
+        <section>
+            <h2>Welcome, <?php echo "Juan Dela Cruz"; // Replace with actual user data ?></h2>
+
             <div class="stats-container">
                 <div class="stat-card">
-                    <h3>Total Prescriptions</h3>
-                    <div class="stat-value">
-                        <?php 
-                        // Replace with actual count later
-                        echo "5"; 
-                        ?>
-                    </div>
+                    <h3>Active Prescriptions</h3>
+                    <p id="active-prescriptions">5</p>
                 </div>
                 <div class="stat-card">
                     <h3>My Doctors</h3>
-                    <div class="stat-value">
-                        <?php 
-                        // Replace with actual count later
-                        echo "2"; 
-                        ?>
+                    <p id="total-doctors">2</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Completed Prescriptions</h3>
+                    <p id="completed-prescriptions">3</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Next Appointment</h3>
+                    <p id="next-appointment">--</p>
+                </div>
+            </div>
+
+            <div class="recent-activity">
+                <h3>Recent Prescriptions</h3>
+                <div id="prescription-log">
+                    <?php 
+                    // This will be populated with actual prescription data
+                    ?>
+                    <div class="prescription-item">
+                        <p>Amoxicillin 500mg</p>
+                        <span class="status active">Active</span>
                     </div>
                 </div>
             </div>
-            
-            <div class="prescription-section">
-                <div class="prescription-title">Your Active Prescriptions</div>
-                <?php 
-                // This is a placeholder. Later you can loop through actual prescriptions
-                $samplePrescription = "Amoxicillin 500mg";
-                ?>
-                <div class="prescription-item">
-                    <?php echo $samplePrescription; ?>
-                </div>
-            <?php endif; ?>
-        </main>
-    </div>
+        </section>
+    </main>
 
     <script src="../../../public/assets/js/patient/dashboard.js"></script>
 </body>
 </html>
-
-
-
