@@ -12,8 +12,8 @@
             <h1>Prescription Tracking System</h1>
             <ul>
                 <li><a href="DoctorDashboard.php">Dashboard</a></li>
-                <li><a href="DoctorProfile.php">Patient Management</a></li>
-                <li><a href="PatientManagement.php">Prescriptions</a></li>
+                <li><a href="PatientManagement.php">Patient Management</a></li>
+                <li><a href="PrescriptionManagement.php">Prescriptions</a></li>
                 <li><a href="DoctorProfile.php">Profile</a></li>
                 <li><a href="../../../public/login.html">Logout</a></li>
             </ul>
