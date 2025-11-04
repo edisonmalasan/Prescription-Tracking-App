@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pharmacy Dashboard</title>
+    <title>Pharmacy Prescriptions</title>
     <link rel="stylesheet" href="../../public/assets/css/pharmacy.css">
 </head>
 <body>
@@ -15,7 +15,7 @@
                     <a href="Dashboard.php">Dashboard</a>
                 </li>
                 <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'PrescriptionManagement.php') echo ' active'; ?>">
-                    <a href="prescriptionManagement.php">Prescription Management</a>
+                    <a href="PrescriptionManagement.php">Prescription Management</a>
                 </li>
                 <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'Prescriptions.php') echo ' active'; ?>">
                     <a href="Prescriptions.php">Prescriptions</a>
@@ -31,25 +31,17 @@
         
         <main class="main-content">
             <header class="header">
-                Dashboard
+                Mercury Drug
             </header>
             
             <div class="dashboard-overview">
                 <div class="card">
                     <h3>Pending Rx</h3>
-                    <p>12</p> <!-- Example dynamic data -->
+                    <p>12</p>
                 </div>
                 <div class="card">
                     <h3>Filled Today</h3>
-                    <p>8</p> <!-- Example dynamic data -->
-                </div>
-                <div class="card">
-                    <h3>Active Patients</h3>
-                    <p>45</p> <!-- Example dynamic data -->
-                </div>
-                <div class="card">
-                    <h3>Total Sales (Today)</h3>
-                    <p>$1250</p> <!-- Example dynamic data -->
+                    <p>8</p>
                 </div>
             </div>
 
@@ -64,7 +56,7 @@
                         </div>
                         <div class="action-buttons">
                             <button class="btn btn-view">View</button>
-                            <button class="btn btn-process">Process</button>
+                            <a href="ProcessPrescription.php" class="btn btn-process">Process</a>
                         </div>
                     </div>
                     <div class="prescription-item">
@@ -90,41 +82,7 @@
                         </div>
                     </div>
                 </div>
-                <a href="Prescriptions.php" class="view-all-button">View All</a>
-            </div>
-
-            <div class="recent-activities">
-                <h2 class="section-title">Recent Sales</h2>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Date/Time</th>
-                            <th>Customer</th>
-                            <th>Items</th>
-                            <th>Medicine</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Oct, 17 2025</td>
-                            <td>Juan Dela Cruz</td>
-                            <td>2</td>
-                            <td>Amoxicillin</td>
-                        </tr>
-                        <tr>
-                            <td>Oct, 17 2025</td>
-                            <td>Maria Garcia</td>
-                            <td>2</td>
-                            <td>Losartan</td>
-                        </tr>
-                        <tr>
-                            <td>Oct, 17 2025</td>
-                            <td>Pedro Santos</td>
-                            <td>3</td>
-                            <td>Metformin</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <button class="view-all-button">View All</button>
             </div>
 
         </main>
