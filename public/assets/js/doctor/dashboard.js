@@ -1,181 +1,95 @@
-// ===============================
-// Doctor Dashboard + Prescription Management
-// ===============================
+console.log("Dashboard JS loaded");
 
-// --- Dashboard Stats ---
-document.addEventListener("DOMContentLoaded", () => {
-    const totalPatients = document.getElementById("total-patients");
-    const activePrescriptions = document.getElementById("active-prescriptions");
-    const pendingPrescriptions = document.getElementById("pending-prescriptions");
+const API_BASE = "../../src/api";
 
-    if (totalPatients) totalPatients.textContent = "36";
-    if (activePrescriptions) activePrescriptions.textContent = "12";
-    if (pendingPrescriptions) pendingPrescriptions.textContent = "4";
+async function fetchJSON(url) {
+  const res = await fetch(url);
+  return res.json();
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = JSON.parse(sessionStorage.getItem("loggedInUser"));
+  if (!user || user.role !== "DOCTOR") {
+    window.location.href = "../../../public/login.html";
+    return;
+  }
+
+  await fetchDoctorDashboard(user.user_id);
 });
 
-// --- Search Filter for Patients ---
-const searchInput = document.getElementById('searchPatient');
-const patientList = document.getElementById('patientList');
+async function fetchDoctorDashboard(doctorId) {
+  try {
+    // Fetch data in parallel
+    const [patientsRes, prescriptionsRes] = await Promise.all([
+      fetchJSON(`${API_BASE}/patientRoutes.php?action=all`),
+      fetchJSON(`${API_BASE}/prescriptionRoutes.php?action=all`),
+    ]);
 
-if (searchInput && patientList) {
-    searchInput.addEventListener('keyup', () => {
-        const filter = searchInput.value.toLowerCase();
-        const rows = patientList.getElementsByTagName('tr');
-        Array.from(rows).forEach(row => {
-            const name = row.cells[0].textContent.toLowerCase();
-            row.style.display = name.includes(filter) ? '' : 'none';
-        });
+    const patients = patientsRes.patients || [];
+    const prescriptions = (prescriptionsRes.prescriptions || []).filter(
+      (p) => p.doctor_id == doctorId
+    );
+
+    //map prescription -> patient via medical record
+    const patientMap = {};
+    patients.forEach((p) => {
+      if (p.record_id) patientMap[p.record_id] = p;
     });
+
+    const doctorPatients = prescriptions.map(
+      (pres) => patientMap[pres.record_id]
+    );
+
+    updateStats(doctorPatients, prescriptions);
+    renderTable(prescriptions, patientMap);
+  } catch (error) {
+    console.error("Error loading dashboard:", error);
+  }
 }
 
-// --- Modal Controls ---
-function viewPatient(name, age, contact, medication, dosage, allergies, visits) {
-    document.getElementById('modalName').textContent = name;
-    document.getElementById('modalAge').textContent = age;
-    document.getElementById('modalContact').textContent = contact;
-    document.getElementById('modalMedication').textContent = medication;
-    document.getElementById('modalDosage').textContent = dosage;
-    document.getElementById('modalAllergies').textContent = allergies;
-    document.getElementById('modalVisits').textContent = visits;
-    document.getElementById('patientModal').style.display = 'block';
+function updateStats(patients, prescriptions) {
+  const setText = (id, val) =>
+    (document.getElementById(id).textContent = val ?? "-");
+
+  setText("total-patients", new Set(patients.filter(Boolean).map(p => p.user_id)).size);
+  setText("total-prescriptions", prescriptions.length);
+
+  const now = new Date();
+  const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const prescriptionsThisWeek = prescriptions.filter(
+    (p) => new Date(p.created_at) >= startOfWeek
+  );
+  const prescriptionsThisMonth = prescriptions.filter(
+    (p) => new Date(p.created_at) >= startOfMonth
+  );
+
+  setText("total-week", prescriptionsThisWeek.length);
+  setText("total-month", prescriptionsThisMonth.length);
 }
 
-function closeModal() {
-    document.getElementById('patientModal').style.display = 'none';
+function renderTable(prescriptions, patientMap) {
+  const tableBody = document.querySelector(".patient-tbody");
+  if (!tableBody) return;
+
+  tableBody.innerHTML = "";
+
+  if (!prescriptions.length) {
+    tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No prescriptions found</td></tr>`;
+    return;
+  }
+
+  prescriptions.forEach((p, index) => {
+    const patient = patientMap[p.record_id];
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${patient ? `${patient.first_name} ${patient.last_name}` : "Unknown"}</td>
+      <td>${p.medicine_name || "-"}</td>
+      <td>${p.dosage || "-"}</td>
+      <td>${p.created_at ? new Date(p.created_at).toLocaleDateString() : "-"}</td>
+    `;
+    tableBody.appendChild(row);
+  });
 }
-
-window.onclick = function(event) {
-    const modal = document.getElementById('patientModal');
-    const addPatientModal = document.getElementById('addPatientModal');
-    if (event.target === modal) modal.style.display = 'none';
-    if (event.target === addPatientModal) addPatientModal.style.display = 'none';
-};
-
-// --- Sample Patient Data ---
-const patientData = {
-    "PT001": {
-        name: "Maria Santos",
-        age: 29,
-        contact: "09123456789",
-        allergies: "None",
-        medications: "Amlodipine 5mg"
-    },
-    "PT002": {
-        name: "Juan Dela Cruz",
-        age: 35,
-        contact: "09998887777",
-        allergies: "Penicillin",
-        medications: "Metformin 500mg"
-    }
-};
-
-// --- Load Selected Patient ---
-function loadPatientDetails() {
-    const select = document.getElementById('selectPatient');
-    const id = select.value;
-    const patient = patientData[id];
-    const details = document.getElementById('patientDetails');
-    const prescription = document.getElementById('prescriptionDetails');
-
-    if (patient) {
-        document.getElementById('pFullName').innerText = patient.name;
-        document.getElementById('pAge').innerText = patient.age;
-        document.getElementById('pContact').innerText = patient.contact;
-        document.getElementById('pAllergies').innerText = patient.allergies;
-        document.getElementById('pMedications').innerText = patient.medications;
-
-        details.classList.remove('hidden');
-        prescription.classList.remove('hidden');
-    } else {
-        details.classList.add('hidden');
-        prescription.classList.add('hidden');
-    }
-}
-
-// --- Create / Cancel Prescription ---
-const createForm = document.getElementById("createPrescriptionForm");
-if (createForm) {
-    const createBtn = document.getElementById("createPrescriptionBtn");
-    const cancelBtn = document.getElementById("cancelPrescriptionBtn");
-
-    createBtn?.addEventListener("click", () => {
-        alert("✅ Prescription created successfully!");
-        createForm.reset();
-    });
-
-    cancelBtn?.addEventListener("click", () => {
-        createForm.reset();
-    });
-}
-
-// --- Add Patient Modal Logic ---
-const addPatientModal = document.getElementById("addPatientModal");
-const addPatientBtn = document.getElementById("addPatientBtn");
-const closeAddPatient = document.getElementById("closeAddPatient");
-const cancelAddPatient = document.getElementById("cancelAddPatient");
-const addPatientForm = document.getElementById("addPatientForm");
-
-addPatientBtn?.addEventListener("click", () => addPatientModal.style.display = "block");
-closeAddPatient?.addEventListener("click", () => addPatientModal.style.display = "none");
-cancelAddPatient?.addEventListener("click", () => addPatientModal.style.display = "none");
-
-addPatientForm?.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const name = document.getElementById("newPatientName").value;
-    const age = document.getElementById("newPatientAge").value;
-    const contact = document.getElementById("newPatientContact").value;
-    const allergies = document.getElementById("newPatientAllergies").value;
-    const meds = document.getElementById("newPatientMedications").value;
-
-    const id = `PT${Math.floor(Math.random() * 1000).toString().padStart(3, "0")}`;
-    patientData[id] = { name, age, contact, allergies, medications: meds };
-
-    const select = document.getElementById("selectPatient");
-    const newOption = document.createElement("option");
-    newOption.value = id;
-    newOption.textContent = name;
-    select.appendChild(newOption);
-
-    alert(`${name} has been added to the patient list!`);
-    addPatientModal.style.display = "none";
-    addPatientForm.reset();
-});
-// ===============================
-// Doctor Profile Logic
-// ===============================
-document.addEventListener("DOMContentLoaded", () => {
-    const editBtn = document.getElementById("editProfileBtn");
-    const formCard = document.getElementById("editProfileForm");
-    const cancelBtn = document.getElementById("cancelProfileBtn");
-    const saveBtn = document.getElementById("saveProfileBtn");
-    const changePhotoBtn = document.getElementById("changePhotoBtn");
-    const uploadImage = document.getElementById("uploadImage");
-    const doctorImage = document.getElementById("doctorImage");
-
-    editBtn.addEventListener("click", () => {
-        formCard.classList.remove("hidden");
-        window.scrollTo({ top: formCard.offsetTop, behavior: "smooth" });
-    });
-
-    cancelBtn.addEventListener("click", () => {
-        formCard.classList.add("hidden");
-    });
-
-    saveBtn.addEventListener("click", () => {
-        alert("Profile updated successfully!");
-        formCard.classList.add("hidden");
-    });
-
-    changePhotoBtn.addEventListener("click", () => uploadImage.click());
-
-    uploadImage.addEventListener("change", function() {
-        const file = this.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = e => doctorImage.src = e.target.result;
-            reader.readAsDataURL(file);
-        }
-    });
-});
-
