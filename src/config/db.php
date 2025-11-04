@@ -7,18 +7,20 @@ class Database {
     private $password = '';
     private $conn;
 
-     public function getConnection() {
+      public function getConnection() {
         $this->conn = null;
         try {
-            $dsn = "mysql:host={$this->host};dbname={$this->db_name};charset=utf8mb4";
-            $this->conn = new PDO($dsn, $this->username, $this->password, [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            ]);
-        } catch (PDOException $e) {
+            $this->conn = new mysqli($this->host, $this->username, $this->password, $this->db_name);
+            
+            if ($this->conn->connect_error) {
+            throw new Exception("Database connection failed: " . $this->conn->connect_error);
+            }
+            if (! $this->conn->set_charset('utf8mb4')) {
+            throw new Exception("Error setting charset: " . $this->conn->error);
+            }
+        } catch (Exception $e) {
             throw new Exception("Database connection failed: " . $e->getMessage());
         }
-
         return $this->conn;
     }
 }
