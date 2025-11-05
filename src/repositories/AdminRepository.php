@@ -13,46 +13,107 @@ class AdminRepository {
         $this->conn = $database->getConnection();
     }
 
-    public function create($userId) {
-        $sql = "INSERT INTO " . $this->table_name . " (user_id, isAdmin) VALUES (:user_id, :isAdmin)";
+    //create a new admin 
+    public function create($admin) {
+        $data = [];
+        if (is_array($admin)) {
+            $data = $admin;
+        } elseif ($admin instanceof \stdClass) {
+            $data = (array)$admin;
+        }
+
+        $now = date('Y-m-d H:i:s');
+        $userData = [
+            'last_name' => $data['last_name'] ?? null,
+            'first_name' => $data['first_name'] ?? null,
+            'role' => isset($data['role']) ? strtoupper($data['role']) : 'ADMIN',
+            'email' => $data['email'] ?? null,
+            'contactno' => $data['contactno'] ?? null,
+            'pass_hash' => $data['pass_hash'] ?? null,
+            'address' => $data['address'] ?? null,
+            'created_at' => $data['created_at'] ?? $now
+        ];
+
+        if (!empty($data['user_id'])) {
+            $userId = $data['user_id'];
+        } else {
+            $userRepo = new UserRepository();
+            $userId = $userRepo->create($userData);
+        }
+
+        $sql = "INSERT INTO " . $this->table_name . " (user_id, isAdmin) VALUES (?, ?)";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([
-            ':user_id' => $userId,
-            ':isAdmin' => 1
-        ]);
-        return $stmt->rowCount() > 0;
+        if (! $stmt) {
+            return false;
+        }
+
+        $isAdmin = 1;
+        $stmt->bind_param('ii', $userId, $isAdmin);
+        $ok = $stmt->execute();
+
+        if ($ok && $stmt->affected_rows > 0) {
+            return $userId;
+        }
+
+        return false;
     }
 
+
+    // Get admin by user ID
     public function findByUserId($userId) {
-        $sql = "SELECT * FROM " . $this->table_name . " WHERE user_id = :user_id";
+        $sql = "SELECT * FROM " . $this->table_name . " WHERE user_id = ?";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([':user_id' => $userId]);
-        return $stmt->fetch();
+        if (! $stmt) {
+            return null;
+        }
+        $stmt->bind_param('i', $userId);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        if ($res) {
+            return $res->fetch_assoc();
+        }
+        return null;
     }
 
-
+    // Get all admins
     public function findAll() {
         $sql = "SELECT * FROM " . $this->table_name;
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $res = $this->conn->query($sql);
+        if ($res) {
+            return $res->fetch_all(MYSQLI_ASSOC);
+        }
+        return [];
     }
 
+    // Update admin
     public function update($admin) {
-        $sql = "UPDATE " . $this->table_name . " SET isAdmin = :isAdmin WHERE user_id = :user_id";
+        $sql = "UPDATE " . $this->table_name . " SET isAdmin = ? WHERE user_id = ?";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([
-            ':isAdmin' => $admin['isAdmin'] ?? 1,
-            ':user_id' => $admin['user_id'] ?? null,
-        ]); 
-        return $stmt->rowCount() > 0;
+        if (! $stmt) {
+            return false;
+        }
+
+        $isAdmin = isset($admin['isAdmin']) ? (int)$admin['isAdmin'] : 1;
+        $user_id = $admin['user_id'] ?? null;
+        if ($user_id === null) {
+            return false;
+        }
+
+        $stmt->bind_param('ii', $isAdmin, $user_id);
+        $stmt->execute();
+        return ($stmt->affected_rows > 0);
     }
 
+    // Delete admin
     public function delete($userId) {
-        $sql = "DELETE FROM " . $this->table_name . " WHERE user_id = :user_id";
+        $sql = "DELETE FROM " . $this->table_name . " WHERE user_id = ?";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([':user_id' => $userId]);
-        return $stmt->rowCount() > 0;
+        if (! $stmt) {
+            return false;
+        }
+        $stmt->bind_param('i', $userId);
+        $stmt->execute();
+        return ($stmt->affected_rows > 0);
     }
 }
 ?>

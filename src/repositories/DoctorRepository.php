@@ -27,7 +27,6 @@ class DoctorRepository {
         $userData = [
             'last_name' => $data['last_name'] ?? ($data['lastName'] ?? null),
             'first_name' => $data['first_name'] ?? ($data['firstName'] ?? null),
-            // schema uses uppercase enum values (e.g. 'DOCTOR') in some DB dumps; normalize to uppercase
             'role' => isset($data['role']) ? strtoupper($data['role']) : 'DOCTOR',
             'email' => $data['email'] ?? null,
             'contactno' => $data['contactno'] ?? ($data['contactNo'] ?? null),
@@ -36,117 +35,164 @@ class DoctorRepository {
             'created_at' => $data['created_at'] ?? $now
         ];
 
-        // If caller already provided a user_id, use it instead of creating a new user
         if (!empty($data['user_id'])) {
             $userId = $data['user_id'];
         } else {
-            // Create user record first
             $userRepo = new UserRepository();
             $userId = $userRepo->create($userData);
         }
 
-        // Now insert doctor-specific data
-        $sql = "INSERT INTO " . $this->table_name . " (user_id, birth_date, specialization, prc_license, clinic_name, isVerified) VALUES (:user_id, :birth_date, :specialization, :prc_license, :clinic_name, :isVerified)";
+        $sql = "INSERT INTO " . $this->table_name . " (user_id, birth_date, specialization, prc_license, clinic_name, isVerified) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([
-            ':user_id' => $userId,
-            ':birth_date' => $data['birth_date'] ?? ($data['birthDate'] ?? null),
-            ':specialization' => $data['specialization'] ?? null,
-            ':prc_license' => $data['prc_license'] ?? ($data['prcLicense'] ?? null),
-            ':clinic_name' => $data['clinic_name'] ?? ($data['clinicName'] ?? null),
-            ':isVerified' => isset($data['isVerified']) ? (int)$data['isVerified'] : (isset($data['verified']) ? (int)$data['verified'] : 0)
-        ]);
+        if (! $stmt) {
+            return $userId;
+        }
 
-        // Return the created user_id to indicate success
+        $birth_date = $data['birth_date'] ?? ($data['birthDate'] ?? null);
+        $specialization = $data['specialization'] ?? null;
+        $prc_license = $data['prc_license'] ?? ($data['prcLicense'] ?? null);
+        $clinic_name = $data['clinic_name'] ?? ($data['clinicName'] ?? null);
+        $isVerified = isset($data['isVerified']) ? (int)$data['isVerified'] : (isset($data['verified']) ? (int)$data['verified'] : 0);
+
+        $stmt->bind_param('issssi', $userId, $birth_date, $specialization, $prc_license, $clinic_name, $isVerified);
+        $stmt->execute();
         return $userId;
     }
 
-    // Create doctor-specific record only (user already exists)
     public function createDoctorRecord($userId, $data) {
-        $sql = "INSERT INTO " . $this->table_name . " (user_id, birth_date, specialization, prc_license, clinic_name, isVerified) VALUES (:user_id, :birth_date, :specialization, :prc_license, :clinic_name, :isVerified)";
+        $sql = "INSERT INTO " . $this->table_name . " (user_id, birth_date, specialization, prc_license, clinic_name, isVerified) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($sql);
-        $result = $stmt->execute([
-            ':user_id' => $userId,
-            ':birth_date' => $data['birth_date'] ?? ($data['birthDate'] ?? null),
-            ':specialization' => $data['specialization'] ?? null,
-            ':prc_license' => $data['prc_license'] ?? ($data['prcLicense'] ?? null),
-            ':clinic_name' => $data['clinic_name'] ?? ($data['clinicName'] ?? null),
-            ':isVerified' => isset($data['isVerified']) ? (int)$data['isVerified'] : (isset($data['verified']) ? (int)$data['verified'] : 0)
-        ]);
+        if (! $stmt) {
+            return false;
+        }
 
-        return $result;
+        $birth_date = $data['birth_date'] ?? ($data['birthDate'] ?? null);
+        $specialization = $data['specialization'] ?? null;
+        $prc_license = $data['prc_license'] ?? ($data['prcLicense'] ?? null);
+        $clinic_name = $data['clinic_name'] ?? ($data['clinicName'] ?? null);
+        $isVerified = isset($data['isVerified']) ? (int)$data['isVerified'] : (isset($data['verified']) ? (int)$data['verified'] : 0);
+
+        $stmt->bind_param('issssi', $userId, $birth_date, $specialization, $prc_license, $clinic_name, $isVerified);
+        $res = $stmt->execute();
+
+        return (bool) $res;
     }
     public function findByUserId($userId) {
-        $sql = "SELECT * FROM " . $this->table_name . " WHERE user_id = :user_id";
+        $sql = "SELECT * FROM " . $this->table_name . " WHERE user_id = ?";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([':user_id' => $userId]);
-        return $stmt->fetch();
+        if (! $stmt) {
+            return null;
+        }
+        $stmt->bind_param('i', $userId);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        if ($res) {
+            return $res->fetch_assoc();
+        }
+        return null;
     }
 
     // Get doctor by PRC license
     public function findByPrcLicense($license) {
-        $sql = "SELECT * FROM " . $this->table_name . " WHERE prc_license = :prc_license";
+        $sql = "SELECT * FROM " . $this->table_name . " WHERE prc_license = ?";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([':prc_license' => $license]);
-        return $stmt->fetch();
+        if (! $stmt) {
+            return null;
+        }
+        $stmt->bind_param('s', $license);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        if ($res) {
+            return $res->fetch_assoc();
+        }
+        return null;
      
     }
 
     // Get all doctors
     public function findAll() {
         $sql = "SELECT * FROM " . $this->table_name;
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $res = $this->conn->query($sql);
+        if ($res) {
+            return $res->fetch_all(MYSQLI_ASSOC);
+        }
+        return [];
     }
 
     // Get verified doctors
     public function findVerified() {
         $sql = "SELECT * FROM " . $this->table_name . " WHERE isVerified = 1";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $res = $this->conn->query($sql);
+        if ($res) {
+            return $res->fetch_all(MYSQLI_ASSOC);
+        }
+        return [];
     }
 
     // Update doctor
     public function update($doctor) {
-        $sql = "UPDATE " . $this->table_name . " SET birth_date = :birth_date, specialization = :specialization, prc_license = :prc_license, clinic_name = :clinic_name, isVerified = :isVerified WHERE user_id = :user_id";
+        $sql = "UPDATE " . $this->table_name . " SET birth_date = ?, specialization = ?, prc_license = ?, clinic_name = ?, isVerified = ? WHERE user_id = ?";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([
-            ':birth_date' => $doctor['birth_date'] ?? null,
-            ':specialization' => $doctor['specialization'] ?? null,
-            ':prc_license' => $doctor['prc_license'] ?? null,
-            ':clinic_name' => $doctor['clinic_name'] ?? null,
-            ':isVerified' => $doctor['isVerified'] ?? 0,
-            ':user_id' => $doctor['user_id'] ?? null,
-        ]); 
-        return $stmt->rowCount() > 0;
+        if (! $stmt) {
+            return false;
+        }
+
+        $birth_date = $doctor['birth_date'] ?? null;
+        $specialization = $doctor['specialization'] ?? null;
+        $prc_license = $doctor['prc_license'] ?? null;
+        $clinic_name = $doctor['clinic_name'] ?? null;
+        $isVerified = isset($doctor['isVerified']) ? (int)$doctor['isVerified'] : 0;
+        $user_id = $doctor['user_id'] ?? null;
+
+        if ($user_id === null) {
+            return false;
+        }
+
+        $stmt->bind_param('ssssii', $birth_date, $specialization, $prc_license, $clinic_name, $isVerified, $user_id);
+        $stmt->execute();
+        return ($stmt->affected_rows > 0);
     }
 
     // Delete doctor
     public function delete($userId) {
-        $sql = "DELETE FROM " . $this->table_name . " WHERE user_id = :user_id";
+        $sql = "DELETE FROM " . $this->table_name . " WHERE user_id = ?";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([':user_id' => $userId]);
-        return $stmt->rowCount() > 0;
+        if (! $stmt) {
+            return false;
+        }
+        $stmt->bind_param('i', $userId);
+        $stmt->execute();
+        return ($stmt->affected_rows > 0);
     }
 
     
 
     // Search doctors by specialization
     public function findBySpecialization($specialization) {
-        $sql = "SELECT * FROM " . $this->table_name . " WHERE specialization = :specialization";
+        $sql = "SELECT * FROM " . $this->table_name . " WHERE specialization = ?";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([':specialization' => $specialization]);
-        return $stmt->fetchAll();
+        if (! $stmt) {
+            return [];
+        }
+        $stmt->bind_param('s', $specialization);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        if ($res) {
+            return $res->fetch_all(MYSQLI_ASSOC);
+        }
+        return [];
     }
 
     // Verify doctor
     public function verifyDoctor($userId) {
-        $sql = "UPDATE " . $this->table_name . " SET isVerified = 1 WHERE user_id = :user_id";
+        $sql = "UPDATE " . $this->table_name . " SET isVerified = 1 WHERE user_id = ?";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([':user_id' => $userId]);
-        return $stmt->rowCount() > 0;
+        if (! $stmt) {
+            return false;
+        }
+        $stmt->bind_param('i', $userId);
+        $stmt->execute();
+        return ($stmt->affected_rows > 0);
     }
 
 }

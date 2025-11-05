@@ -13,9 +13,7 @@ class PatientRepository {
         $this->conn = $database->getConnection();
     }
 
-    // Create a new patient. Accepts array, stdClass, or PatientModel.
-    // If caller provides user_id it will be reused; otherwise a users record will be created.
-    // Returns the user_id on success, or false on failure.
+
     public function create($patient) {
         $data = [];
         if (is_array($patient)) {
@@ -46,14 +44,17 @@ class PatientRepository {
             $userId = $userRepo->create($userData);
         }
 
-        $sql = "INSERT INTO " . $this->table_name . " (user_id, birth_date) VALUES (:user_id, :birth_date)";
+        $sql = "INSERT INTO " . $this->table_name . " (user_id, birth_date) VALUES (?, ?)";
         $stmt = $this->conn->prepare($sql);
-        $ok = $stmt->execute([
-            ':user_id' => $userId,
-            ':birth_date' => $data['birth_date'] ?? ($data['birthDate'] ?? null)
-        ]);
+        if (! $stmt) {
+            return false;
+        }
 
-        if ($ok && $stmt->rowCount() > 0) {
+        $birth_date = $data['birth_date'] ?? ($data['birthDate'] ?? null);
+        $stmt->bind_param('is', $userId, $birth_date);
+        $ok = $stmt->execute();
+
+        if ($ok && $stmt->affected_rows > 0) {
             return $userId;
         }
 
@@ -61,34 +62,56 @@ class PatientRepository {
     }
 
     public function findByUserId($userId) {
-        $sql = "SELECT * FROM " . $this->table_name . " WHERE user_id = :user_id";
+        $sql = "SELECT * FROM " . $this->table_name . " WHERE user_id = ?";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([':user_id' => $userId]);
-        return $stmt->fetch();
+        if (! $stmt) {
+            return null;
+        }
+        $stmt->bind_param('i', $userId);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        if ($res) {
+            return $res->fetch_assoc();
+        }
+        return null;
     }
 
     public function findAll() {
         $sql = "SELECT * FROM " . $this->table_name;
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $res = $this->conn->query($sql);
+        if ($res) {
+            return $res->fetch_all(MYSQLI_ASSOC);
+        }
+        return [];
     }
 
     public function update($patient) {
-        $sql = "UPDATE " . $this->table_name . " SET birth_date = :birth_date WHERE user_id = :user_id";
+        $sql = "UPDATE " . $this->table_name . " SET birth_date = ? WHERE user_id = ?";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([
-            ':birth_date' => $patient['birth_date'] ?? null,
-            ':user_id' => $patient['user_id'] ?? null,
-        ]); 
-        return $stmt->rowCount() > 0;
+        if (! $stmt) {
+            return false;
+        }
+
+        $birth_date = $patient['birth_date'] ?? null;
+        $user_id = $patient['user_id'] ?? null;
+        if ($user_id === null) {
+            return false;
+        }
+
+        $stmt->bind_param('si', $birth_date, $user_id);
+        $stmt->execute();
+        return ($stmt->affected_rows > 0);
     }
 
     public function delete($userId) {
-        $sql = "DELETE FROM " . $this->table_name . " WHERE user_id = :user_id";
+        $sql = "DELETE FROM " . $this->table_name . " WHERE user_id = ?";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([':user_id' => $userId]);
-        return $stmt->rowCount() > 0;
+        if (! $stmt) {
+            return false;
+        }
+        $stmt->bind_param('i', $userId);
+        $stmt->execute();
+        return ($stmt->affected_rows > 0);
     }
 }
 ?>

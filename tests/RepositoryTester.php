@@ -5,10 +5,42 @@ chdir(__DIR__ . '/../src/repositories');
 require_once 'UserRepository.php';
 require_once 'DoctorRepository.php';
 require_once 'PatientRepository.php';
+require_once 'PharmacyRepository.php';
+require_once 'AdminRepository.php';
+require_once 'DrugRepository.php';
+require_once 'MedicalRecordRepository.php';
+require_once 'PrescriptionRepository.php';
 
 date_default_timezone_set('UTC');
 
 try {
+	// Simple check helpers for fetch/search functions
+	function checkExists($label, $val) {
+		if ($val === null || $val === false) {
+			echo "[FAIL] $label returned null/false\n";
+			return false;
+		}
+		if (is_array($val) && count($val) === 0) {
+			echo "[FAIL] $label returned empty array\n";
+			return false;
+		}
+		echo "[PASS] $label returned result\n";
+		return true;
+	}
+
+	function checkArray($label, $arr) {
+		if (!is_array($arr)) {
+			echo "[FAIL] $label did not return an array\n";
+			return false;
+		}
+		if (count($arr) === 0) {
+			echo "[FAIL] $label returned empty array\n";
+			return false;
+		}
+		echo "[PASS] $label returned " . count($arr) . " rows\n";
+		return true;
+	}
+
 	$userRepo = new UserRepository();
 
 	$now = date('Y-m-d H:i:s');
@@ -28,6 +60,7 @@ try {
 
 	echo "Checking for existing user...\n";
 	$existing = $userRepo->findByEmail($userData['email']);
+	checkExists('UserRepository::findByEmail', $existing);
 	if ($existing) {
 		$userId = $existing['user_id'];
 		echo "User already exists with ID: $userId\n";
@@ -61,7 +94,9 @@ try {
 
 	// Fetch back to verify
 	$fetchedUser = $userRepo->findById($userId);
+	checkExists('UserRepository::findById', $fetchedUser);
 	$fetchedDoctor = $doctorRepo->findByUserId($userId);
+	checkExists('DoctorRepository::findByUserId', $fetchedDoctor);
 
 	echo "\nInserted user row:\n";
 	print_r($fetchedUser);
@@ -85,6 +120,7 @@ try {
 
 	// check existing
 	$existingPatientUser = $userRepo->findByEmail($patientData->email);
+	checkExists('UserRepository::findByEmail (patient)', $existingPatientUser);
 	if ($existingPatientUser) {
 		$patientUserId = $existingPatientUser['user_id'];
 		echo "Patient user already exists with ID: $patientUserId\n";
@@ -99,7 +135,9 @@ try {
 	}
 
 	$fetchedPatientUser = $userRepo->findById($patientUserId);
+	checkExists('UserRepository::findById (patient)', $fetchedPatientUser);
 	$fetchedPatient = $patientRepo->findByUserId($patientUserId);
+	checkExists('PatientRepository::findByUserId', $fetchedPatient);
 
 	echo "\nInserted patient user row:\n";
 	print_r($fetchedPatientUser);
@@ -108,6 +146,99 @@ try {
 	print_r($fetchedPatient);
 
 	echo "\nDone.\n";
+
+
+	// --- Create a sample drug ---
+	echo "\n--- Creating sample drug ---\n";
+	$drugRepo = new DrugRepository();
+	$drugName = 'TestDrug-' . rand(1000,9999);
+	$existingDrug = $drugRepo->findByGenericName($drugName);
+	checkExists('DrugRepository::findByGenericName', $existingDrug);
+	if ($existingDrug) {
+		echo "Drug already exists: " . $existingDrug['drug_id'] . "\n";
+		$drugId = $existingDrug['drug_id'];
+	} else {
+		$drug = [
+			'generic_name' => $drugName,
+			'brand' => 'TestBrand',
+			'chemical_name' => 'TestChem',
+			'category' => 'OTC',
+			'expiry_date' => null,
+			'isControlled' => 0
+		];
+		$drugId = $drugRepo->create($drug);
+		echo "Created drug id: $drugId\n";
+	}
+
+	// --- Create a sample pharmacy (will create user if needed) ---
+	echo "\n--- Creating sample pharmacy ---\n";
+	$pharmacyRepo = new PharmacyRepository();
+	$pharmacyData = [
+		'first_name' => 'Pharm',
+		'last_name' => 'Test',
+		'email' => 'pharm.test+' . rand(1000,9999) . '@example.com',
+		'pharmacy_name' => 'Test Pharmacy',
+		'phar_license' => 'LIC' . rand(1000,9999),
+		'open_time' => '08:00',
+		'close_time' => '18:00',
+		'dates_open' => 'Mon-Fri'
+	];
+	$pharmUserId = $pharmacyRepo->create($pharmacyData);
+	if ($pharmUserId) {
+		echo "Pharmacy created for user id: $pharmUserId\n";
+		$pharm = $pharmacyRepo->findByUserId($pharmUserId);
+		checkExists('PharmacyRepository::findByUserId', $pharm);
+	} else {
+		echo "Failed to create pharmacy\n";
+	}
+
+	// --- Create medical record for patient ---
+	echo "\n--- Creating medical record for patient ---\n";
+	$mrRepo = new MedicalRecordRepository();
+	$mrData = [
+		'user_id' => $patientUserId,
+		'height' => '175',
+		'weight' => '70',
+		'allergies' => 'None'
+	];
+	$recordId = $mrRepo->create($mrData);
+	if ($recordId) {
+		echo "Medical record created with id: $recordId\n";
+		$mrFetched = $mrRepo->findByUserId($patientUserId);
+		checkExists('MedicalRecordRepository::findByUserId', $mrFetched);
+	} else {
+		echo "Failed to create medical record\n";
+	}
+
+	// --- Create a prescription for the patient by the doctor ---
+	echo "\n--- Creating prescription and detail ---\n";
+	$presRepo = new PrescriptionRepository();
+	$presData = [
+		'prescribing_doctor' => $userId,
+		'record_id' => $recordId,
+		'prescription_date' => date('Y-m-d'),
+		'status' => 'pending'
+	];
+	$prescriptionId = $presRepo->create($presData);
+	if ($prescriptionId) {
+		echo "Prescription created id: $prescriptionId\n";
+		checkExists('PrescriptionRepository::findById (created)', $presRepo->findById($prescriptionId));
+		$detail = [
+			'prescription_id' => $prescriptionId,
+			'drug_id' => $drugId,
+			'duration' => '7 days',
+			'dosage' => '1 pill',
+			'frequency' => 'Twice a day',
+			'refills' => 0,
+			'special_instructions' => 'After meals'
+		];
+		$ok = $presRepo->addPrescriptionDetail($detail);
+		if ($ok) echo "Added prescription detail\n"; else echo "Failed to add prescription detail\n";
+		$details = $presRepo->getPrescriptionDetails($prescriptionId);
+		checkArray('PrescriptionRepository::getPrescriptionDetails', $details);
+	} else {
+		echo "Failed to create prescription\n";
+	}
 
 } catch (Exception $e) {
 	echo "Error: " . $e->getMessage() . "\n";
