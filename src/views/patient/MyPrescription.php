@@ -7,67 +7,76 @@
     <link rel="stylesheet" href="../../../public/assets/css/patient.css">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-brand">
-            <h2>Patient Portal</h2>
-        </div>
-        <ul class="nav-list">
-            <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'PatientDashboard.php') echo ' active'; ?>">
-                <a href="PatientDashboard.php">Dashboard</a>
-            </li>
-            <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'MyPrescription.php') echo ' active'; ?>">
-                <a href="MyPrescription.php">My Prescriptions</a>
-            </li>
-            <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'PatientProfile.php') echo ' active'; ?>">
-                <a href="PatientProfile.php">Profile</a>
-            </li>
-        </ul>
-    </nav>
-        
-        <main class="main-content">
-            <header class="header">
-                My Prescriptions
-            </header>
+    <header>
+        <nav class="navbar">
+            <h1>Prescription Tracking System</h1>
+            <ul class="nav-links">
+                <li><a href="PatientDashboard.php">Dashboard</a></li>
+                <li><a href="MyPrescription.php" class="active">My Prescriptions</a></li>
+                <li><a href="PatientProfile.php">Profile</a></li>
+                <li><a href="../../../public/login.html">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main class="dashboard">
+        <section class="prescription-management">
+            <h2>My Prescriptions</h2>
             
-            <div class="prescription-controls">
-                <div class="tabs" role="tablist">
-                    <button class="tab active" role="tab" aria-selected="true" aria-controls="active-prescriptions">
-                        Active (<?php echo $activePrescriptionCount ?? '0'; ?>)
-                    </button>
-                    <button class="tab" role="tab" aria-selected="false" aria-controls="completed-prescriptions">
-                        Completed (<?php echo $completedPrescriptionCount ?? '0'; ?>)
-                    </button>
-                </div>
-
-                <div class="prescription-filters">
+            <div class="action-buttons">
+                <div class="search-container">
                     <input type="text" 
                             class="search-prescriptions" 
                             placeholder="Search prescriptions..."
                             aria-label="Search prescriptions">
-                    <select class="filter-by-date" aria-label="Filter by date">
-                        <option value="all">All Time</option>
-                        <option value="month">Last Month</option>
-                        <option value="3months">Last 3 Months</option>
-                        <option value="6months">Last 6 Months</option>
-                        <option value="year">Last Year</option>
-                    </select>
+                </div>
+                <select class="filter-by-date" aria-label="Filter by date">
+                    <option value="all">All Time</option>
+                    <option value="month">Last Month</option>
+                    <option value="3months">Last 3 Months</option>
+                    <option value="6months">Last 6 Months</option>
+                    <option value="year">Last Year</option>
+                </select>
+            </div>
+
+            <div class="tabs-container">
+                <div class="tab-buttons">
+                    <button class="tab active" data-tab="active">
+                        Active (<?php echo $activePrescriptionCount ?? '0'; ?>)
+                    </button>
+                    <button class="tab" data-tab="completed">
+                        Completed (<?php echo $completedPrescriptionCount ?? '0'; ?>)
+                    </button>
+                </div>
+
+                <div class="patient-table-container">
+                    <table class="patient-table" id="active-prescriptions">
+                        <thead>
+                            <tr>
+                                <th>Prescription ID</th>
+                                <th>Medicine</th>
+                                <th>Doctor</th>
+                                <th>Date Prescribed</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($prescriptions)): ?>
+                            <tr>
+                                <td colspan="6" class="no-data">No prescriptions found</td>
+                            </tr>
+                            <?php else: ?>
+                            <tr>
+                                <td colspan="6" class="loading">Loading prescriptions...</td>
+                            </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            
-            <div class="prescriptions-list" role="tabpanel" id="active-prescriptions">
-                <?php if (empty($prescriptions)): ?>
-                <div class="no-prescriptions">
-                    No prescriptions found
-                </div>
-                <?php else: ?>
-                    <!-- Prescriptions will be loaded by JavaScript -->
-                    <div class="loading-prescriptions">
-                        Loading prescriptions...
-                    </div>
-                <?php endif; ?>
-            </div>
-        </main>
-    </div>
+        </section>
+    </main>
 
     <!-- Prescription Detail Modal Template -->
     <template id="prescription-modal">
@@ -91,5 +100,3 @@
     <script src="../../../public/assets/js/patient/prescriptions.js"></script>
 </body>
 </html>
-
-

@@ -42,7 +42,7 @@
                 </div>
             </div>
             
-            <div class="recent-activity">
+            <div class="patients-table">
                 <h3>Overview</h3>
                 <div id="system-stats">
                     <p>...</p>

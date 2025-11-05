@@ -7,41 +7,36 @@
     <link rel="stylesheet" href="../../../public/assets/css/patient.css">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-brand">
-            <h2>Patient Portal</h2>
-        </div>
-        <ul class="nav-list">
-            <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'PatientDashboard.php') echo ' active'; ?>">
-                <a href="PatientDashboard.php">Dashboard</a>
-            </li>
-            <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'MyPrescription.php') echo ' active'; ?>">
-                <a href="MyPrescription.php">My Prescriptions</a>
-            </li>
-            <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'PatientProfile.php') echo ' active'; ?>">
-                <a href="PatientProfile.php">Profile</a>
-            </li>
-        </ul>
-    </nav>
-        
-        <main class="main-content">
-            <header class="header">
-                My Profile
-            </header>
-            
-            <div class="profile-section">
-                <div class="profile-header">
-                    <div class="profile-photo"></div>
-                    <div class="profile-name">
-                        <?php 
-                        // Will be updated by JavaScript with actual user data
-                        echo "Loading..."; 
-                        ?>
-                    </div>
+    <header>
+        <nav class="navbar">
+            <h1>Prescription Tracking System</h1>
+            <ul class="nav-links">
+                <li><a href="PatientDashboard.php">Dashboard</a></li>
+                <li><a href="MyPrescription.php">My Prescriptions</a></li>
+                <li><a href="PatientProfile.php" class="active">Profile</a></li>
+                <li><a href="../../../public/login.html">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main class="dashboard">
+        <section class="profile-management">
+            <h2>My Profile</h2>
+
+            <div class="profile-container">
+                <div class="profile-photo">
+                    <img src="../../../public/assets/images/default-avatar.png" alt="Profile Photo" id="profile-image">
                 </div>
-                
+                <div class="profile-info">
+                    <h3 id="profile-name"><?php echo "Loading..."; ?></h3>
+                    <p id="profile-email"></p>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Personal Information</h3>
                 <form class="profile-form">
-                    <div class="form-row">
+                    <div class="form-grid">
                         <div class="form-group">
                             <label for="firstName">First Name</label>
                             <input type="text" id="firstName" name="firstName" value="<?php echo htmlspecialchars($firstName ?? ''); ?>">
@@ -50,9 +45,6 @@
                             <label for="lastName">Last Name</label>
                             <input type="text" id="lastName" name="lastName" value="<?php echo htmlspecialchars($lastName ?? ''); ?>">
                         </div>
-                    </div>
-                    
-                    <div class="form-row">
                         <div class="form-group">
                             <label for="dateOfBirth">Date of Birth</label>
                             <input type="date" id="dateOfBirth" name="dateOfBirth" value="<?php echo htmlspecialchars($dateOfBirth ?? ''); ?>">
@@ -61,23 +53,18 @@
                             <label for="email">Email</label>
                             <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email ?? ''); ?>">
                         </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group full-width">
+                        <div class="form-group">
                             <label for="contactNumber">Contact Number</label>
                             <input type="tel" id="contactNumber" name="contactNumber" value="<?php echo htmlspecialchars($contactNumber ?? ''); ?>">
                         </div>
                     </div>
-                    
-                    <div class="form-row">
+
+                    <h3>Address Information</h3>
+                    <div class="form-grid">
                         <div class="form-group full-width">
-                            <label for="address">Address</label>
+                            <label for="address">Street Address</label>
                             <input type="text" id="address" name="address" value="<?php echo htmlspecialchars($address ?? ''); ?>">
                         </div>
-                    </div>
-                    
-                    <div class="form-row">
                         <div class="form-group">
                             <label for="city">City</label>
                             <input type="text" id="city" name="city" value="<?php echo htmlspecialchars($city ?? ''); ?>">
@@ -88,24 +75,19 @@
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <h3>Medical Information</h3>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="allergies">Known Allergies</label>
+                            <input type="text" id="allergies" name="allergies" value="<?php echo htmlspecialchars($allergies ?? ''); ?>">
+                        </div>
                     </div>
+
                 </form>
             </div>
-            
-            <div class="medical-section">
-                <div class="medical-header">Medical Information</div>
-                <div class="medical-content">
-                    <label for="allergies">Known Allergies</label>
-                    <input type="text" id="allergies" name="allergies" value="<?php echo htmlspecialchars($allergies ?? ''); ?>">
-                </div>
-            </div>
-        </main>
-    </div>
+        </section>
+    </main>
 
     <script src="../../../public/assets/js/patient/profile.js"></script>
 </body>
 </html>
-
-
