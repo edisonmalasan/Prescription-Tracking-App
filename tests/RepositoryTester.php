@@ -217,25 +217,29 @@ try {
 		'prescribing_doctor' => $userId,
 		'record_id' => $recordId,
 		'prescription_date' => date('Y-m-d'),
-		'status' => 'pending'
+		'status' => 'pending',
+		'details' => [
+			[
+				'drug_id' => $drugId,
+				'duration' => '7 days',
+				'dosage' => '1 pill',
+				'frequency' => 'Twice a day',
+				'refills' => 0,
+				'special_instructions' => 'After meals',
+				'description' => 'Treat fever and pain'
+			]
+		]
 	];
+
 	$prescriptionId = $presRepo->create($presData);
 	if ($prescriptionId) {
 		echo "Prescription created id: $prescriptionId\n";
 		checkExists('PrescriptionRepository::findById (created)', $presRepo->findById($prescriptionId));
-		$detail = [
-			'prescription_id' => $prescriptionId,
-			'drug_id' => $drugId,
-			'duration' => '7 days',
-			'dosage' => '1 pill',
-			'frequency' => 'Twice a day',
-			'refills' => 0,
-			'special_instructions' => 'After meals'
-		];
-		$ok = $presRepo->addPrescriptionDetail($detail);
-		if ($ok) echo "Added prescription detail\n"; else echo "Failed to add prescription detail\n";
 		$details = $presRepo->getPrescriptionDetails($prescriptionId);
 		checkArray('PrescriptionRepository::getPrescriptionDetails', $details);
+		// Print details to verify description field
+		echo "\nInserted prescription details:\n";
+		print_r($details);
 	} else {
 		echo "Failed to create prescription\n";
 	}
