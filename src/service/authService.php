@@ -41,7 +41,9 @@ class AuthService {
                 return ['error' => 'Email already exists'];
             }
 
-            $hash = password_hash($data['password'], PASSWORD_BCRYPT);
+            // $hash = password_hash($data['password'], PASSWORD_BCRYPT);
+            // for prototype
+            $plainPassword = $data['password'];
 
             $payload = [
                 'last_name'   => $data['last_name'] ?? '',
@@ -50,7 +52,7 @@ class AuthService {
                 'role'        => $data['role'] ?? 'PATIENT', // default to patient
                 'contactno'   => $data['contactno'] ?? '',
                 'address'     => $data['address'] ?? '',
-                'pass_hash'   => $hash,
+                'pass_hash'   => $plainPassword,
                 'created_at'  => date('Y-m-d H:i:s'),
             ];
             
@@ -88,7 +90,12 @@ class AuthService {
                 return ['error' => 'Account not found'];
             }
 
-            if (!password_verify($data['password'], $user['pass_hash'])) {
+            // for pass hash
+            // if (!password_verify($data['password'], $user['pass_hash'])) {
+            //     return ['error' => 'Invalid password'];
+            // }
+
+            if ($data['password'] !== $user['pass_hash']) {
                 return ['error' => 'Invalid password'];
             }
 

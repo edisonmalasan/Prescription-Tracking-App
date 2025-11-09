@@ -2,7 +2,7 @@
 
 class Database {
     private $host = 'localhost';
-    private $db_name = 'wium_lie';
+    private $db_name = 'wium_lie_demo';
     private $username = 'root';
     private $password = '';
     private $conn;
