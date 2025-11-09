@@ -13,7 +13,7 @@ class PharmacyRepository {
         $this->conn = $database->getConnection();
     }
 
-    public function create($pharmacy) {
+    public function create($userId, $pharmacy) {
         $data = [];
         if (is_array($pharmacy)) {
             $data = $pharmacy;
@@ -23,37 +23,26 @@ class PharmacyRepository {
             $data = $pharmacy->toArray();
         }
 
-        $now = date('Y-m-d H:i:s');
-        $userData = [
-            'last_name' => $data['pharmacy_name'] ?? ($data['pharmacyName'] ?? null),
-            'first_name' => '',
-            'role' => isset($data['role']) ? strtoupper($data['role']) : 'PHARMACY',
-            'email' => $data['email'] ?? null,
-            'contactno' => $data['contact_number'] ?? ($data['contactNumber'] ?? null),
-            'pass_hash' => $data['pass_hash'] ?? ($data['passHash'] ?? null),
-            'address' => $data['address'] ?? null,
-            'created_at' => $data['created_at'] ?? $now
-        ];
-
-        if (!empty($data['user_id'])) {
-            $userId = $data['user_id'];
-        } else {
-            $userRepo = new UserRepository();
-            $userId = $userRepo->create($userData);
-        }
-
-        $sql = "INSERT INTO " . $this->table_name . " (user_id, pharmacy_name, operating_hours) VALUES (?, ?, ?)";
+        $sql = "INSERT INTO " . $this->table_name . " (user_id, pharmacy_name, phar_license, open_time, close_time, dates_open) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($sql);
         if (! $stmt) {
+            return false;
+        }
+
+        $pharmacy_name = $data['pharmacy_name'] ?? null;
+        $phar_license = $data['phar_license'] ?? null;
+        $open_time = $data['open_time'] ?? null;
+        $close_time = $data['close_time'] ?? null;
+        $dates_open = $data['dates_open'] ?? null;
+
+        $stmt->bind_param('isssss', $userId, $pharmacy_name, $phar_license, $open_time, $close_time, $dates_open);
+        $ok = $stmt->execute();
+
+        if ($ok && $stmt->affected_rows > 0) {
             return $userId;
         }
 
-        $pharmacy_name = $data['pharmacy_name'] ?? ($data['pharmacyName'] ?? null);
-        $operating_hours = $data['operating_hours'] ?? ($data['operatingHours'] ?? null);
-
-        $stmt->bind_param('iss', $userId, $pharmacy_name, $operating_hours);
-        $stmt->execute();
-        return $userId;
+        return false;
     }
 
     public function findByUserId($userId) {

@@ -14,33 +14,7 @@ class AdminRepository {
     }
 
     //create a new admin 
-    public function create($admin) {
-        $data = [];
-        if (is_array($admin)) {
-            $data = $admin;
-        } elseif ($admin instanceof \stdClass) {
-            $data = (array)$admin;
-        }
-
-        $now = date('Y-m-d H:i:s');
-        $userData = [
-            'last_name' => $data['last_name'] ?? null,
-            'first_name' => $data['first_name'] ?? null,
-            'role' => isset($data['role']) ? strtoupper($data['role']) : 'ADMIN',
-            'email' => $data['email'] ?? null,
-            'contactno' => $data['contactno'] ?? null,
-            'pass_hash' => $data['pass_hash'] ?? null,
-            'address' => $data['address'] ?? null,
-            'created_at' => $data['created_at'] ?? $now
-        ];
-
-        if (!empty($data['user_id'])) {
-            $userId = $data['user_id'];
-        } else {
-            $userRepo = new UserRepository();
-            $userId = $userRepo->create($userData);
-        }
-
+    public function create($userId) {
         $sql = "INSERT INTO " . $this->table_name . " (user_id, isAdmin) VALUES (?, ?)";
         $stmt = $this->conn->prepare($sql);
         if (! $stmt) {
