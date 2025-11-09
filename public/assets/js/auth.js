@@ -72,9 +72,8 @@ document.addEventListener("DOMContentLoaded", () => {
       formData.clinic_name = document.getElementById("clinicName").value;
     } else if (role === "PHARMACY") {
       formData.pharmacy_name = document.getElementById("pharmacyName").value;
-      formData.phar_license = document.getElementById("pharmacyLicense").value;
-      formData.open_time = document.getElementById("openTime").value;
-      formData.close_time = document.getElementById("closeTime").value;
+      formData.address = document.getElementById("address").value;
+      formData.operating_hours = document.getElementById("operatingHours").value;
     }
 
     console.log("Sending registration data:", formData);
