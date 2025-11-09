@@ -16,23 +16,78 @@ class PrescriptionRepository {
 
     // Create a new prescription
     public function create($prescription) {
-        $sql = "INSERT INTO " . $this->table_name . " (prescribing_doctor, record_id, prescription_date, status) VALUES (?, ?, ?, ?)";
-        $stmt = $this->conn->prepare($sql);
-        if (! $stmt) {
-            return false;
-        }
-
+        // Expecting $prescription to be an array with keys: prescribing_doctor, record_id, prescription_date, status, details
+        // details should be an array of detail arrays (drug_id, duration, dosage, frequency, refills, special_instructions, description)
         $prescribing_doctor = $prescription['prescribing_doctor'] ?? null;
         $record_id = $prescription['record_id'] ?? null;
         $prescription_date = $prescription['prescription_date'] ?? date('Y-m-d');
         $status = $prescription['status'] ?? 'pending';
+        $details = $prescription['details'] ?? [];
 
-        $stmt->bind_param('iiss', $prescribing_doctor, $record_id, $prescription_date, $status);
-        $ok = $stmt->execute();
-        if ($ok) {
-            return $this->conn->insert_id;
+    // Debug: show received input (CLI-friendly)
+    echo "[DEBUG] create input: prescribing_doctor=" . var_export($prescribing_doctor, true) . ", record_id=" . var_export($record_id, true) . ", details_count=" . count($details) . "\n";
+
+    // Start transaction so prescription + details are atomic
+        $this->conn->begin_transaction();
+        try {
+            $sql = "INSERT INTO " . $this->table_name . " (prescribing_doctor, record_id, prescription_date, status) VALUES (?, ?, ?, ?)";
+            $stmt = $this->conn->prepare($sql);
+            if (! $stmt) {
+                error_log("PrescriptionRepository.create prepare failed: " . $this->conn->error);
+                // echo for CLI visibility
+                echo "[DEBUG] prepare failed: " . $this->conn->error . "\n";
+                $this->conn->rollback();
+                return false;
+            }
+            $stmt->bind_param('iiss', $prescribing_doctor, $record_id, $prescription_date, $status);
+            if (! $stmt->execute()) {
+                error_log("PrescriptionRepository.create execute failed: " . $stmt->error);
+                echo "[DEBUG] execute failed: " . $stmt->error . "\n";
+                $this->conn->rollback();
+                return false;
+            }
+            $prescription_id = $this->conn->insert_id;
+
+            // Insert details if any
+            if (!empty($details)) {
+                $detailSql = "INSERT INTO " . $this->details_table . " (prescription_id, drug_id, duration, dosage, frequency, refills, special_instructions, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                $dStmt = $this->conn->prepare($detailSql);
+                if (! $dStmt) {
+                    error_log("PrescriptionRepository.create detail prepare failed: " . $this->conn->error);
+                    echo "[DEBUG] detail prepare failed: " . $this->conn->error . "\n";
+                    $this->conn->rollback();
+                    return false;
+                }
+
+                foreach ($details as $d) {
+                    $drug_id = $d['drug_id'] ?? $d->drug_id ?? null;
+                    $duration = $d['duration'] ?? $d->duration ?? '';
+                    $dosage = $d['dosage'] ?? $d->dosage ?? '';
+                    $frequency = $d['frequency'] ?? $d->frequency ?? '';
+                    $refills = isset($d['refills']) ? (int)$d['refills'] : 0;
+                    $special_instructions = $d['special_instructions'] ?? $d->special_instructions ?? '';
+                    $description = $d['description'] ?? $d->description ?? '';
+
+                    $dStmt->bind_param('iisssiss', $prescription_id, $drug_id, $duration, $dosage, $frequency, $refills, $special_instructions, $description);
+                    if (! $dStmt->execute()) {
+                        error_log("PrescriptionRepository.create detail execute failed: " . $dStmt->error);
+                        echo "[DEBUG] detail execute failed: " . $dStmt->error . "\n";
+                        $this->conn->rollback();
+                        return false;
+                    }
+                }
+                $dStmt->close();
+            }
+
+            $stmt->close();
+            $this->conn->commit();
+            return $prescription_id;
+        } catch (Exception $e) {
+            $this->conn->rollback();
+            error_log("PrescriptionRepository.create exception: " . $e->getMessage());
+            echo "[DEBUG] exception: " . $e->getMessage() . "\n";
+            return false;
         }
-        return false;
     }        
 
     // Get prescription by ID
@@ -87,7 +142,23 @@ class PrescriptionRepository {
 
     // Get all prescriptions
     public function findAll() {
-        $sql = "SELECT * FROM " . $this->table_name;
+        $sql = "SELECT 
+                    p.prescription_id,
+                    p.prescription_date,
+                    p.status,
+                    CONCAT(u.first_name, ' ', u.last_name) AS patient_name,
+                    CONCAT(d_user.first_name, ' ', d_user.last_name) AS doctor_name,
+                    pd.dosage,
+                    pd.duration,
+                    dr.medication_name,
+                    p.notes
+                FROM prescription p
+                JOIN medicalrecord mr ON p.record_id = mr.record_id
+                JOIN users u ON mr.user_id = u.user_id
+                JOIN doctor d ON p.prescribing_doctor = d.user_id
+                JOIN users d_user ON d.user_id = d_user.user_id
+                LEFT JOIN prescriptiondetails pd ON p.prescription_id = pd.prescription_id
+                LEFT JOIN drug dr ON pd.drug_id = dr.drug_id";
         $res = $this->conn->query($sql);
         if ($res) {
             return $res->fetch_all(MYSQLI_ASSOC);
@@ -95,25 +166,52 @@ class PrescriptionRepository {
         return [];
     }
 
-    // Update prescription
+    //update prescription details
     public function update($prescription) {
-        $sql = "UPDATE " . $this->table_name . " SET prescribing_doctor = ?, record_id = ?, prescription_date = ?, status = ? WHERE prescription_id = ?";
+        $prescription_id = $prescription['prescription_id'] ?? null;
+        if ($prescription_id === null) {
+            return false;
+        }
+
+        $fields = [];
+        $params = [];
+        $types = '';
+
+        if (isset($prescription['prescribing_doctor'])) {
+            $fields[] = 'prescribing_doctor = ?';
+            $params[] = $prescription['prescribing_doctor'];
+            $types .= 'i';
+        }
+        if (isset($prescription['record_id'])) {
+            $fields[] = 'record_id = ?';
+            $params[] = $prescription['record_id'];
+            $types .= 'i';
+        }
+        if (isset($prescription['prescription_date'])) {
+            $fields[] = 'prescription_date = ?';
+            $params[] = $prescription['prescription_date'];
+            $types .= 's';
+        }
+        if (isset($prescription['status'])) {
+            $fields[] = 'status = ?';
+            $params[] = $prescription['status'];
+            $types .= 's';
+        }
+
+        if (empty($fields)) {
+            return false;
+        }
+
+        $sql = "UPDATE " . $this->table_name . " SET " . implode(', ', $fields) . " WHERE prescription_id = ?";
         $stmt = $this->conn->prepare($sql);
         if (! $stmt) {
             return false;
         }
 
-        $prescribing_doctor = $prescription['prescribing_doctor'] ?? null;
-        $record_id = $prescription['record_id'] ?? null;
-        $prescription_date = $prescription['prescription_date'] ?? null;
-        $status = $prescription['status'] ?? null;
-        $prescription_id = $prescription['prescription_id'] ?? null;
+        $params[] = $prescription_id;
+        $types .= 'i';
 
-        if ($prescription_id === null) {
-            return false;
-        }
-
-        $stmt->bind_param('iissi', $prescribing_doctor, $record_id, $prescription_date, $status, $prescription_id);
+        $stmt->bind_param($types, ...$params);
         $stmt->execute();
         return ($stmt->affected_rows > 0);
     }
@@ -145,7 +243,7 @@ class PrescriptionRepository {
     }
 
     public function addPrescriptionDetail($detail) {
-        $sql = "INSERT INTO " . $this->details_table . " (prescription_id, drug_id, duration, dosage, frequency, refills, special_instructions) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO " . $this->details_table . " (prescription_id, drug_id, duration, dosage, frequency, refills, special_instructions, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($sql);
         if (! $stmt) {
             return false;
@@ -158,8 +256,9 @@ class PrescriptionRepository {
         $frequency = $detail['frequency'] ?? '';
         $refills = isset($detail['refills']) ? (int)$detail['refills'] : 0;
         $special_instructions = $detail['special_instructions'] ?? '';
+        $description = $detail['description'] ?? '';
 
-        $stmt->bind_param('iisssis', $prescription_id, $drug_id, $duration, $dosage, $frequency, $refills, $special_instructions);
+        $stmt->bind_param('iisssiss', $prescription_id, $drug_id, $duration, $dosage, $frequency, $refills, $special_instructions, $description);
         $stmt->execute();
         return ($stmt->affected_rows > 0);
     }

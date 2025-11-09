@@ -273,45 +273,34 @@ textarea {
   cursor: pointer;
 }
 
-/* --- Profile --- */
-.profile-card {
-  display: flex;
-  gap: 24px;
-  align-items: flex-start;
-  background: #fff;
-  padding: 18px;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+#profile-view {
+  display: block;
+  line-height: 1.6;
 }
 
-.profile-left {
-  width: 160px;
+#profile-view div {
+  margin: 4px 0;
 }
 
-.placeholder-photo {
-  width: 140px;
-  height: 140px;
-  background: #e5e7eb;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #777;
-  font-weight: 500;
+#profile-form {
+  display: none;
 }
 
-.profile-right {
-  flex: 1;
-}
-
-.profile-form .two-col {
+#profile-form .row {
+  margin-top: 12px;
   display: flex;
   gap: 10px;
 }
 
-.profile-form input {
-  margin-bottom: 8px;
+#edit-profile-btn {
+  display: inline-block;
 }
+
+.btn.hidden {
+  display: none;
+}
+
+
 
 /* --- Utilities --- */
 .small {

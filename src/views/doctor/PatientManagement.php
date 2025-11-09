@@ -52,6 +52,6 @@
     </div>
   </div>
 
-  <script src="./js/patientManagement.js"></script>
+  <script src="..\..\public\assets\js\doctor\patientManagement.js"></script>
 </body>
 </html>
