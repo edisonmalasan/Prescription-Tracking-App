@@ -1,62 +1,67 @@
-<!DOCTYPE html>
+<?php
+session_start();
+$patient_id = $_SESSION['patient_id'] ?? null;
+?>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patient Dashboard</title>
-    <link rel="stylesheet" href="../../../public/assets/css/patient.css">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Patient Dashboard</title>
+<link rel="stylesheet" href="../../../public/assets/css/patient.css" />
 </head>
 <body>
-    <header>
-        <nav class="navbar">
-            <h1>Prescription Tracking System</h1>
-            <ul class="nav-links">
-                <li><a href="PatientDashboard.php" class="active">Dashboard</a></li>
-                <li><a href="MyPrescription.php">My Prescriptions</a></li>
-                <li><a href="PatientProfile.php">Profile</a></li>
-                <li><a href="../../../public/login.html">Logout</a></li>
-            </ul>
-        </nav>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">Patient</div>
+    <nav>
+      <a class="active" href="PatientDashboard.php">Dashboard</a>
+      <a href="MyPrescription.php">My Prescriptions</a>
+      <a href="PatientProfile.php">Profile</a>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="welcome">
+        <div id="patient-name">Welcome, —</div>
+        <div id="patient-id" class="sub">Patient ID: —</div>
+      </div>
     </header>
 
-    <main class="dashboard">
-        <section>
-            <h2>Welcome, <?php echo "Juan Dela Cruz"; // Replace with actual user data ?></h2>
+    <section class="content">
+      <div class="cards">
+        <div class="card stat">
+          <h4>Total Prescriptions</h4>
+          <div class="stat-value" id="stat-total-prescriptions">0</div>
+        </div>
+        <div class="card stat">
+          <h4>Active Prescriptions</h4>
+          <div class="stat-value" id="stat-active-prescriptions">0</div>
+        </div>
+      </div>
 
-            <div class="stats-container">
-                <div class="stat-card">
-                    <h3>Active Prescriptions</h3>
-                    <p id="active-prescriptions">5</p>
-                </div>
-                <div class="stat-card">
-                    <h3>My Doctors</h3>
-                    <p id="total-doctors">2</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Completed Prescriptions</h3>
-                    <p id="completed-prescriptions">3</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Next Appointment</h3>
-                    <p id="next-appointment">--</p>
-                </div>
-            </div>
+      <div class="card prescription-list">
+        <h3>Recent Prescriptions</h3>
+        <table id="recent-prescriptions">
+          <thead>
+            <tr>
+              <th>Prescription ID</th>
+              <th>Doctor</th>
+              <th>Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</div>
 
-            <div class="recent-activity">
-                <h3>Recent Prescriptions</h3>
-                <div id="prescription-log">
-                    <?php 
-                    // This will be populated with actual prescription data
-                    ?>
-                    <div class="prescription-item">
-                        <p>Amoxicillin 500mg</p>
-                        <span class="status active">Active</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <script src="../../../public/assets/js/patient/dashboard.js"></script>
+<script>
+const USER_ID = <?= json_encode($patient_id) ?>;
+</script>
+<script src="../../../js/patientDashboard.js"></script>
 </body>
 </html>
