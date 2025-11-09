@@ -46,7 +46,7 @@ class PharmacyRepository {
     }
 
     public function findByUserId($userId) {
-        $sql = "SELECT p.*, u.email, u.contactno as contact_number, u.address FROM " . $this->table_name . " p JOIN user u ON p.user_id = u.user_id WHERE p.user_id = ?";
+        $sql = "SELECT p.*, u.email, u.contactno as contact_number, u.address FROM " . $this->table_name . " p JOIN users u ON p.user_id = u.user_id WHERE p.user_id = ?";
         $stmt = $this->conn->prepare($sql);
         if (! $stmt) {
             return null;

@@ -99,9 +99,9 @@ class PrescriptionRepository {
                     p.notes
                 FROM prescription p
                 JOIN medicalrecord mr ON p.record_id = mr.record_id
-                JOIN user u ON mr.user_id = u.user_id
+                JOIN users u ON mr.user_id = u.user_id
                 JOIN doctor d ON p.prescribing_doctor = d.user_id
-                JOIN user d_user ON d.user_id = d_user.user_id
+                JOIN users d_user ON d.user_id = d_user.user_id
                 LEFT JOIN prescriptiondetails pd ON p.prescription_id = pd.prescription_id
                 LEFT JOIN drug dr ON pd.drug_id = dr.drug_id";
         $res = $this->conn->query($sql);
