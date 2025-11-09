@@ -13,14 +13,10 @@ $prescription_id = $_GET['prescription_id'] ?? null;
 </head>
 <body>
 <div class="app">
-  <aside class="sidebar">
-    <div class="brand">Patient</div>
-    <nav>
-      <a href="PatientDashboard.php">Dashboard</a>
-      <a class="active" href="MyPrescription.php">My Prescriptions</a>
-      <a href="PatientProfile.php">Profile</a>
-    </nav>
-  </aside>
+  <?php
+  $activePage = 'prescriptions';
+  include '../components/PatientSidebar.php';
+  ?>
 
   <div class="main">
     <header class="topbar">

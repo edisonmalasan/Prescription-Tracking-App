@@ -8,15 +8,10 @@
 </head>
 <body>
   <div class="app">
-    <aside class="sidebar">
-      <div class="brand">Doctor</div>
-      <nav>
-        <a href="DoctorDashboard.php">Dashboard</a>
-        <a href="PatientManagement.php">Patient Management</a>
-        <a href="PrescriptionManagement.php">Prescription</a>
-        <a class="active" href="DoctorProfile.php">Profile</a>
-      </nav>
-    </aside>
+    <?php
+    $activePage = 'profile';
+    include '../components/DoctorSidebar.php';
+    ?>
 
     <div class="main">
       <header class="topbar">

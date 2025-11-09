@@ -12,14 +12,10 @@ $patient_id = $_SESSION['patient_id'] ?? null;
 </head>
 <body>
 <div class="app">
-  <aside class="sidebar">
-    <div class="brand">Patient</div>
-    <nav>
-      <a class="active" href="PatientDashboard.php">Dashboard</a>
-      <a href="MyPrescription.php">My Prescriptions</a>
-      <a href="PatientProfile.php">Profile</a>
-    </nav>
-  </aside>
+  <?php
+  $activePage = 'dashboard';
+  include '../components/PatientSidebar.php';
+  ?>
 
   <div class="main">
     <header class="topbar">
