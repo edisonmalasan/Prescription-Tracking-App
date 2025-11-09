@@ -142,7 +142,23 @@ class PrescriptionRepository {
 
     // Get all prescriptions
     public function findAll() {
-        $sql = "SELECT * FROM " . $this->table_name;
+        $sql = "SELECT 
+                    p.prescription_id,
+                    p.prescription_date,
+                    p.status,
+                    CONCAT(u.first_name, ' ', u.last_name) AS patient_name,
+                    CONCAT(d_user.first_name, ' ', d_user.last_name) AS doctor_name,
+                    pd.dosage,
+                    pd.duration,
+                    dr.medication_name,
+                    p.notes
+                FROM prescription p
+                JOIN medicalrecord mr ON p.record_id = mr.record_id
+                JOIN users u ON mr.user_id = u.user_id
+                JOIN doctor d ON p.prescribing_doctor = d.user_id
+                JOIN users d_user ON d.user_id = d_user.user_id
+                LEFT JOIN prescriptiondetails pd ON p.prescription_id = pd.prescription_id
+                LEFT JOIN drug dr ON pd.drug_id = dr.drug_id";
         $res = $this->conn->query($sql);
         if ($res) {
             return $res->fetch_all(MYSQLI_ASSOC);
@@ -153,59 +169,51 @@ class PrescriptionRepository {
     //update prescription details
     public function update($prescription) {
         $prescription_id = $prescription['prescription_id'] ?? null;
-        $details = $prescription['details'] ?? [];
-        if ($prescription_id === null || empty($details)) {
+        if ($prescription_id === null) {
             return false;
         }
 
-        $this->conn->begin_transaction();
-        try {
-            $updateSql = "UPDATE " . $this->details_table . " SET duration = ?, dosage = ?, frequency = ?, refills = ?, special_instructions = ?, description = ? WHERE prescription_id = ? AND drug_id = ?";
-            $uStmt = $this->conn->prepare($updateSql);
-            if (! $uStmt) {
-                $this->conn->rollback();
-                return false;
-            }
+        $fields = [];
+        $params = [];
+        $types = '';
 
-            foreach ($details as $d) {
-                $drug_id = $d['drug_id'] ?? $d->drug_id ?? null;
-                $duration = $d['duration'] ?? $d->duration ?? '';
-                $dosage = $d['dosage'] ?? $d->dosage ?? '';
-                $frequency = $d['frequency'] ?? $d->frequency ?? '';
-                $refills = isset($d['refills']) ? (int)$d['refills'] : 0;
-                $special_instructions = $d['special_instructions'] ?? $d->special_instructions ?? '';
-                $description = $d['description'] ?? $d->description ?? '';
+        if (isset($prescription['prescribing_doctor'])) {
+            $fields[] = 'prescribing_doctor = ?';
+            $params[] = $prescription['prescribing_doctor'];
+            $types .= 'i';
+        }
+        if (isset($prescription['record_id'])) {
+            $fields[] = 'record_id = ?';
+            $params[] = $prescription['record_id'];
+            $types .= 'i';
+        }
+        if (isset($prescription['prescription_date'])) {
+            $fields[] = 'prescription_date = ?';
+            $params[] = $prescription['prescription_date'];
+            $types .= 's';
+        }
+        if (isset($prescription['status'])) {
+            $fields[] = 'status = ?';
+            $params[] = $prescription['status'];
+            $types .= 's';
+        }
 
-                $uStmt->bind_param('sssissii', $duration, $dosage, $frequency, $refills, $special_instructions, $description, $prescription_id, $drug_id);
-                if (! $uStmt->execute()) {
-                    $this->conn->rollback();
-                    return false;
-                }
-
-                if ($uStmt->affected_rows === 0) {
-                    $insOk = $this->addPrescriptionDetail([
-                        'prescription_id' => $prescription_id,
-                        'drug_id' => $drug_id,
-                        'duration' => $duration,
-                        'dosage' => $dosage,
-                        'frequency' => $frequency,
-                        'refills' => $refills,
-                        'special_instructions' => $special_instructions,
-                        'description' => $description
-                    ]);
-                    if (! $insOk) {
-                        $this->conn->rollback();
-                        return false;
-                    }
-                }
-            }
-            $uStmt->close();
-            $this->conn->commit();
-            return true;
-        } catch (Exception $e) {
-            $this->conn->rollback();
+        if (empty($fields)) {
             return false;
         }
+
+        $sql = "UPDATE " . $this->table_name . " SET " . implode(', ', $fields) . " WHERE prescription_id = ?";
+        $stmt = $this->conn->prepare($sql);
+        if (! $stmt) {
+            return false;
+        }
+
+        $params[] = $prescription_id;
+        $types .= 'i';
+
+        $stmt->bind_param($types, ...$params);
+        $stmt->execute();
+        return ($stmt->affected_rows > 0);
     }
 
     public function delete($id) {

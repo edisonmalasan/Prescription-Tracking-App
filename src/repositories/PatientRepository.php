@@ -14,7 +14,7 @@ class PatientRepository {
     }
 
 
-    public function create($patient) {
+    public function create($userId, $patient) {
         $data = [];
         if (is_array($patient)) {
             $data = $patient;
@@ -22,26 +22,6 @@ class PatientRepository {
             $data = (array)$patient;
         } elseif ($patient instanceof PatientModel) {
             $data = $patient->toArray();
-        }
-
-        $now = date('Y-m-d H:i:s');
-        $userData = [
-            'last_name' => $data['last_name'] ?? null,
-            'first_name' => $data['first_name'] ?? null,
-            'role' => isset($data['role']) ? strtoupper($data['role']) : 'PATIENT',
-            'email' => $data['email'] ?? null,
-            'contactno' => $data['contactno'] ?? null,
-            'pass_hash' => $data['pass_hash'] ?? null,
-            'address' => $data['address'] ?? null,
-            'created_at' => $data['created_at'] ?? $now
-        ];
-
-        // Use provided user_id if available
-        if (!empty($data['user_id'])) {
-            $userId = $data['user_id'];
-        } else {
-            $userRepo = new UserRepository();
-            $userId = $userRepo->create($userData);
         }
 
         $sql = "INSERT INTO " . $this->table_name . " (user_id, birth_date) VALUES (?, ?)";

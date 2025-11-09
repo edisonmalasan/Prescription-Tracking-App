@@ -70,6 +70,6 @@
     </div>
   </div>
 
-  <script src="./js/prescriptionManagement.js"></script>
+  <script src="..\..\public\assets\js\doctor\prescriptionManagement.js"></script>
 </body>
 </html>

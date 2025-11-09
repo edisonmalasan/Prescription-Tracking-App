@@ -4,6 +4,7 @@ require_once '../controllers/PharmacyController.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
+// create instance of controller to handle http requests
 $pharmacyController = new PharmacyController();
 
 switch ($method) {
@@ -20,29 +21,11 @@ switch ($method) {
         break;
     case 'GET':
         switch ($action) {
-             case 'all':
-                echo $pharmacyController->getAllPharmacies();
-                break;
             case 'profile':
                 echo $pharmacyController->getProfile();
                 break;
-            case 'prescriptions':
-                echo $pharmacyController->getPrescriptions();
-                break;
-            case 'statistics':
-                echo $pharmacyController->getStatistics();
-                break;
-            case 'prescription-details':
-                echo $pharmacyController->getPrescriptionDetails();
-                break;
-            case 'filter':
-                echo $pharmacyController->filterPrescriptions();
-                break;
-            case 'search-patient':
-                echo $pharmacyController->searchByPatient();
-                break;
-            case 'search-drug':
-                echo $pharmacyController->searchByDrug();
+            case 'all':
+                echo $pharmacyController->getAllPharmacies();
                 break;
             default:
                 http_response_code(404);
@@ -55,9 +38,6 @@ switch ($method) {
             case 'profile':
                 echo $pharmacyController->updateProfile();
                 break;
-            case 'prescription-status':
-                echo $pharmacyController->updatePrescriptionStatus();
-                break;
             default:
                 http_response_code(404);
                 echo json_encode(['error' => 'Action not found']);
@@ -66,6 +46,9 @@ switch ($method) {
         break;
     case 'DELETE':
         switch ($action) {
+            case 'delete':
+                echo $pharmacyController->deletePharmacy();
+                break;
             default:
                 http_response_code(404);
                 echo json_encode(['error' => 'Action not found']);

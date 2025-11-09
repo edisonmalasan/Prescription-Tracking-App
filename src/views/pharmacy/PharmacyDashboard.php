@@ -1,133 +1,74 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pharmacy Dashboard</title>
-    <link rel="stylesheet" href="../../../public/assets/css/pharmacy.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pharmacy Dashboard</title>
+  <link rel="stylesheet" href="..\..\..\public\assets\css\pharmacy.css" />
 </head>
 <body>
-    <div class="container">
-        <nav class="sidebar">
-            <h2 class="sidebar-header">Pharmacy</h2>
-            <ul class="nav-list">
-                <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'Dashboard.php') echo ' active'; ?>">
-                    <a href="Dashboard.php">Dashboard</a>
-                </li>
-                <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'PrescriptionManagement.php') echo ' active'; ?>">
-                    <a href="prescriptionManagement.php">Prescription Management</a>
-                </li>
-                <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'Prescriptions.php') echo ' active'; ?>">
-                    <a href="Prescriptions.php">Prescriptions</a>
-                </li>
-                <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'Sales.php') echo ' active'; ?>">
-                    <a href="Sales.php">Sales</a>
-                </li>
-                <li class="nav-item<?php if(basename($_SERVER['PHP_SELF']) === 'Profile.php') echo ' active'; ?>">
-                    <a href="Profile.php">Profile</a>
-                </li>
-            </ul>
-        </nav>
-        
-        <main class="main-content">
-            <header class="header">
-                Dashboard
-            </header>
-            
-            <div class="dashboard-overview">
-                <div class="card">
-                    <h3>Pending Rx</h3>
-                    <p>12</p> <!-- Example dynamic data -->
-                </div>
-                <div class="card">
-                    <h3>Filled Today</h3>
-                    <p>8</p> <!-- Example dynamic data -->
-                </div>
-                <div class="card">
-                    <h3>Active Patients</h3>
-                    <p>45</p> <!-- Example dynamic data -->
-                </div>
-                <div class="card">
-                    <h3>Total Sales (Today)</h3>
-                    <p>$1250</p> <!-- Example dynamic data -->
-                </div>
-            </div>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">Pharmacy</div>
+      <nav>
+        <a class="active" href="PharmacyDashboard.php">Dashboard</a>
+        <a href="PharmacyProfile.php">Profile</a>
+      </nav>
+    </aside>
 
-            <div class="pending-prescriptions">
-                <h2 class="section-title">Pending Prescriptions (12)</h2>
-                <div class="prescriptions-list">
-                    <div class="prescription-item">
-                        <div>
-                            <p><strong>Juan Dela Cruz</strong></p>
-                            <p>Amoxicillin 500mg: 30 caps</p>
-                            <p>15 mins ago</p>
-                        </div>
-                        <div class="action-buttons">
-                            <button class="btn btn-view">View</button>
-                            <button class="btn btn-process">Process</button>
-                        </div>
-                    </div>
-                    <div class="prescription-item">
-                        <div>
-                            <p><strong>Maria Garcia</strong></p>
-                            <p>Losartan 50mg: 15 caps</p>
-                            <p>18 mins ago</p>
-                        </div>
-                        <div class="action-buttons">
-                            <button class="btn btn-view">View</button>
-                            <button class="btn btn-process">Process</button>
-                        </div>
-                    </div>
-                    <div class="prescription-item">
-                        <div>
-                            <p><strong>Pedro Santos</strong></p>
-                            <p>Metformin 500mg: 60 caps</p>
-                            <p>60 mins ago</p>
-                        </div>
-                        <div class="action-buttons">
-                            <button class="btn btn-view">View</button>
-                            <button class="btn btn-process">Process</button>
-                        </div>
-                    </div>
-                </div>
-                <a href="Prescriptions.php" class="view-all-button">View All</a>
-            </div>
+    <div class="main">
+      <header class="topbar">
+        <div class="welcome">
+          <div id="pharmacy-name">Welcome, —</div>
+          <div id="pharmacy-address" class="sub">Address: —</div>
+        </div>
+      </header>
 
-            <div class="recent-activities">
-                <h2 class="section-title">Recent Sales</h2>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Date/Time</th>
-                            <th>Customer</th>
-                            <th>Items</th>
-                            <th>Medicine</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Oct, 17 2025</td>
-                            <td>Juan Dela Cruz</td>
-                            <td>2</td>
-                            <td>Amoxicillin</td>
-                        </tr>
-                        <tr>
-                            <td>Oct, 17 2025</td>
-                            <td>Maria Garcia</td>
-                            <td>2</td>
-                            <td>Losartan</td>
-                        </tr>
-                        <tr>
-                            <td>Oct, 17 2025</td>
-                            <td>Pedro Santos</td>
-                            <td>3</td>
-                            <td>Metformin</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+      <section class="content">
+        <div class="cards">
+          <div class="card stat">
+            <h4>Total Prescriptions</h4>
+            <div class="stat-value" id="stat-total-prescriptions">0</div>
+          </div>
 
-        </main>
+          <div class="card stat">
+            <h4>Pending Prescriptions</h4>
+            <div class="stat-value" id="stat-pending-prescriptions">0</div>
+          </div>
+
+          <div class="card stat">
+            <h4>Filled Prescriptions</h4>
+            <div class="stat-value" id="stat-filled-prescriptions">0</div>
+          </div>
+        </div>
+
+        <div class="card prescription-list">
+          <h3>All Prescriptions</h3>
+          <div class="filter-container">
+            <input type="text" id="patient-name-filter" placeholder="Filter by Patient Name...">
+            <input type="text" id="drug-name-filter" placeholder="Filter by Drug Name...">
+          </div>
+          <table id="prescriptions-table">
+            <thead>
+              <tr>
+                <th>Patient Name</th>
+                <th>Doctor Name</th>
+                <th>Drug Name</th>
+                <th>Dosage</th>
+                <th>Duration</th>
+                <th>Date Prescribed</th>
+                <th>Notes</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
     </div>
+  </div>
+
+  <script src="..\..\..\public\assets\js\pharmacy\dashboard.js"></script>
 </body>
 </html>
