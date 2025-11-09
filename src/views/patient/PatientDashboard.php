@@ -62,6 +62,6 @@ $patient_id = $_SESSION['patient_id'] ?? null;
 <script>
 const USER_ID = <?= json_encode($patient_id) ?>;
 </script>
-<script src="../../../js/patientDashboard.js"></script>
+<script src="..\..\public\assets\js\patient\patientdashboard.js"></script>
 </body>
 </html>

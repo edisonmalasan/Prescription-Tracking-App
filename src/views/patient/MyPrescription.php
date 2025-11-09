@@ -55,6 +55,6 @@ $prescription_id = $_GET['prescription_id'] ?? null;
 const USER_ID = <?= json_encode($patient_id) ?>;
 const PRESCRIPTION_ID = <?= json_encode($prescription_id) ?>;
 </script>
-<script src="../../../js/myPrescription.js"></script>
+<script src="..\..\public\assets\js\patient\myprescription.js"></script>
 </body>
 </html>
