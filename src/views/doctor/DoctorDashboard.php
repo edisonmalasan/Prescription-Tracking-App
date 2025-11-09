@@ -1,67 +1,75 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="../../../public/assets/css/admin.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Doctor Dashboard</title>
+  <link rel="stylesheet" href="..\..\..\public\assets\css\doctor.css" />
 </head>
 <body>
-    <header>
-        <nav>
-            <h1>Prescription Tracking System</h1>
-            <ul>
-                <li><a href="DoctorDashboard.php">Dashboard</a></li>
-                <li><a href="PatientManagement.php">Patient Management</a></li>
-                <li><a href="PrescriptionManagement.php">Prescriptions</a></li>
-                <li><a href="DoctorProfile.php">Profile</a></li>
-                <li><a href="../../../public/login.html">Logout</a></li>
-            </ul>
-        </nav>
-    </header>
-    
-    <main>
-        <section class="dashboard">
-            <h2>Doctor Dashboard</h2>
-            
-            <div class="stats-container">
-                <div class="stat-card">
-                    <h3>Total Patients</h3>
-                    <p id="total-patients">-</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Active Prescriptions</h3>
-                    <p id="total-prescriptions">-</p>
-                </div>
-                <div class="stat-card">
-                    <h3>This Week</h3>
-                    <p id="total-week">-</p>
-                </div>
-                <div class="stat-card">
-                    <h3>This Month</h3>
-                    <p id="total-month">-</p>
-                </div>
-            </div>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">Doctor</div>
+      <nav>
+        <a class="active" href="DoctorDashboard.php">Dashboard</a>
+        <a href="PatientManagement.php">Patient Management</a>
+        <a href="PrescriptionManagement.php">Prescription</a>
+        <a href="DoctorProfile.php">Profile</a>
+      </nav>
+    </aside>
 
-        <table id="patient-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Medications</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="patient-tbody">
-                    <tr>
-                        <td colspan="5">Loading...</td>
-                    </tr>
-                </tbody>
-            </table>
-    </main>
-    
-    <script src="../../../public/assets/js/doctor/dashboard.js"></script>
+    <div class="main">
+      <header class="topbar">
+        <div class="welcome">
+          <div id="doctor-name">Welcome, Dr. —</div>
+          <div id="doctor-prc" class="sub">PRC License: —</div>
+        </div>
+        <div>
+          <button id="new-prescription-btn" class="btn">New Prescription</button>
+        </div>
+      </header>
+
+      <section class="content">
+        <div class="cards">
+          <div class="card stat">
+            <h4>Total Patients</h4>
+            <div class="stat-value" id="stat-total-patients">0</div>
+          </div>
+
+          <div class="card stat">
+            <h4>Active Prescriptions</h4>
+            <div class="stat-value" id="stat-active-prescriptions">0</div>
+          </div>
+
+          <div class="card stat">
+            <h4>This Week</h4>
+            <div class="stat-value" id="stat-this-week">0</div>
+          </div>
+
+          <div class="card stat">
+            <h4>This Month</h4>
+            <div class="stat-value" id="stat-this-month">0</div>
+          </div>
+        </div>
+
+        <div class="card prescription-list">
+          <h3>Recent Prescriptions</h3>
+          <table id="recent-prescriptions">
+            <thead>
+              <tr>
+                <th>Patient</th>
+                <th>Medication</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="./js/doctorDashboard.js"></script>
 </body>
 </html>
-
-
