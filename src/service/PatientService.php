@@ -35,7 +35,8 @@ class PatientService {
         $userId = $this->userRepository->create($patientData);
 
         if ($userId) {
-            $this->patientRepository->create($userId, $patientData);
+            $patientData['user_id'] = $userId;
+            $this->patientRepository->create($patientData);
             
             return [
                 'success' => true,
