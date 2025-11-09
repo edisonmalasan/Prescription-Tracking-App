@@ -87,7 +87,23 @@ class PrescriptionRepository {
 
     // Get all prescriptions
     public function findAll() {
-        $sql = "SELECT * FROM " . $this->table_name;
+        $sql = "SELECT 
+                    p.prescription_id,
+                    p.prescription_date,
+                    p.status,
+                    CONCAT(u.first_name, ' ', u.last_name) AS patient_name,
+                    CONCAT(d_user.first_name, ' ', d_user.last_name) AS doctor_name,
+                    pd.dosage,
+                    pd.duration,
+                    dr.medication_name,
+                    p.notes
+                FROM prescription p
+                JOIN medicalrecord mr ON p.record_id = mr.record_id
+                JOIN user u ON mr.user_id = u.user_id
+                JOIN doctor d ON p.prescribing_doctor = d.user_id
+                JOIN user d_user ON d.user_id = d_user.user_id
+                LEFT JOIN prescriptiondetails pd ON p.prescription_id = pd.prescription_id
+                LEFT JOIN drug dr ON pd.drug_id = dr.drug_id";
         $res = $this->conn->query($sql);
         if ($res) {
             return $res->fetch_all(MYSQLI_ASSOC);
@@ -97,23 +113,50 @@ class PrescriptionRepository {
 
     // Update prescription
     public function update($prescription) {
-        $sql = "UPDATE " . $this->table_name . " SET prescribing_doctor = ?, record_id = ?, prescription_date = ?, status = ? WHERE prescription_id = ?";
+        $prescription_id = $prescription['prescription_id'] ?? null;
+        if ($prescription_id === null) {
+            return false;
+        }
+
+        $fields = [];
+        $params = [];
+        $types = '';
+
+        if (isset($prescription['prescribing_doctor'])) {
+            $fields[] = 'prescribing_doctor = ?';
+            $params[] = $prescription['prescribing_doctor'];
+            $types .= 'i';
+        }
+        if (isset($prescription['record_id'])) {
+            $fields[] = 'record_id = ?';
+            $params[] = $prescription['record_id'];
+            $types .= 'i';
+        }
+        if (isset($prescription['prescription_date'])) {
+            $fields[] = 'prescription_date = ?';
+            $params[] = $prescription['prescription_date'];
+            $types .= 's';
+        }
+        if (isset($prescription['status'])) {
+            $fields[] = 'status = ?';
+            $params[] = $prescription['status'];
+            $types .= 's';
+        }
+
+        if (empty($fields)) {
+            return false;
+        }
+
+        $sql = "UPDATE " . $this->table_name . " SET " . implode(', ', $fields) . " WHERE prescription_id = ?";
         $stmt = $this->conn->prepare($sql);
         if (! $stmt) {
             return false;
         }
 
-        $prescribing_doctor = $prescription['prescribing_doctor'] ?? null;
-        $record_id = $prescription['record_id'] ?? null;
-        $prescription_date = $prescription['prescription_date'] ?? null;
-        $status = $prescription['status'] ?? null;
-        $prescription_id = $prescription['prescription_id'] ?? null;
+        $params[] = $prescription_id;
+        $types .= 'i';
 
-        if ($prescription_id === null) {
-            return false;
-        }
-
-        $stmt->bind_param('iissi', $prescribing_doctor, $record_id, $prescription_date, $status, $prescription_id);
+        $stmt->bind_param($types, ...$params);
         $stmt->execute();
         return ($stmt->affected_rows > 0);
     }

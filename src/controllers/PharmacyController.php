@@ -1,4 +1,5 @@
 <?php
+
 require_once '../service/PharmacyService.php';
 
 class PharmacyController {
@@ -15,7 +16,7 @@ class PharmacyController {
             $data = $_POST;
         }
         
-        $result = $this->pharmacyService->registerPharmacy($data);
+        $result = $this->pharmacyService->createPharmacy($data);
         
         header('Content-Type: application/json');
         http_response_code(isset($result['error']) ? 400 : 201);
@@ -26,8 +27,10 @@ class PharmacyController {
         $userId = $_GET['user_id'] ?? null;
         
         if (!$userId) {
-            http_response_code(400);
-            return json_encode(['error' => 'User ID is required']);
+            // For now, let's assume a logged-in pharmacy. 
+        
+            
+            $userId = 1; 
         }
         
         $result = $this->pharmacyService->getPharmacyProfile($userId);
@@ -41,12 +44,13 @@ class PharmacyController {
         $userId = $_GET['user_id'] ?? null;
         
         if (!$userId) {
-            http_response_code(400);
-            return json_encode(['error' => 'User ID is required']);
+            // For now, let's assume a logged-in pharmacy. 
+            
+            $userId = 1; 
         }
-                
+        
         $data = json_decode(file_get_contents("php://input"), true);
-
+        
         if (empty($data)) {
             $data = $_POST;
         }
@@ -58,117 +62,25 @@ class PharmacyController {
         return json_encode($result);
     }
 
-    public function getPrescriptions() {
-        $pharmacyId = $_GET['pharmacy_id'] ?? null;
-        
-        if (!$pharmacyId) {
-            http_response_code(400);
-            return json_encode(['error' => 'Pharmacy ID is required']);
-        }
-        
-        $result = $this->pharmacyService->getPharmacyPrescriptions($pharmacyId);
+    public function getAllPharmacies() {
+        $result = $this->pharmacyService->getAllPharmacies();
         
         header('Content-Type: application/json');
         return json_encode($result);
     }
 
-    public function updatePrescriptionStatus() {
-        $prescriptionId = $_GET['prescription_id'] ?? null;
+    public function deletePharmacy() {
+        $userId = $_GET['user_id'] ?? null;
         
-        if (!$prescriptionId) {
+        if (!$userId) {
             http_response_code(400);
-            return json_encode(['error' => 'Prescription ID is required']);
+            return json_encode(['error' => 'User ID is required']);
         }
         
-        $data = json_decode(file_get_contents("php://input"), true);
-        
-        if (empty($data)) {
-            $data = $_POST;
-        }
-        
-        if (empty($data['status'])) {
-            http_response_code(400);
-            return json_encode(['error' => 'Status is required']);
-        }
-        
-        $result = $this->pharmacyService->updatePrescriptionStatus($prescriptionId, $data['status']);
+        $result = $this->pharmacyService->deletePharmacy($userId);
         
         header('Content-Type: application/json');
-        http_response_code(isset($result['error']) ? 400 : 200);
-        return json_encode($result);
-    }
-
-    public function filterPrescriptions() {
-        $data = json_decode(file_get_contents("php://input"), true);
-        
-        if (empty($data)) {
-            $data = $_GET;
-        }
-        
-        $result = $this->pharmacyService->filterPrescriptions($data);
-        
-        header('Content-Type: application/json');
-        return json_encode($result);
-    }
-
-    public function getStatistics() {
-        $pharmacyId = $_GET['pharmacy_id'] ?? null;
-        
-        if (!$pharmacyId) {
-            http_response_code(400);
-            return json_encode(['error' => 'Pharmacy ID is required']);
-        }
-        
-        $result = $this->pharmacyService->getPharmacyStatistics($pharmacyId);
-        
-        header('Content-Type: application/json');
-        return json_encode($result);
-    }
-
-    public function getPrescriptionDetails() {
-        $prescriptionId = $_GET['prescription_id'] ?? null;
-        
-        if (!$prescriptionId) {
-            http_response_code(400);
-            return json_encode(['error' => 'Prescription ID is required']);
-        }
-        
-        require_once '../repositories/PrescriptionRepository.php';
-        $prescriptionRepo = new PrescriptionRepository();
-        $details = $prescriptionRepo->getPrescriptionDetails($prescriptionId);
-        
-        header('Content-Type: application/json');
-        return json_encode([
-            'success' => true,
-            'details' => $details
-        ]);
-    }
-
-    public function searchByPatient() {
-        $searchTerm = $_GET['search'] ?? null;
-        
-        if (!$searchTerm) {
-            http_response_code(400);
-            return json_encode(['error' => 'Search term is required']);
-        }
-        
-        $result = $this->pharmacyService->searchByPatient($searchTerm);
-        
-        header('Content-Type: application/json');
-        return json_encode($result);
-    }
-
-    public function searchByDrug() {
-        $drugId = $_GET['drug_id'] ?? null;
-        
-        if (!$drugId) {
-            http_response_code(400);
-            return json_encode(['error' => 'Drug ID is required']);
-        }
-        
-        $result = $this->pharmacyService->searchByDrug($drugId);
-        
-        header('Content-Type: application/json');
+        http_response_code(isset($result['error']) ? 404 : 200);
         return json_encode($result);
     }
 }

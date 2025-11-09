@@ -129,17 +129,17 @@ class PrescriptionController {
     }
 
     public function updatePrescriptionStatus() {
-        $prescriptionId = $_GET['prescription_id'] ?? null;
-        
-        if (!$prescriptionId) {
-            http_response_code(400);
-            return json_encode(['error' => 'Prescription ID is required']);
-        }
-        
         $data = json_decode(file_get_contents("php://input"), true);
         
         if (empty($data)) {
             $data = $_POST;
+        }
+
+        $prescriptionId = $data['prescription_id'] ?? null;
+        
+        if (!$prescriptionId) {
+            http_response_code(400);
+            return json_encode(['error' => 'Prescription ID is required']);
         }
         
         if (empty($data['status'])) {
