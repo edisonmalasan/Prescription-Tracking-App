@@ -210,7 +210,6 @@ CREATE TABLE `prescriptiondetails` (
   `frequency` varchar(50),
   `special_instructions` text,
   `refills` int DEFAULT 0,
-  `description` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`prescription_id`,`drug_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
