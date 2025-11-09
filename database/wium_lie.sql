@@ -185,6 +185,8 @@ CREATE TABLE IF NOT EXISTS `prescriptiondetails` (
   `dosage` varchar(50) DEFAULT NULL,
   `frequency` varchar(50) DEFAULT NULL,
   `special_instructions` text,
+  `refills` int DEFAULT 0,
+  `description` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`prescription_id`,`drug_id`),
   KEY `fk_details_drug` (`drug_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

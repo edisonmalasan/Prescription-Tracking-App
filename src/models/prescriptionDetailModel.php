@@ -8,6 +8,7 @@ class PrescriptionDetailModel {
     public $frequency;
     public $refills;
     public $special_instructions;
+    public $description;
 
     public function __construct($data = []) {
         if (!empty($data)) {
@@ -18,6 +19,7 @@ class PrescriptionDetailModel {
             $this->frequency = $data['frequency'] ?? '';
             $this->refills = $data['refills'] ?? 0;
             $this->special_instructions = $data['special_instructions'] ?? '';
+            $this->description = $data['description'] ?? '';
         }
     }
 
@@ -29,7 +31,8 @@ class PrescriptionDetailModel {
             'dosage' => $this->dosage,
             'frequency' => $this->frequency,
             'refills' => $this->refills,
-            'special_instructions' => $this->special_instructions
+            'special_instructions' => $this->special_instructions,
+            'description' => $this->description
         ];
     }
 

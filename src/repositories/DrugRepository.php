@@ -24,11 +24,12 @@ class DrugRepository {
         $brand = $drug['brand'] ?? '';
         $chemical_name = $drug['chemical_name'] ?? '';
         $category = $drug['category'] ?? '';
-        $expiry_date = $drug['expiry_date'] ?? null;
+    // ensure expiry_date is a string (mysqli bind_param expects variables)
+    $expiry_date = isset($drug['expiry_date']) && $drug['expiry_date'] !== null ? $drug['expiry_date'] : '';
         $isControlled = isset($drug['isControlled']) ? (int)$drug['isControlled'] : 0;
 
-    // types: generic_name(s), brand(s), chemical_name(s), category(s), expiry_date(s), isControlled(i)
-    $stmt->bind_param('sssssi', $generic_name, $brand, $chemical_name, $category, $expiry_date, $isControlled);
+        // types: generic_name(s), brand(s), chemical_name(s), category(s), expiry_date(s), isControlled(i)
+        $stmt->bind_param('sssssi', $generic_name, $brand, $chemical_name, $category, $expiry_date, $isControlled);
         $ok = $stmt->execute();
 
         if ($ok) {
@@ -117,7 +118,8 @@ class DrugRepository {
         $brand = $drug['brand'] ?? '';
         $chemical_name = $drug['chemical_name'] ?? '';
         $category = $drug['category'] ?? '';
-        $expiry_date = $drug['expiry_date'] ?? null;
+    // ensure expiry_date is a string for binding
+    $expiry_date = isset($drug['expiry_date']) && $drug['expiry_date'] !== null ? $drug['expiry_date'] : '';
         $isControlled = isset($drug['isControlled']) ? (int)$drug['isControlled'] : 0;
         $drug_id = $drug['drug_id'] ?? null;
 
