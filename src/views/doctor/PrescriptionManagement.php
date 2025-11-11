@@ -35,12 +35,21 @@
               <input id="medication-name" placeholder="Start typing..."/>
               <div id="drug-suggestions" class="search-results"></div>
 
-              <label>Dosage</label>
-              <input id="dosage" />
-              <label>Frequency</label>
-              <input id="frequency" />
-              <label>Duration (days)</label>
-              <input id="duration" type="number" />
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Dosage</label>
+                  <input id="dosage" />
+                </div>
+                <div class="form-group">
+                  <label>Frequency</label>
+                  <input id="frequency" />
+                </div>
+                <div class="form-group">
+                  <label>Duration (days)</label>
+                  <input id="duration" type="number" />
+                </div>
+              </div>
+
               <label>Refills</label>
               <input id="refills" type="number" value="0" />
               <label>Special Instructions</label>
