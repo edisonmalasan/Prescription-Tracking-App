@@ -66,7 +66,6 @@ class PrescriptionRepository {
                     $frequency = $d['frequency'] ?? $d->frequency ?? '';
                     $refills = isset($d['refills']) ? (int)$d['refills'] : 0;
                     $special_instructions = $d['special_instructions'] ?? $d->special_instructions ?? '';
-                    $description = $d['description'] ?? $d->description ?? '';
 
                     $dStmt->bind_param('iisssiss', $prescription_id, $drug_id, $duration, $dosage, $frequency, $refills, $special_instructions, $description);
                     if (! $dStmt->execute()) {
