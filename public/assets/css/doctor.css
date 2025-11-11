@@ -226,24 +226,94 @@ table thead th {
 input[type="text"],
 input[type="email"],
 input[type="number"],
-textarea {
+input[type="password"],
+input[type="tel"],
+input[type="date"],
+input[type="time"],
+textarea,
+select {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #ccc;
+  border: 1px solid #d1d5db;
   border-radius: var(--radius);
   font-size: 14px;
+  font-family: inherit;
   transition: border 0.2s, box-shadow 0.2s;
+  background-color: #ffffff;
+  box-sizing: border-box;
 }
 
+/* Ensure input focus states are applied */
 input:focus,
-textarea:focus {
+textarea:focus,
+select:focus {
   border-color: var(--primary);
   outline: none;
   box-shadow: 0 0 0 2px rgba(0, 74, 173, 0.15);
 }
 
+/* Explicit rules for common input types */
+#presc-search-patient,
+#medication-name,
+#dosage,
+#frequency,
+#duration,
+#refills {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-family: inherit;
+  background-color: #ffffff;
+  box-sizing: border-box;
+}
+
+#presc-search-patient:focus,
+#medication-name:focus,
+#dosage:focus,
+#frequency:focus,
+#duration:focus,
+#refills:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 74, 173, 0.15);
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #1f2937;
+  border: none;
+}
+
 textarea {
   min-height: 90px;
+}
+
+/* --- Form Row & Groups --- */
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+  margin-top: 16px;
+  border: none;
+  padding: 0;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 6px;
+  border: none;
+  padding: 0;
+  font-weight: 500;
+  color: #1f2937;
 }
 
 /* --- Two-Column Layout --- */
@@ -342,8 +412,6 @@ textarea {
 .btn.hidden {
   display: none;
 }
-
-
 
 /* --- Utilities --- */
 .small {
