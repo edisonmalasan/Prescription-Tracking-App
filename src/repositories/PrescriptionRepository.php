@@ -149,8 +149,9 @@ class PrescriptionRepository {
                     CONCAT(d_user.first_name, ' ', d_user.last_name) AS doctor_name,
                     pd.dosage,
                     pd.duration,
-                    dr.medication_name,
-                    p.notes
+                    pd.frequency,
+                    dr.generic_name AS medication_name,
+                    pd.special_instructions AS notes
                 FROM prescription p
                 JOIN medicalrecord mr ON p.record_id = mr.record_id
                 JOIN users u ON mr.user_id = u.user_id
