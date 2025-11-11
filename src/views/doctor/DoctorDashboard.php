@@ -65,6 +65,6 @@
     </div>
   </div>
 
-  <script src="..\..\public\assets\js\doctor\doctorDashboard.js"></script>
+  <script src="../../../public/assets/js/doctor/doctorDashboard.js"></script>
 </body>
 </html>
