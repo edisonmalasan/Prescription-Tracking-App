@@ -17,7 +17,7 @@ class PrescriptionRepository {
     // Create a new prescription
     public function create($prescription) {
         // Expecting $prescription to be an array with keys: prescribing_doctor, record_id, prescription_date, status, details
-        // details should be an array of detail arrays (drug_id, duration, dosage, frequency, refills, special_instructions, description)
+        // details should be an array of detail arrays (drug_id, duration, dosage, frequency, refills, special_instructions)
         $prescribing_doctor = $prescription['prescribing_doctor'] ?? null;
         $record_id = $prescription['record_id'] ?? null;
         $prescription_date = $prescription['prescription_date'] ?? date('Y-m-d');
@@ -39,6 +39,8 @@ class PrescriptionRepository {
                 $this->conn->rollback();
                 return false;
             }
+
+            error_log("[DEBUG] Creating prescription: Doctor={$prescribing_doctor}, Record={$record_id}, Date={$prescription_date}, Status={$status}");
             $stmt->bind_param('iiss', $prescribing_doctor, $record_id, $prescription_date, $status);
             if (! $stmt->execute()) {
                 error_log("PrescriptionRepository.create execute failed: " . $stmt->error);
@@ -50,7 +52,7 @@ class PrescriptionRepository {
 
             // Insert details if any
             if (!empty($details)) {
-                $detailSql = "INSERT INTO " . $this->details_table . " (prescription_id, drug_id, duration, dosage, frequency, refills, special_instructions, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                $detailSql = "INSERT INTO " . $this->details_table . " (prescription_id, drug_id, duration, dosage, frequency, refills, special_instructions) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 $dStmt = $this->conn->prepare($detailSql);
                 if (! $dStmt) {
                     error_log("PrescriptionRepository.create detail prepare failed: " . $this->conn->error);
@@ -67,7 +69,7 @@ class PrescriptionRepository {
                     $refills = isset($d['refills']) ? (int)$d['refills'] : 0;
                     $special_instructions = $d['special_instructions'] ?? $d->special_instructions ?? '';
 
-                    $dStmt->bind_param('iisssiss', $prescription_id, $drug_id, $duration, $dosage, $frequency, $refills, $special_instructions, $description);
+                    $dStmt->bind_param('iisssis', $prescription_id, $drug_id, $duration, $dosage, $frequency, $refills, $special_instructions);
                     if (! $dStmt->execute()) {
                         error_log("PrescriptionRepository.create detail execute failed: " . $dStmt->error);
                         echo "[DEBUG] detail execute failed: " . $dStmt->error . "\n";
@@ -243,7 +245,7 @@ class PrescriptionRepository {
     }
 
     public function addPrescriptionDetail($detail) {
-        $sql = "INSERT INTO " . $this->details_table . " (prescription_id, drug_id, duration, dosage, frequency, refills, special_instructions, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO " . $this->details_table . " (prescription_id, drug_id, duration, dosage, frequency, refills, special_instructions) VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($sql);
         if (! $stmt) {
             return false;
@@ -256,9 +258,8 @@ class PrescriptionRepository {
         $frequency = $detail['frequency'] ?? '';
         $refills = isset($detail['refills']) ? (int)$detail['refills'] : 0;
         $special_instructions = $detail['special_instructions'] ?? '';
-        $description = $detail['description'] ?? '';
 
-        $stmt->bind_param('iisssiss', $prescription_id, $drug_id, $duration, $dosage, $frequency, $refills, $special_instructions, $description);
+        $stmt->bind_param('iisssis', $prescription_id, $drug_id, $duration, $dosage, $frequency, $refills, $special_instructions);
         $stmt->execute();
         return ($stmt->affected_rows > 0);
     }
