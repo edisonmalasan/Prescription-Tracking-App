@@ -46,6 +46,7 @@ $patient_id = $_SESSION['patient_id'] ?? null;
               <th>Doctor</th>
               <th>Date</th>
               <th>Status</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -55,9 +56,6 @@ $patient_id = $_SESSION['patient_id'] ?? null;
   </div>
 </div>
 
-<script>
-const USER_ID = <?= json_encode($patient_id) ?>;
-</script>
-<script src="..\..\public\assets\js\patient\patientdashboard.js"></script>
+<script src="../../../public/assets/js/patient/patientdashboard.js"></script>
 </body>
 </html>
