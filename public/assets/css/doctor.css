@@ -155,6 +155,12 @@ html, body {
   cursor: not-allowed;
 }
 
+input:disabled {
+  background-color: #f0f0f0;
+  color: #777;
+  cursor: not-allowed;
+}
+
 /* --- Content Area --- */
 .content {
   padding: 24px 32px;
@@ -357,7 +363,7 @@ textarea {
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.35);
-  z-index: 1000;
+  z-index: 99999;
 }
 
 .modal.hidden {
