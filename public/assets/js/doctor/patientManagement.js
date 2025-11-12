@@ -128,18 +128,45 @@ async function openPatientModal(userId) {
     const record = recordRes.medical_record ?? {};
     const prescriptions = prescriptionsRes.prescriptions ?? [];
 
+    const prescriptionsWithDetails = await Promise.all(
+      prescriptions.map(async (rx) => {
+        try {
+          const detailRes = await fetchJSON(`${API_BASE}/prescriptionRoutes.php?action=details&prescription_id=${rx.prescription_id}`);
+          rx.details = detailRes.details ?? [];
+
+          //now fetch drug name from drug
+          rx.details = await Promise.all(
+            rx.details.map(async (d) => {
+              if (d.drug_id) {
+                try {
+                  const drugRes = await fetchJSON(`${API_BASE}/drugRoutes.php?action=get&drug_id=${d.drug_id}`);
+                  d.generic_name = drugRes.drug?.generic_name ?? "Unknown";
+                } catch {
+                  d.generic_name = "Unknown";
+                }
+              } else {
+                d.generic_name = "—";
+              }
+              return d;
+            })
+          );
+        } catch {
+          rx.details = [];
+        }
+        return rx;
+      })
+    );
+
+    const activePrescriptions = prescriptionsWithDetails.filter(rx => rx.status === "active");
+
     const activeRows =
-      prescriptions
-        .flatMap(rx => rx.details ?? [])
-        .map(
-          d =>
-            `<tr>
-              <td>${d.generic_name ?? "—"}</td>
-              <td>${d.dosage ?? "—"}</td>
-              <td>${d.frequency ?? "—"}</td>
-            </tr>`
-        )
-        .join("") ||
+      activePrescriptions.flatMap(rx => rx.details ?? []).map(d => `
+        <tr>
+          <td>${d.generic_name ?? "—"}</td>
+          <td>${d.dosage ?? "—"}</td>
+          <td>${d.frequency ?? "—"}</td>
+        </tr>
+      `).join("") ||
       `<tr><td colspan="3">No active prescriptions</td></tr>`;
 
     document.getElementById("patient-modal-content").innerHTML = `
