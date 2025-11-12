@@ -172,7 +172,7 @@ async function createPrescription(user) {
       prescribing_doctor: user.user_id,
       record_id: record.record_id,
       prescription_date: new Date().toISOString().split("T")[0],
-      status: "active",
+      status: "pending",
       details: [
         {
           drug_id: selectedDrug.drug_id,
