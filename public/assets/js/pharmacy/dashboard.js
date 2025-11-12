@@ -29,6 +29,7 @@ const api = {
     }),
 };
 
+//dom refs
 const nameEl = document.getElementById("pharmacy-name");
 const addressEl = document.getElementById("pharmacy-address");
 const totalEl = document.getElementById("stat-total-prescriptions");
@@ -106,7 +107,36 @@ function renderTable(data) {
           ? "status-pending"
           : p.status === "filled"
           ? "status-filled"
+          : p.status === "dispensed"
+          ? "status-dispensed"
           : "status-other";
+
+      //dropdown actions --for status scaling cs idk
+      const actions = [];
+      if (p.status === "pending") {
+        actions.push(`
+          <button class="dropdown-item fill-btn" data-id="${p.prescription_id}" data-action="filled">
+            ✅ Mark as Filled
+          </button>
+          <button class="dropdown-item cancel-btn" data-id="${p.prescription_id}" data-action="cancelled">
+            ❌ Cancel
+          </button>`);
+      } else if (p.status === "filled") {
+        actions.push(`
+          <button class="dropdown-item dispense-btn" data-id="${p.prescription_id}" data-action="dispensed">
+            💊 Mark as Dispensed
+          </button>`);
+      }
+
+      const actionHTML = actions.length
+        ? `
+          <div class="dropdown">
+            <button class="btn small action-toggle" title="Actions">⋮</button>
+            <div class="dropdown-menu">
+              ${actions.join("")}
+            </div>
+          </div>`
+        : `<span class="text-muted">—</span>`;
 
       return `
         <tr>
@@ -118,37 +148,34 @@ function renderTable(data) {
           <td>${date}</td>
           <td>${p.notes ?? "—"}</td>
           <td class="${statusClass}">${capitalize(p.status)}</td>
-          <td>
-            ${
-              p.status === "pending"
-                ? `<button class="btn small fill-btn" data-id="${p.prescription_id}">Mark as Filled</button>`
-                : `<span class="text-muted">—</span>`
-            }
-          </td>
+          <td>${actionHTML}</td>
         </tr>
       `;
     })
     .join("");
 
-  document.querySelectorAll(".fill-btn").forEach((btn) => {
+  document.querySelectorAll(".dropdown-item").forEach((btn) => {
     btn.addEventListener("click", async (e) => {
       const prescId = e.target.dataset.id;
-      await markAsFilled(prescId);
+      const newStatus = e.target.dataset.action;
+      await updatePrescriptionStatus(prescId, newStatus);
     });
   });
 }
 
-async function markAsFilled(prescriptionId) {
-  if (!confirm("Mark this prescription as filled?")) return;
+
+
+async function updatePrescriptionStatus(prescriptionId, newStatus) {
+  if (!confirm(`Are you sure you want to mark this prescription as "${newStatus}"?`)) return;
 
   try {
     const res = await api.put(
       `prescriptionRoutes.php?action=update&prescription_id=${prescriptionId}`,
-      { status: "filled" }
+      { status: newStatus }
     );
 
     if (res.success) {
-      alert("Prescription marked as filled!");
+      alert(`Prescription updated to "${capitalize(newStatus)}"!`);
       await loadPrescriptions();
     } else {
       alert(res.error || "Failed to update prescription status.");
@@ -158,6 +185,7 @@ async function markAsFilled(prescriptionId) {
     alert("Server error while updating status.");
   }
 }
+
 
 function applyFilters() {
   const patientQuery = patientFilter.value.toLowerCase();
