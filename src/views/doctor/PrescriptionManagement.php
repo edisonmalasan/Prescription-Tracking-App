@@ -74,6 +74,6 @@
     </div>
   </div>
 
-  <script src="../../../public/assets/js/doctor/prescriptionManagement.js"></script>
+  <script src="../../../public/assets/js/doctor/prescription.js"></script>
 </body>
 </html>

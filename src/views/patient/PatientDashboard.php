@@ -56,6 +56,6 @@ $patient_id = $_SESSION['patient_id'] ?? null;
   </div>
 </div>
 
-<script src="../../../public/assets/js/patient/patientdashboard.js"></script>
+<script src="../../../public/assets/js/patient/dashboard.js"></script>
 </body>
 </html>
