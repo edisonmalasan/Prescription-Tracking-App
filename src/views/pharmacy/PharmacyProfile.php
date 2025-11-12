@@ -39,7 +39,10 @@
                 <input id="contact_number" placeholder="Contact Number" />
                 <input id="address" placeholder="Address" />
               </div>
-              <input id="operating_hours" placeholder="Operating Hours" />
+              <div class="two-col">
+                <input id="open_time" type="time" placeholder="Opening Time" />
+                <input id="close_time" type="time" placeholder="Closing Time" />
+              </div>
               <div class="row">
                 <button type="button" id="cancel-profile" class="btn small secondary">Cancel</button>
                 <button type="submit" id="save-profile" class="btn small">Save</button>

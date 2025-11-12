@@ -209,9 +209,9 @@ async function saveNewPatient() {
     first_name: document.getElementById("new-first-name").value.trim(),
     last_name: document.getElementById("new-last-name").value.trim(),
     email: `patient_${Date.now()}@temp.com`,
-    password: Math.random().toString(36).slice(-8),
+    password: 'temp123',
     birth_date: document.getElementById("new-birthdate").value,
-    contactno: document.getElementById("new-contact").value.trim(),
+    contactno: " " + document.getElementById("new-contact").value.trim(),
     address: document.getElementById("new-address").value.trim(),
   };
 
