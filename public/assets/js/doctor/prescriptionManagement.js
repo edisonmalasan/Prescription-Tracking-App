@@ -1,159 +1,223 @@
-const API_BASE = "../../src/api";
+console.log("Prescription Management JS loaded");
 
-async function fetchJSON(url, opts = {}) {
-  const res = await fetch(url, opts);
-  return res.json();
-}
+const API_BASE = "/Prescription-Tracking-App/src/api";
 
+const apiCall = async (url, options = {}) => {
+  const response = await fetch(url, {
+    headers: { "Content-Type": "application/json", ...options.headers },
+    ...options,
+  });
+  const text = await response.text();
+
+  // Strip PHP/Xdebug noise
+  const jsonStart = text.indexOf("{");
+  const cleanText = jsonStart >= 0 ? text.slice(jsonStart) : text;
+
+  try {
+    return JSON.parse(cleanText);
+  } catch (err) {
+    console.error("Invalid JSON from server:", text);
+    throw err;
+  }
+};
+
+const api = {
+  get: (endpoint) => apiCall(`${API_BASE}/${endpoint}`),
+  post: (endpoint, data) =>
+    apiCall(`${API_BASE}/${endpoint}`, { method: "POST", body: JSON.stringify(data) }),
+};
+
+// === Global state ===
 let selectedPatient = null;
 let selectedDrug = null;
 
-async function searchPatients(query) {
-  if (!query) return [];
-  // get all patients and filter client-side for simplicity
-  const res = await fetchJSON(`${API_BASE}/patientRoutes.php?action=all`);
-  const patients = res.patients ?? [];
-  return patients.filter(p => (`${p.first_name} ${p.last_name}`).toLowerCase().includes(query.toLowerCase()));
-}
+// === DOM references ===
+const searchInput = document.getElementById("presc-search-patient");
+const patientResults = document.getElementById("patient-search-results");
+const selectedPatientBox = document.getElementById("selected-patient");
+const allergiesBox = document.getElementById("patient-allergies");
+const medicationsBox = document.getElementById("current-medications");
 
-async function searchDrugs(query) {
-  if (!query) return [];
-  // use drugRoutes search if exists, fallback to all
+const medInput = document.getElementById("medication-name");
+const drugSuggestions = document.getElementById("drug-suggestions");
+
+const dosageInput = document.getElementById("dosage");
+const freqInput = document.getElementById("frequency");
+const durationInput = document.getElementById("duration");
+const refillsInput = document.getElementById("refills");
+const instructionsInput = document.getElementById("instructions");
+
+const createBtn = document.getElementById("create-presc");
+const cancelBtn = document.getElementById("cancel-presc");
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = JSON.parse(sessionStorage.getItem("loggedInUser"));
+  if (!user || user.role !== "DOCTOR") {
+    window.location.href = "../../../public/login.html";
+    return;
+  }
+
+  // === Patient Search ===
+  searchInput.addEventListener("input", async (e) => {
+    const q = e.target.value.trim();
+    if (!q) {
+      patientResults.innerHTML = "";
+      return;
+    }
+
+    try {
+      const res = await api.get(`patientRoutes.php?action=by-doctor&user_id=${user.user_id}`);
+      const allPatients = res.patients ?? [];
+      const matches = allPatients.filter(p =>
+        `${p.first_name} ${p.last_name}`.toLowerCase().includes(q.toLowerCase())
+      );
+
+      patientResults.innerHTML = matches
+        .map(
+          (p) =>
+            `<div class="search-item" data-id="${p.user_id}">
+              ${p.first_name} ${p.last_name} — ${p.contactno ?? ""}
+            </div>`
+        )
+        .join("");
+
+      document.querySelectorAll(".search-item").forEach((el) => {
+        el.addEventListener("click", () => selectPatient(el.dataset.id, user));
+      });
+    } catch (err) {
+      console.error("Error searching patients:", err);
+    }
+  });
+
+  // === Drug Autocomplete ===
+  medInput.addEventListener("input", async (e) => {
+    const q = e.target.value.trim();
+    if (!q) {
+      drugSuggestions.innerHTML = "";
+      return;
+    }
+
+    try {
+      const res = await api.get(`drugRoutes.php?action=search&search=${encodeURIComponent(q)}`);
+      const drugs = res.drugs ?? [];
+      drugSuggestions.innerHTML = drugs
+        .map((d) => `<div class="search-item" data-id="${d.drug_id}">${d.generic_name}</div>`)
+        .join("");
+
+      document.querySelectorAll("#drug-suggestions .search-item").forEach((el) => {
+        el.addEventListener("click", () => {
+          selectedDrug = { drug_id: el.dataset.id, name: el.textContent };
+          medInput.value = selectedDrug.name;
+          drugSuggestions.innerHTML = "";
+        });
+      });
+    } catch (err) {
+      console.error("Error fetching drugs:", err);
+    }
+  });
+
+  // === Buttons ===
+  createBtn.addEventListener("click", () => createPrescription(user));
+  cancelBtn.addEventListener("click", resetForm);
+});
+
+// === Patient selection ===
+async function selectPatient(patientId, doctor) {
   try {
-    const res = await fetchJSON(`${API_BASE}/drugRoutes.php?action=search&q=${encodeURIComponent(query)}`);
-    return res.drugs ?? [];
-  } catch (e) {
-    const res = await fetchJSON(`${API_BASE}/drugRoutes.php?action=all`);
-    return (res.drugs ?? []).filter(d => (d.generic_name + ' ' + d.brand).toLowerCase().includes(query.toLowerCase()));
+    const [profileRes, recordRes] = await Promise.all([
+      api.get(`patientRoutes.php?action=profile&user_id=${patientId}`),
+      api.get(`patientRoutes.php?action=medical-record&user_id=${patientId}`),
+    ]);
+
+    const profile = profileRes.patient ?? {};
+    const record = recordRes.medical_record ?? {};
+
+    selectedPatient = profile;
+
+    selectedPatientBox.innerHTML = `
+      <strong>${profile.first_name ?? "Unknown"} ${profile.last_name ?? ""}</strong><br/>
+      ${profile.contactno ?? ""}
+    `;
+
+    allergiesBox.textContent = record.allergies ?? "—";
+    medicationsBox.textContent = record.medications ?? "—";
+
+    patientResults.innerHTML = "";
+    searchInput.value = `${profile.first_name} ${profile.last_name}`;
+  } catch (err) {
+    console.error("Error selecting patient:", err);
+    alert("Failed to load patient info");
   }
 }
 
-// Wire UI
-document.addEventListener("DOMContentLoaded", () => {
-  const patientInput = document.getElementById("presc-search-patient");
-  const patientResults = document.getElementById("patient-search-results");
-  const selectedPatientBox = document.getElementById("selected-patient");
-  const allergiesBox = document.getElementById("patient-allergies");
-  const currentMedsBox = document.getElementById("current-medications");
+// === Create Prescription ===
+async function createPrescription(user) {
+  if (!selectedPatient) {
+    return alert("Please select a patient first.");
+  }
 
-  patientInput.addEventListener("input", async (e) => {
-    const q = e.target.value.trim();
-    patientResults.innerHTML = '';
-    if (!q) return;
-    const hits = await searchPatients(q);
-    hits.slice(0, 6).forEach(p => {
-      const div = document.createElement("div");
-      div.className = 'search-item';
-      div.textContent = `${p.first_name} ${p.last_name} — ${p.contactno ?? ''}`;
-      div.addEventListener("click", async () => {
-        selectedPatient = p;
-        selectedPatientBox.innerHTML = `<strong>${p.first_name} ${p.last_name}</strong><div>Age: ${p.birth_date ? (new Date().getFullYear() - new Date(p.birth_date).getFullYear()) : '—'}</div><div>Contact: ${p.contactno ?? '—'}</div>`;
-        patientResults.innerHTML = '';
-        // fetch medical record for allergies + current meds via patientRoutes.php?action=medical-record
-        const record = await fetchJSON(`${API_BASE}/patientRoutes.php?action=medical-record&user_id=${p.user_id}`);
-        allergiesBox.textContent = (record.record && record.record.allergies) ? record.record.allergies : 'None';
-        // current medications - fetch prescriptions by patient
-        const rxRes = await fetchJSON(`${API_BASE}/prescriptionRoutes.php?action=by-patient&patient_id=${p.user_id}`);
-        const meds = (rxRes.prescriptions ?? []).flatMap(r => r.details ?? []).map(d => d.medication_name).filter(Boolean);
-        currentMedsBox.innerHTML = meds.length ? `<ul>${meds.map(m => `<li>${m}</li>`).join('')}</ul>` : 'None';
-      });
-      patientResults.appendChild(div);
-    });
-  });
+  if (!selectedDrug) {
+    return alert("Please select a medication.");
+  }
 
-  // Drug autocomplete
-  const medInput = document.getElementById("medication-name");
-  const drugSuggestions = document.getElementById("drug-suggestions");
-  medInput.addEventListener("input", async (e) => {
-    const q = e.target.value.trim();
-    drugSuggestions.innerHTML = '';
-    if (!q) return;
-    const drugs = await searchDrugs(q);
-    drugs.slice(0, 8).forEach(d => {
-      const div = document.createElement("div");
-      div.className = 'search-item';
-      div.textContent = `${d.generic_name} ${d.brand ? '('+d.brand+')' : ''}`;
-      div.addEventListener("click", () => {
-        selectedDrug = d;
-        medInput.value = d.generic_name + (d.brand ? ` (${d.brand})` : '');
-        drugSuggestions.innerHTML = '';
-      });
-      drugSuggestions.appendChild(div);
-    });
-  });
-
-  document.getElementById("cancel-presc").addEventListener("click", () => {
-    // reset fields
-    selectedPatient = null;
-    selectedDrug = null;
-    medInput.value = '';
-    document.getElementById("dosage").value = '';
-    document.getElementById("frequency").value = '';
-    document.getElementById("duration").value = '';
-    document.getElementById("refills").value = 0;
-    document.getElementById("instructions").value = '';
-    document.getElementById("selected-patient").textContent = 'No patient selected';
-    document.getElementById("patient-allergies").textContent = '—';
-    document.getElementById("current-medications").textContent = '—';
-  });
-
-  document.getElementById("create-presc").addEventListener("click", async () => {
-    if (!selectedPatient) return alert("Please select a patient first.");
-    const medicationName = document.getElementById("medication-name").value.trim();
-    if (!medicationName) return alert("Please enter medication name.");
-
-    // Create prescription (POST) -> prescriptionRoutes.php?action=create
-    // assumed payload: { prescribing_doctor: (server uses session to determine doctor), record_id or patient_id, prescription_date }
-    // We'll send patient_id and prescription_date; controller should map to models.
-    try {
-      const prescRes = await fetchJSON(`${API_BASE}/prescriptionRoutes.php?action=create`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          patient_id: selectedPatient.user_id,
-          record_id: selectedPatient.record_id ?? null,
-          prescription_date: new Date().toISOString(),
-          status: "active"
-        })
-      });
-
-      if (!prescRes.success || !prescRes.prescription_id) {
-        console.error("Create prescription response", prescRes);
-        return alert("Failed to create prescription. Check console for details.");
-      }
-
-      const prescriptionId = prescRes.prescription_id;
-
-      // Add prescription detail
-      const detailPayload = {
-        prescription_id: prescriptionId,
-        drug_id: selectedDrug?.drug_id ?? null,
-        medication_name: medicationName,
-        dosage: document.getElementById("dosage").value,
-        frequency: document.getElementById("frequency").value,
-        duration: document.getElementById("duration").value,
-        refills: parseInt(document.getElementById("refills").value || 0),
-        special_instructions: document.getElementById("instructions").value
-      };
-
-      const detailRes = await fetchJSON(`${API_BASE}/prescriptionRoutes.php?action=add-detail`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(detailPayload)
-      });
-
-      if (!detailRes.success) {
-        console.error("Add detail response", detailRes);
-        return alert("Prescription created but failed to add details.");
-      }
-
-      alert("Prescription created successfully!");
-      // redirect to dashboard or clear form
-      location.href = "DoctorDashboard.php";
-
-    } catch (err) {
-      console.error("Error creating prescription", err);
-      alert("Server error when creating prescription.");
+  try {
+    // Get patient's record for linking
+    const recordRes = await api.get(
+      `patientRoutes.php?action=medical-record&user_id=${selectedPatient.user_id}`
+    );
+    const record = recordRes.medical_record ?? null;
+    if (!record) {
+      return alert("No medical record found for this patient.");
     }
-  });
-});
+
+    const payload = {
+      prescribing_doctor: user.user_id,
+      record_id: record.record_id,
+      prescription_date: new Date().toISOString().split("T")[0],
+      status: "active",
+      details: [
+        {
+          drug_id: selectedDrug.drug_id,
+          dosage: dosageInput.value.trim(),
+          frequency: freqInput.value.trim(),
+          duration: durationInput.value.trim(),
+          refills: parseInt(refillsInput.value) || 0,
+          special_instructions: instructionsInput.value.trim(),
+        },
+      ],
+    };
+
+    const response = await api.post("prescriptionRoutes.php?action=create", payload);
+
+    if (response.success) {
+      alert("Prescription created successfully!");
+      resetForm();
+    } else {
+      console.error("Prescription error:", response);
+      alert("Failed to create prescription.");
+    }
+  } catch (err) {
+    console.error("Error creating prescription:", err);
+    alert("Server error while creating prescription.");
+  }
+}
+
+// === Reset Form ===
+function resetForm() {
+  selectedPatient = null;
+  selectedDrug = null;
+
+  searchInput.value = "";
+  patientResults.innerHTML = "";
+  selectedPatientBox.textContent = "No patient selected";
+  allergiesBox.textContent = "—";
+  medicationsBox.textContent = "—";
+
+  medInput.value = "";
+  drugSuggestions.innerHTML = "";
+  dosageInput.value = "";
+  freqInput.value = "";
+  durationInput.value = "";
+  refillsInput.value = 0;
+  instructionsInput.value = "";
+}
