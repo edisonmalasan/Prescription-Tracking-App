@@ -124,8 +124,8 @@ async function openPatientModal(userId) {
       fetchJSON(`${API_BASE}/prescriptionRoutes.php?action=by-patient&patient_id=${userId}`)
     ]);
 
-    const profile = profileRes.profile ?? {};
-    const record = recordRes.record ?? {};
+    const profile = profileRes.patient ?? {};
+    const record = recordRes.medical_record ?? {};
     const prescriptions = prescriptionsRes.prescriptions ?? [];
 
     const activeRows =
