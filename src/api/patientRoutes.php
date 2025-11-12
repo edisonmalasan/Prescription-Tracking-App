@@ -32,6 +32,10 @@ switch ($method) {
             case 'medical-record':
                 echo $patientController->getMedicalRecord();
                 break;
+            case 'by-doctor':
+                echo $patientController->getPatientsByDoctor();
+                break;
+
             default:
                 http_response_code(404);
                 echo json_encode(['error' => 'Action not found']);

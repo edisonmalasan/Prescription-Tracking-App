@@ -35,8 +35,7 @@ class PatientService {
         $userId = $this->userRepository->create($patientData);
 
         if ($userId) {
-            $patientData['user_id'] = $userId;
-            $this->patientRepository->create($patientData);
+            $this->patientRepository->create($userId, $patientData);
             
             return [
                 'success' => true,
@@ -89,6 +88,20 @@ class PatientService {
             'patients' => $patients
         ];
     }
+
+    public function getPatientsByDoctor($userId) {
+    if (empty($userId)) {
+        return ['error' => 'User ID is required'];
+    }
+
+    $patients = $this->patientRepository->findByDoctor($userId);
+
+    return [
+        'success' => true,
+        'patients' => $patients
+    ];
+    }  
+
 
     public function createMedicalRecord($userId, $medicalRecordData) {
         $medicalRecordData['user_id'] = $userId;

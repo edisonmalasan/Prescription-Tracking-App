@@ -93,5 +93,22 @@ class PatientRepository {
         $stmt->execute();
         return ($stmt->affected_rows > 0);
     }
+
+    public function findByDoctor($userId) {
+    $sql = "SELECT DISTINCT u.user_id, u.first_name, u.last_name, u.contactno, p.birth_date
+            FROM patient p
+            JOIN users u ON p.user_id = u.user_id
+            JOIN medicalrecord m ON p.user_id = m.user_id
+            JOIN prescription pr ON m.record_id = pr.record_id
+            WHERE pr.prescribing_doctor = ?";
+    
+    $stmt = $this->conn->prepare($sql);
+    if (!$stmt) return [];
+    $stmt->bind_param('i', $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
+
 }
 ?>

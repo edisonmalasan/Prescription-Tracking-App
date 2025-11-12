@@ -138,5 +138,21 @@ class PatientController {
         http_response_code(isset($result['error']) ? 404 : 200);
         return json_encode($result);
     }
+
+    public function getPatientsByDoctor() {
+    $doctorId = $_GET['user_id'] ?? null;
+
+    if (!$doctorId) {
+        http_response_code(400);
+        return json_encode(['error' => 'Doctor ID is required']);
+    }
+
+    $result = $this->patientService->getPatientsByDoctor($doctorId);
+
+    header('Content-Type: application/json');
+    http_response_code(isset($result['error']) ? 400 : 200);
+    return json_encode($result);
+}
+
 }
 ?>
