@@ -86,12 +86,23 @@ async function loadPrescriptions(patientId) {
           <td>${p.doctor_name ?? "—"}</td>
           <td>${date}</td>
           <td class="${statusClass}">${capitalize(p.status)}</td>
+          <td><button class="btn small view-btn" data-id="${p.prescription_id}">View</button></td>
         </tr>
       `;
     })
     .join("");
 
   tableBody.innerHTML = rows || `<tr><td colspan="4">No recent prescriptions</td></tr>`;
+  document.querySelectorAll(".view-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const prescId = e.target.dataset.id;
+      if (!prescId) return alert("Missing prescription ID.");
+
+      sessionStorage.setItem("selectedPrescriptionId", prescId);
+
+      window.location.href = `./myprescription.php?prescription_id=${prescId}`;
+    });
+  });
 }
 
 function formatDate(dateStr) {
