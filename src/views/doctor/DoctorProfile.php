@@ -31,7 +31,6 @@
             <div id="profile-contact">Contact: —</div>
             <div id="profile-email">Email: —</div>
             <div id="profile-clinic">Clinic: —</div>
-            <div id="profile-address">Address: —</div>
           </div>
 
           <!-- EDIT FORM -->
@@ -62,6 +61,6 @@
     </div>
   </div>
 
-  <script src="..\..\public\assets\js\doctor\doctorProfile.js"></script>
+  <script src="../../../public/assets/js/doctor/profile.js"></script>
 </body>
 </html>

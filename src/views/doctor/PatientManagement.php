@@ -47,6 +47,35 @@
     </div>
   </div>
 
-  <script src="..\..\public\assets\js\doctor\patientManagement.js"></script>
+  <div id="add-patient-modal" class="modal hidden">
+    <div class="modal-inner" style="width: 420px;">
+      <button class="close-modal" onclick="hideModal('add-patient-modal')">&times;</button>
+
+      <h3>Add New Patient</h3>
+
+      <div class="form-grid">
+        <label>First Name</label>
+        <input id="new-first-name" type="text" />
+
+        <label>Last Name</label>
+        <input id="new-last-name" type="text" />
+
+        <label>Birthdate</label>
+        <input id="new-birthdate" type="date" />
+
+        <label>Contact No.</label>
+        <input id="new-contact" type="text" />
+
+        <label>Address</label>
+        <input id="new-address" type="text" />
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn" id="save-patient-btn">Save Patient</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../../public/assets/js/doctor/patient.js"></script>
 </body>
 </html>

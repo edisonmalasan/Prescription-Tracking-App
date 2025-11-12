@@ -9,7 +9,6 @@ const apiCall = async (url, options = {}) => {
   });
   const text = await response.text();
 
-  // Strip PHP/Xdebug noise
   const jsonStart = text.indexOf("{");
   const cleanText = jsonStart >= 0 ? text.slice(jsonStart) : text;
 
@@ -27,11 +26,10 @@ const api = {
     apiCall(`${API_BASE}/${endpoint}`, { method: "POST", body: JSON.stringify(data) }),
 };
 
-// === Global state ===
 let selectedPatient = null;
 let selectedDrug = null;
 
-// === DOM references ===
+//DOM refs
 const searchInput = document.getElementById("presc-search-patient");
 const patientResults = document.getElementById("patient-search-results");
 const selectedPatientBox = document.getElementById("selected-patient");
@@ -57,7 +55,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // === Patient Search ===
+  //patient search
   searchInput.addEventListener("input", async (e) => {
     const q = e.target.value.trim();
     if (!q) {
@@ -67,6 +65,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
       const res = await api.get(`patientRoutes.php?action=by-doctor&user_id=${user.user_id}`);
+      
       const allPatients = res.patients ?? [];
       const matches = allPatients.filter(p =>
         `${p.first_name} ${p.last_name}`.toLowerCase().includes(q.toLowerCase())
@@ -89,7 +88,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // === Drug Autocomplete ===
+  //drug auto
   medInput.addEventListener("input", async (e) => {
     const q = e.target.value.trim();
     if (!q) {
@@ -116,12 +115,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // === Buttons ===
   createBtn.addEventListener("click", () => createPrescription(user));
   cancelBtn.addEventListener("click", resetForm);
 });
 
-// === Patient selection ===
+//patients
 async function selectPatient(patientId, doctor) {
   try {
     const [profileRes, recordRes] = await Promise.all([
@@ -150,7 +148,6 @@ async function selectPatient(patientId, doctor) {
   }
 }
 
-// === Create Prescription ===
 async function createPrescription(user) {
   if (!selectedPatient) {
     return alert("Please select a patient first.");
@@ -161,7 +158,7 @@ async function createPrescription(user) {
   }
 
   try {
-    // Get patient's record for linking
+    //get record for linking
     const recordRes = await api.get(
       `patientRoutes.php?action=medical-record&user_id=${selectedPatient.user_id}`
     );
