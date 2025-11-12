@@ -1,21 +1,56 @@
-console.log("Dashboard JS loaded");
+console.log("Doctor Dashboard JS loaded");
 
-const API_BASE = "../../../src/api";
+const API_BASE = "/Prescription-Tracking-App/src/api";
 
-async function fetchJSON(url, opts = {}) {
-  const res = await fetch(url, opts);
-  return res.json();
-}
+const apiCall = async (url, options = {}) => {
+  const response = await fetch(url, {
+    headers: { "Content-Type": "application/json", ...options.headers },
+    ...options,
+  });
+  const text = await response.text();
+
+  //remove php debug texts
+  const jsonStart = text.indexOf("{");
+  const cleanText = jsonStart >= 0 ? text.slice(jsonStart) : text;
+
+  try {
+    return JSON.parse(cleanText);
+  } catch (err) {
+    console.error("Invalid JSON from server:", text);
+    throw err;
+  }
+};
+
+const api = {
+  get: (endpoint) => apiCall(`${API_BASE}/${endpoint}`),
+  post: (endpoint, data) =>
+    apiCall(`${API_BASE}/${endpoint}`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  put: (endpoint, data) =>
+    apiCall(`${API_BASE}/${endpoint}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+};
 
 document.addEventListener("DOMContentLoaded", async () => {
   const user = JSON.parse(sessionStorage.getItem("loggedInUser"));
+
   if (!user || user.role !== "DOCTOR") {
     window.location.href = "../../../public/login.html";
     return;
   }
 
-  
-  await loadDashboard(user.user_id);
+  console.log("Loading dashboard for doctor:", user.user_id);
+
+  try {
+    await loadDashboard(user);
+  } catch (err) {
+    console.error("Error loading dashboard:", err);
+    alert("Failed to load dashboard data.");
+  }
 
   const newBtn = document.getElementById("new-prescription-btn");
   if (newBtn) {
@@ -25,151 +60,120 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
+async function loadDashboard(user) {
+  const [doctorRes, patientRes, presRes] = await Promise.all([
+    api.get(`doctorRoutes.php?action=profile&user_id=${user.user_id}`),
+    api.get(`patientRoutes.php?action=all`),
+    api.get(`prescriptionRoutes.php?action=all`),
+  ]);
 
-async function loadDashboard(doctorId) {
-  try {
-    // const profileURL = `${API_BASE}/doctorRoutes.php?action=profile&user_id=${doctorId}`;
-    // const patientsURL = `${API_BASE}/patientRoutes.php?action=all`;
-    // const prescriptionsURL = `${API_BASE}/prescriptionRoutes.php?action=all`;
+  console.log("[DEBUG] Doctor:", doctorRes);
+  console.log("[DEBUG] Patients:", patientRes);
+  console.log("[DEBUG] Prescriptions:", presRes);
 
-    // console.log("PROFILE URL:", profileURL);
-    // console.log("PATIENTS URL:", patientsURL);
-    // console.log("PRESCRIPTIONS URL:", prescriptionsURL);
+  if (!doctorRes.success || !doctorRes.doctor) throw new Error("Failed to load doctor profile");
 
-    // // Test each endpoint individually
-    // const profileTxt = await (await fetch(profileURL)).text();
-    // console.log("PROFILE RAW:", profileTxt);
+  const doctor = doctorRes.doctor;
+  const doctorName = `${doctor.first_name} ${doctor.last_name}`.toLowerCase();
 
-    // const patientsTxt = await (await fetch(patientsURL)).text();
-    // console.log("PATIENTS RAW:", patientsTxt);
+  const prescriptions = (presRes.prescriptions ?? []).filter(
+    (p) => (p.doctor_name ?? "").toLowerCase() === doctorName
+  );
 
-    // const prescriptionsTxt = await (await fetch(prescriptionsURL)).text();
-    // console.log("PRESCRIPTIONS RAW:", prescriptionsTxt);
-
-    // return;
-    
-    const [
-      doctorRes,
-      patientsRes,
-      prescriptionsRes
-    ] = await Promise.all([
-      fetchJSON(`${API_BASE}/doctorRoutes.php?action=profile&user_id=${doctorId}`),
-      fetchJSON(`${API_BASE}/patientRoutes.php?action=all`),
-      fetchJSON(`${API_BASE}/prescriptionRoutes.php?action=all`)
-    ]);
-
-    //prescrip filter for doctor
-    const prescriptions = (prescriptionsRes.prescriptions || []).filter(
-      p => p.doctor_id == doctorId
-    );
-    
-    const patients = patientsRes.patients || [];
-    const patientMap = {};
-    patients.forEach(p => {
-      if (p.record_id) patientMap[p.record_id] = p;
-    });
-
-    // Update UI blocks
-    updateDoctorProfile(doctorRes);
-    updateStatsFromMergedLogic(patients, prescriptions, patientMap);
-    renderRecentPrescriptions(prescriptions, patientMap);
-    renderFullTable(prescriptions, patientMap);
-
-  } catch (err) {
-    console.error("Error loading dashboard:", err);
-  }
+  updateDoctorProfile(doctor);
+  updateStats(prescriptions);
+  renderRecentPrescriptions(prescriptions);
 }
 
-function updateDoctorProfile(docRes) {
-  if (!(docRes?.success && docRes.doctor)) return;
-
-  const p = docRes.doctor;
-
-  const nameEl = document.getElementById("doctor-name");
-  const prcEl = document.getElementById("doctor-prc");
-
-  if (nameEl) nameEl.textContent = `Welcome, Dr. ${p.first_name} ${p.last_name}`;
-  if (prcEl) prcEl.textContent = `PRC License: ${p.prc_license ?? "—"}`;
+function updateDoctorProfile(doctor) {
+  document.getElementById("doctor-name").textContent = `Welcome, Dr. ${doctor.first_name} ${doctor.last_name}`;
+  document.getElementById("doctor-prc").textContent = `PRC License: ${doctor.prc_license ?? "—"}`;
 }
 
-function updateStatsFromMergedLogic(patients, prescriptions, patientMap) {
+function updateStats(prescriptions) {
   const setText = (id, val) => {
     const el = document.getElementById(id);
-    if (el) el.textContent = val ?? "—";
+    if (el) el.textContent = val ?? "0";
   };
 
-  //dooctor -> patients
-  const docPatients = prescriptions
-    .map(pres => patientMap[pres.record_id])
-    .filter(Boolean);
+  if (!prescriptions || prescriptions.length === 0) {
+    setText("stat-total-patients", 0);
+    setText("stat-active-prescriptions", 0);
+    setText("stat-this-week", 0);
+    setText("stat-this-month", 0);
+    return;
+  }
 
-  setText("total-patients", new Set(docPatients.map(p => p.user_id)).size);
 
-  setText("total-prescriptions", prescriptions.length);
+  //filter by uniqque patient names
+  const totalPatients = new Set(
+    prescriptions.map((p) => (p.patient_name ?? "").trim().toLowerCase())
+  ).size;
 
-  // Time-based logic
+  //filter by active prescrips
+  const activeCount = prescriptions.filter(
+    (p) => (p.status ?? "").toLowerCase() === "active"
+  ).length;
+
   const now = new Date();
-  const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - now.getDay());
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const weekCount = prescriptions.filter(
-    p => new Date(p.created_at) >= startOfWeek
-  ).length;
+  const weekCount = prescriptions.filter((p) => {
+    const d = new Date(p.prescription_date);
+    return !isNaN(d) && d >= startOfWeek;
+  }).length;
 
-  const monthCount = prescriptions.filter(
-    p => new Date(p.created_at) >= startOfMonth
-  ).length;
+  const monthCount = prescriptions.filter((p) => {
+    const d = new Date(p.prescription_date);
+    return !isNaN(d) && d >= startOfMonth;
+  }).length;
 
-  setText("total-week", weekCount);
-  setText("total-month", monthCount);
+  setText("stat-total-patients", totalPatients);
+  setText("stat-active-prescriptions", activeCount);
+  setText("stat-this-week", weekCount);
+  setText("stat-this-month", monthCount);
+
+  console.log("[STATS DEBUG] patients:", totalPatients, "active:", activeCount, "week:", weekCount, "month:", monthCount);
 }
 
-function renderRecentPrescriptions(prescriptions, patientMap) {
+function renderRecentPrescriptions(prescriptions) {
   const tbody = document.querySelector("#recent-prescriptions tbody");
   if (!tbody) return;
 
   tbody.innerHTML = "";
 
-  const top10 = prescriptions.slice(0, 10);
-
-  top10.forEach(rx => {
-    const patient = patientMap[rx.record_id];
-    const row = document.createElement("tr");
-
-    row.innerHTML = `
-      <td>${patient ? `${patient.first_name} ${patient.last_name}` : "Unknown"}</td>
-      <td>${rx.medicine_name ?? rx.medication_name ?? "—"}</td>
-      <td>${rx.created_at ? new Date(rx.created_at).toLocaleDateString() : "—"}</td>
-      <td>${rx.status ?? "—"}</td>
-    `;
-
-    tbody.appendChild(row);
-  });
-}
-
-function renderFullTable(prescriptions, patientMap) {
-  const tableBody = document.querySelector(".patient-tbody");
-  if (!tableBody) return;
-
-  tableBody.innerHTML = "";
-
   if (!prescriptions.length) {
-    tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No prescriptions found</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No prescriptions found</td></tr>`;
     return;
   }
 
-  prescriptions.forEach((p, index) => {
-    const patient = patientMap[p.record_id];
-    const row = document.createElement("tr");
+  //sort by recent --idk if ts works
+  prescriptions.sort(
+    (a, b) => new Date(b.prescription_date) - new Date(a.prescription_date)
+  );
 
-    row.innerHTML = `
-      <td>${index + 1}</td>
-      <td>${patient ? patient.first_name + " " + patient.last_name : "Unknown"}</td>
-      <td>${p.medicine_name || "-"}</td>
-      <td>${p.dosage || "-"}</td>
-      <td>${p.created_at ? new Date(p.created_at).toLocaleDateString() : "-"}</td>
+  prescriptions.slice(0, 10).forEach((rx) => {
+    const tr = document.createElement("tr");
+    const status = (rx.status ?? "—").toLowerCase();
+    const statusLabel =
+      status === "active"
+        ? `<span class="status active">${status}</span>`
+        : `<span class="status">${status}</span>`;
+
+    tr.innerHTML = `
+      <td>${rx.patient_name ?? "Unknown"}</td>
+      <td>${rx.medication_name ?? "—"}</td>
+      <td>${formatDate(rx.prescription_date)}</td>
+      <td>${statusLabel}</td>
     `;
-
-    tableBody.appendChild(row);
+    tbody.appendChild(tr);
   });
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return "—";
+  const d = new Date(dateStr);
+  return isNaN(d) ? "—" : d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
