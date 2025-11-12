@@ -42,7 +42,8 @@ class AdminService {
             return ['error' => 'Access denied. Admin privileges required'];
         }
 
-        if (!password_verify($credentials['password'], $user['pass_hash'])) {
+        // if (!password_verify($credentials['password'], $user['pass_hash'])) {
+         if ($credentials['password'] !== $user['pass_hash']) {
             return ['error' => 'Invalid password'];
         }
 
@@ -125,7 +126,8 @@ class AdminService {
                 return ['error' => 'User with this email already exists'];
             }
 
-            $userData['pass_hash'] = password_hash($userData['password'], PASSWORD_BCRYPT);
+            // $userData['pass_hash'] = password_hash($userData['password'], PASSWORD_BCRYPT);
+            $userData['pass_hash'] = $userData['password'];
             unset($userData['password']);
 
             $userData['created_at'] = date('Y-m-d H:i:s');
@@ -158,7 +160,8 @@ class AdminService {
             }
 
             if (!empty($userData['password'])) {
-                $userData['pass_hash'] = password_hash($userData['password'], PASSWORD_BCRYPT);
+                // $userData['pass_hash'] = password_hash($userData['password'], PASSWORD_BCRYPT);
+                $userData['pass_hash'] = $userData['password'];
                 unset($userData['password']);
             }
 

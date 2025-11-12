@@ -20,7 +20,8 @@ class UserService {
             return ['error' => 'User with this email already exists'];
         }
 
-        $userData['pass_hash'] = password_hash($userData['password'], PASSWORD_BCRYPT);
+        // $userData['pass_hash'] = password_hash($userData['password'], PASSWORD_BCRYPT);
+        $userData['pass_hash'] = $userData['password'];
         unset($userData['password']); 
 
         $userData['created_at'] = date('Y-m-d H:i:s');
@@ -45,7 +46,7 @@ class UserService {
             return ['error' => 'User not found'];
         }
 
-        if (!password_verify($password, $user['pass_hash'])) {
+        if ($password !== $user['pass_hash']) {
             return ['error' => 'Invalid password'];
         }
 
@@ -122,13 +123,11 @@ class UserService {
             return ['error' => 'User not found'];
         }
 
-        if (!password_verify($oldPassword, $user['pass_hash'])) {
+        if ($oldPassword !== $user['pass_hash']) {
             return ['error' => 'Current password is incorrect'];
         }
 
-        $newHash = password_hash($newPassword, PASSWORD_BCRYPT);
-
-        $user['pass_hash'] = $newHash;
+        $user['pass_hash'] = $newPassword;
         $result = $this->userRepository->update($user);
         
         if ($result !== false) {

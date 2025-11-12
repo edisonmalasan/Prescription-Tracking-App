@@ -26,7 +26,8 @@ class PatientService {
             return ['error' => 'Patient with this email already exists'];
         }
 
-        $patientData['pass_hash'] = password_hash($patientData['password'], PASSWORD_BCRYPT);
+        // $patientData['pass_hash'] = password_hash($patientData['password'], PASSWORD_BCRYPT);
+        $patientData['pass_hash'] = $patientData['password'];
         unset($patientData['password']); 
 
         $patientData['role'] = 'PATIENT';

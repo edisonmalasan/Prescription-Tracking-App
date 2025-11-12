@@ -23,7 +23,8 @@ class PharmacyService {
             return ['error' => 'Pharmacy with this email already exists'];
         }
 
-        $pharmacyData['pass_hash'] = password_hash($pharmacyData['password'], PASSWORD_BCRYPT);
+        // $patientData['pass_hash'] = password_hash($patientData['password'], PASSWORD_BCRYPT);
+        $pharmacyData['pass_hash'] = $pharmacyData['password'];
         unset($pharmacyData['password']);
 
         $pharmacyData['role'] = 'PHARMACY';

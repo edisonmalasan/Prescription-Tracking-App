@@ -23,7 +23,8 @@ class DoctorService {
             return ['error' => 'Doctor with this email already exists'];
         }
 
-        $doctorData['pass_hash'] = password_hash($doctorData['password'], PASSWORD_BCRYPT);
+        // $doctorData['pass_hash'] = password_hash($doctorData['password'], PASSWORD_BCRYPT);
+        $doctorData['pass_hash'] = $doctorData['password'];
         unset($doctorData['password']);
 
         $doctorData['role'] = 'DOCTOR';
