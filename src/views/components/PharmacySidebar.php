@@ -11,3 +11,4 @@ $activePage = $activePage ?? 'dashboard';
     <a href="../../../public/login.html" class="logout-btn">Logout</a>
   </div>
 </aside>
+

@@ -53,7 +53,7 @@ CREATE TABLE `users` (
   `first_name` varchar(50) NOT NULL,
   `role` enum('DOCTOR','PATIENT','PHARMACY','ADMIN') NOT NULL,
   `email` varchar(100) NOT NULL,
-  `contactno` int DEFAULT NULL,
+  `contactno` varchar(20) DEFAULT NULL,
   `pass_hash` varchar(255) DEFAULT NULL,
   `address` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
@@ -63,12 +63,12 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `users` VALUES
-(1, 'Gud', 'Fyll', 'DOCTOR', 'feelgood@gmail.com', 918514237, '111', 'Goodville', '2025-10-25 03:06:32'),
-(2, 'Doe', 'Jane', 'PATIENT', 'jane.doe@example.com', 918123456, '222', 'Health Street', '2025-10-25 03:06:32'),
-(3, 'Smith', 'John', 'PHARMACY', 'john.smith@pharma.com', 918111222, '333', 'Pharma Town', '2025-10-25 03:06:32'),
-(4, 'Adams', 'Grace', 'ADMIN', 'grace.adams@sys.com', 918999888, '444', 'Admin City', '2025-10-25 03:06:32'),
-(5, 'White', 'Ella', 'PATIENT', 'ella.white@example.com', 918777666, '555', 'Wellness Village', '2025-10-25 03:06:32'),
-(6, 'Strong', 'Jack', 'PATIENT', 'jack.strong@example.com', 918123123, 'hashedpassword006', 'Resilient Avenue', '2025-10-25 03:13:46');
+(1, 'Gud', 'Fyll', 'DOCTOR', 'feelgood@gmail.com', '0918514237', '111', 'Goodville', '2025-10-25 03:06:32'),
+(2, 'Doe', 'Jane', 'PATIENT', 'jane.doe@example.com', '0918123456', '222', 'Health Street', '2025-10-25 03:06:32'),
+(3, 'Smith', 'John', 'PHARMACY', 'john.smith@pharma.com', '0918111222', '333', 'Pharma Town', '2025-10-25 03:06:32'),
+(4, 'Adams', 'Grace', 'ADMIN', 'grace.adams@sys.com', '0918999888', '444', 'Admin City', '2025-10-25 03:06:32'),
+(5, 'White', 'Ella', 'PATIENT', 'ella.white@example.com', '0918777666', '555', 'Wellness Village', '2025-10-25 03:06:32'),
+(6, 'Strong', 'Jack', 'PATIENT', 'jack.strong@example.com', '0918123123', 'hashedpassword006', 'Resilient Avenue', '2025-10-25 03:13:46');
 
 -- --------------------------------------------------------
 -- Table: admin

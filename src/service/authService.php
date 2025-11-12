@@ -56,6 +56,13 @@ class AuthService {
                 'created_at'  => date('Y-m-d H:i:s'),
             ];
             
+            $contact = trim($payload['contactno'] ?? '');
+            if ($contact === '') {
+                unset($payload['contactno']);
+            } else {
+                $payload['contactno'] = preg_replace('/[^\d\+]/', '', $contact);
+            }
+            
             $id = $this->userRepo->create($payload);
             
             if (!$id) {
