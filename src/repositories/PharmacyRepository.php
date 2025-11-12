@@ -70,21 +70,22 @@ class PharmacyRepository {
     }
 
     public function update($pharmacy) {
-        $sql = "UPDATE " . $this->table_name . " SET pharmacy_name = ?, operating_hours = ? WHERE user_id = ?";
+        $sql = "UPDATE " . $this->table_name . " SET pharmacy_name = ?, open_time = ?, close_time = ? WHERE user_id = ?";
         $stmt = $this->conn->prepare($sql);
         if (! $stmt) {
             return false;
         }
 
         $pharmacy_name = $pharmacy['pharmacy_name'] ?? null;
-        $operating_hours = $pharmacy['operating_hours'] ?? null;
+        $open_time = $pharmacy['open_time'] ?? null;
+        $close_time = $pharmacy['close_time'] ?? null;
         $user_id = $pharmacy['user_id'] ?? null;
 
         if ($user_id === null) {
             return false;
         }
 
-        $stmt->bind_param('ssi', $pharmacy_name, $operating_hours, $user_id);
+        $stmt->bind_param('sssi', $pharmacy_name, $open_time, $close_time, $user_id);
         $stmt->execute();
         
         $userRepo = new UserRepository();
