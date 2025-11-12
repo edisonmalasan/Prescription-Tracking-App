@@ -115,6 +115,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
+  //event listeners
   createBtn.addEventListener("click", () => createPrescription(user));
   cancelBtn.addEventListener("click", resetForm);
 });

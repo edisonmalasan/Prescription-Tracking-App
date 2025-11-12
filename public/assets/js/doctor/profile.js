@@ -56,6 +56,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     alert("Failed to load profile data.");
   }
 
+  //event listeners
   editBtn.addEventListener("click", enableEditMode);
   cancelBtn.addEventListener("click", cancelEdit);
   profileForm.addEventListener("submit", saveProfile);
@@ -70,6 +71,7 @@ async function loadDoctorProfile(doctorId) {
 
   const d = res.doctor;
 
+  //display refs
   document.getElementById("profile-name").textContent = `Dr. ${d.first_name} ${d.last_name}`;
   document.getElementById("profile-special").textContent = `Specialization: ${d.specialization ?? "—"}`;
   document.getElementById("profile-prc").textContent = `PRC License: ${d.prc_license ?? "—"}`;
@@ -77,6 +79,7 @@ async function loadDoctorProfile(doctorId) {
   document.getElementById("profile-email").textContent = `Email: ${d.email ?? "—"}`;
   document.getElementById("profile-clinic").textContent = `Clinic: ${d.clinic_name ?? "—"}`;
 
+  //form refs
   profileForm.querySelector("#first_name").value = d.first_name ?? "";
   profileForm.querySelector("#last_name").value = d.last_name ?? "";
   profileForm.querySelector("#contactno").value = d.contactno ?? "";
