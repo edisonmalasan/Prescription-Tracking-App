@@ -1,10 +1,45 @@
-console.log("Patient Managemet JS loaded");
+console.log("Patient Managememnt JS loaded");
 
 const API_BASE = "/Prescription-Tracking-App/src/api";
 
+const apiCall = async (url, options = {}) => {
+  const response = await fetch(url, {
+    headers: { "Content-Type": "application/json", ...options.headers },
+    ...options,
+  });
+  const text = await response.text();
+
+  //REMOVE DEBUG LINES
+  const jsonStart = text.indexOf("{");
+  const cleanText = jsonStart >= 0 ? text.slice(jsonStart) : text;
+
+  try {
+    return JSON.parse(cleanText);
+  } catch (err) {
+    console.error("Invalid JSON from server:", text);
+    throw err;
+  }
+};
+
+const api = {
+    get: (endpoint) => apiCall(`${API_BASE}/${endpoint}`),
+    post: (endpoint, data) => apiCall(`${API_BASE}/${endpoint}`, { method: 'POST', body: JSON.stringify(data) }),
+    put: (endpoint, data) => apiCall(`${API_BASE}/${endpoint}`, { method: 'PUT', body: JSON.stringify(data) })
+};
+
 async function fetchJSON(url, opts = {}) {
   const res = await fetch(url, opts);
-  return res.json();
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`HTTP ${res.status}: ${text.slice(0, 200)}`);
+  }
+  try {
+    return await res.json();
+  } catch {
+    const text = await res.text();
+    console.error("Invalid JSON from server:", text);
+    throw new Error("Invalid JSON response");
+  }
 }
 
 // Age helper
@@ -44,9 +79,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 async function loadPatients(doctorId, query = "") {
   try {
-    const res = await fetchJSON(`${API_BASE}/patientRoutes.php?action=all`);
-    const allPatients = res.patients ?? [];
-    const patients = allPatients.filter(p => p.assigned_doctor == doctorId);
+    const res = await fetchJSON(`${API_BASE}/patientRoutes.php?action=by-doctor&user_id=${doctorId}`);
+    const patients = res.patients ?? [];
 
     const tbody = document.querySelector("#patients-table tbody");
     tbody.innerHTML = "";
@@ -147,10 +181,11 @@ async function saveNewPatient() {
   const payload = {
     first_name: document.getElementById("new-first-name").value.trim(),
     last_name: document.getElementById("new-last-name").value.trim(),
+    email: `patient_${Date.now()}@temp.com`,
+    password: Math.random().toString(36).slice(-8),
     birth_date: document.getElementById("new-birthdate").value,
     contactno: document.getElementById("new-contact").value.trim(),
     address: document.getElementById("new-address").value.trim(),
-    assigned_doctor: user.user_id
   };
 
   if (!payload.first_name || !payload.last_name) {
@@ -158,14 +193,38 @@ async function saveNewPatient() {
   }
 
   try {
-    const res = await fetchJSON(`${API_BASE}/patientRoutes.php?action=register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+    const response = await api.post('patientRoutes.php?action=register', payload);
+    if (response.success) {
 
-    if (!res.success) {
-      console.error("Register patient response:", res);
+    const medResponse = await api.post(
+      `patientRoutes.php?action=medical-record&user_id=${response.user_id}`,
+      {
+        allergies: "N/A",
+        medications: "N/A",
+        height: null,
+        weight: null,
+      }
+    );
+
+    console.log("MEDICAL RECORD RESPONSE:", medResponse);
+
+    //create blank prescription for linking patient -> doctor
+    const prescripResponse = await api.post(
+      `prescriptionRoutes.php?action=create`,
+      {
+        prescribing_doctor: user.user_id, // logged-in doctor
+        record_id: medResponse.record_id, // link to the new record if available
+        prescription_date: new Date().toISOString().split("T")[0],
+        status: "pending", // or "draft"
+        details: [], // no drugs yet
+      }
+    );
+
+    
+    console.log("Sending patient data:", payload);
+
+    if (!response.success) {
+      console.error("Register patient response:", response);
       return alert("Failed to add patient.");
     }
 
@@ -173,7 +232,7 @@ async function saveNewPatient() {
     alert("Patient added successfully!");
 
     loadPatients(user.user_id);
-
+  }
   } catch (err) {
     console.error("Error adding patient:", err);
     alert("Server error while adding patient.");
