@@ -47,6 +47,9 @@ $prescription_id = $_GET['prescription_id'] ?? null;
   </div>
 </div>
 
+<script>
+    const PRESCRIPTION_ID = <?= json_encode($prescription_id) ?>;
+</script>
 <script src="../../../public/assets/js/patient/prescription.js"></script>
 </body>
 </html>
