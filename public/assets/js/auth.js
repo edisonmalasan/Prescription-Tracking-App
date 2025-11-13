@@ -201,7 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
               redirectUrl = "../src/views/admin/AdminDashboard.php";
               break;
             default:
-              redirectUrl = "./index.html";
+              redirectUrl = "../index.html";
               break;
           }
           window.location.href = redirectUrl;

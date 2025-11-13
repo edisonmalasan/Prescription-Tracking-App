@@ -1,6 +1,6 @@
 console.log("Patient Managememnt JS loaded");
 
-const API_BASE = "/Prescription-Tracking-App/src/api";
+const API_BASE = "../../../src/api";
 
 const apiCall = async (url, options = {}) => {
   const response = await fetch(url, {
@@ -157,7 +157,7 @@ async function openPatientModal(userId) {
       })
     );
 
-    const activePrescriptions = prescriptionsWithDetails.filter(rx => rx.status === "active");
+    const activePrescriptions = prescriptionsWithDetails.filter(rx => rx.status === "pending");
 
     const activeRows =
       activePrescriptions.flatMap(rx => rx.details ?? []).map(d => `
@@ -185,7 +185,7 @@ async function openPatientModal(userId) {
         </div>
 
         <div class="card">
-          <h4>Active Prescriptions</h4>
+          <h4>Pending Prescriptions</h4>
           <table>
             <thead><tr><th>Medication</th><th>Dosage</th><th>Frequency</th></tr></thead>
             <tbody>${activeRows}</tbody>

@@ -1,6 +1,6 @@
 console.log("Patient Profile JS loaded");
 
-const API_BASE = "/Prescription-Tracking-App/src/api";
+const API_BASE = "../../../src/api";
 
 const apiCall = async (url, options = {}) => {
   const response = await fetch(url, {

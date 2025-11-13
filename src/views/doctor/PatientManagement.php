@@ -30,7 +30,7 @@
 
           <table id="patients-table">
             <thead>
-              <tr><th>Name</th><th>Age</th><th>Contact</th><th>Last Visit</th><th>Action</th></tr>
+              <tr><th>Name</th><th>Age</th><th>Contact</th><th>Action</th></tr>
             </thead>
             <tbody></tbody>
           </table>

@@ -214,10 +214,10 @@ CREATE TABLE `prescriptiondetails` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `prescriptiondetails` VALUES
-(1,1,'5 days','500 mg','Every 6 hours','Take after meals', 0, NULL),
-(1,3,'3 days','250 mg','Every 8 hours','Complete full dosage', 0, NULL),
-(2,2,'7 days','200 mg','Twice a day','Avoid alcohol', 0, NULL),
-(2,4,'As needed','10 mg','Once a day','Do not exceed 1 tablet per 24 hours', 0, NULL);
+(1,1,'5 days','500 mg','Every 6 hours','Take after meals', 0),
+(1,3,'3 days','250 mg','Every 8 hours','Complete full dosage'),
+(2,2,'7 days','200 mg','Twice a day','Avoid alcohol', 0),
+(2,4,'As needed','10 mg','Once a day','Do not exceed 1 tablet per 24 hours', 0);
 
 -- --------------------------------------------------------
 -- Foreign Keys
