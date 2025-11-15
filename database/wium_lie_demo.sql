@@ -3,8 +3,8 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Oct 29, 2025 at 03:27 AM
--- Server version: 9.1.0
+-- Generation Time: Nov 15, 2025 at 03:01 AM
+-- Server version: 8.4.3
 -- PHP Version: 8.3.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -27,27 +27,230 @@ SET time_zone = "+00:00";
 -- Table structure for table `admin`
 --
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
- /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
- /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
- /*!40101 SET NAMES utf8mb4 */;
-
--- Drop tables to avoid conflicts
-DROP TABLE IF EXISTS `prescriptiondetails`;
-DROP TABLE IF EXISTS `prescription`;
-DROP TABLE IF EXISTS `medicalrecord`;
-DROP TABLE IF EXISTS `drug`;
-DROP TABLE IF EXISTS `pharmacy`;
-DROP TABLE IF EXISTS `patient`;
-DROP TABLE IF EXISTS `doctor`;
 DROP TABLE IF EXISTS `admin`;
-DROP TABLE IF EXISTS `users`;
+CREATE TABLE IF NOT EXISTS `admin` (
+  `user_id` int NOT NULL,
+  `isAdmin` tinyint(1) DEFAULT '1',
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `admin`
+--
+
+INSERT INTO `admin` (`user_id`, `isAdmin`) VALUES
+(4, 1);
 
 -- --------------------------------------------------------
--- Table: users
+
+--
+-- Table structure for table `doctor`
+--
+
+DROP TABLE IF EXISTS `doctor`;
+CREATE TABLE IF NOT EXISTS `doctor` (
+  `user_id` int NOT NULL,
+  `birth_date` date NOT NULL,
+  `specialization` varchar(100) DEFAULT NULL,
+  `prc_license` varchar(100) DEFAULT NULL,
+  `clinic_name` varchar(100) DEFAULT NULL,
+  `isVerified` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`user_id`),
+  UNIQUE KEY `prc_license` (`prc_license`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `doctor`
+--
+
+INSERT INTO `doctor` (`user_id`, `birth_date`, `specialization`, `prc_license`, `clinic_name`, `isVerified`) VALUES
+(1, '1988-10-11', 'General Medicine', 'PRC-0001', 'FeelGood Clinic', 1);
+
 -- --------------------------------------------------------
-CREATE TABLE `users` (
+
+--
+-- Table structure for table `drug`
+--
+
+DROP TABLE IF EXISTS `drug`;
+CREATE TABLE IF NOT EXISTS `drug` (
+  `drug_id` int NOT NULL AUTO_INCREMENT,
+  `generic_name` varchar(100) NOT NULL,
+  `brand` varchar(100) DEFAULT NULL,
+  `chemical_name` varchar(100) DEFAULT NULL,
+  `category` varchar(100) DEFAULT NULL,
+  `expiry_date` date DEFAULT NULL,
+  `isControlled` tinyint(1) DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`drug_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `drug`
+--
+
+INSERT INTO `drug` (`drug_id`, `generic_name`, `brand`, `chemical_name`, `category`, `expiry_date`, `isControlled`, `created_at`) VALUES
+(1, 'Paracetamol', 'Biogesic', 'Acetaminophen', 'Analgesic/Antipyretic', '2026-05-01', 0, '2025-11-15 02:51:10'),
+(2, 'Ibuprofen', 'Advil', 'Ibuprofen', 'NSAID', '2026-11-10', 0, '2025-11-15 02:51:10'),
+(3, 'Amoxicillin', 'Amoxil', 'Amoxicillin Trihydrate', 'Antibiotic', '2027-02-15', 0, '2025-11-15 02:51:10'),
+(4, 'Cetirizine', 'Allerkid', 'Cetirizine Hydrochloride', 'Antihistamine', '2026-08-20', 0, '2025-11-15 02:51:10'),
+(5, 'Metformin', 'Glucophage', 'Metformin Hydrochloride', 'Antidiabetic', '2027-01-01', 0, '2025-11-15 02:51:10'),
+(6, 'Losartan', 'Cozaar', 'Losartan Potassium', 'Antihypertensive', '2027-06-30', 0, '2025-11-15 02:51:10'),
+(7, 'Omeprazole', 'Losec', 'Omeprazole', 'PPI', '2026-09-14', 0, '2025-11-15 02:51:10'),
+(8, 'Azithromycin', 'Zithromax', 'Azithromycin', 'Antibiotic', '2026-10-05', 0, '2025-11-15 02:51:10'),
+(9, 'Tramadol', 'Tramal', 'Tramadol Hydrochloride', 'Opioid Analgesic', '2027-04-22', 1, '2025-11-15 02:51:10'),
+(10, 'Hydroxyzine', 'Atarax', 'Hydroxyzine Hydrochloride', 'Anxiolytic', '2026-12-11', 0, '2025-11-15 02:51:10');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `medicalrecord`
+--
+
+DROP TABLE IF EXISTS `medicalrecord`;
+CREATE TABLE IF NOT EXISTS `medicalrecord` (
+  `record_id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `height` varchar(20) DEFAULT NULL,
+  `weight` varchar(20) DEFAULT NULL,
+  `allergies` text,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`record_id`),
+  KEY `fk_medicalrecord_patient` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `medicalrecord`
+--
+
+INSERT INTO `medicalrecord` (`record_id`, `user_id`, `height`, `weight`, `allergies`, `created_at`, `updated_at`) VALUES
+(1, 6, '180 cm', '75 kg', 'None', '2025-10-28 12:37:23', '2025-10-28 12:37:23');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `patient`
+--
+
+DROP TABLE IF EXISTS `patient`;
+CREATE TABLE IF NOT EXISTS `patient` (
+  `user_id` int NOT NULL,
+  `birth_date` date NOT NULL,
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `patient`
+--
+
+INSERT INTO `patient` (`user_id`, `birth_date`) VALUES
+(2, '1995-06-21'),
+(5, '1999-03-10'),
+(6, '1990-09-20');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pharmacy`
+--
+
+DROP TABLE IF EXISTS `pharmacy`;
+CREATE TABLE IF NOT EXISTS `pharmacy` (
+  `user_id` int NOT NULL,
+  `pharmacy_name` varchar(100) DEFAULT NULL,
+  `phar_license` varchar(100) DEFAULT NULL,
+  `open_time` time DEFAULT NULL,
+  `close_time` time DEFAULT NULL,
+  `dates_open` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `pharmacy`
+--
+
+INSERT INTO `pharmacy` (`user_id`, `pharmacy_name`, `phar_license`, `open_time`, `close_time`, `dates_open`) VALUES
+(3, 'HealthPlus Pharmacy', 'PHR-00321', '08:00:00', '20:00:00', 'Mon–Sun');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `prescription`
+--
+
+DROP TABLE IF EXISTS `prescription`;
+CREATE TABLE IF NOT EXISTS `prescription` (
+  `prescription_id` int NOT NULL AUTO_INCREMENT,
+  `prescribing_doctor` int NOT NULL,
+  `record_id` int NOT NULL,
+  `prescription_date` date NOT NULL,
+  `status` varchar(50) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`prescription_id`),
+  KEY `fk_prescription_doctor` (`prescribing_doctor`),
+  KEY `fk_prescription_record` (`record_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `prescription`
+--
+
+INSERT INTO `prescription` (`prescription_id`, `prescribing_doctor`, `record_id`, `prescription_date`, `status`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, '2025-11-15', 'ACTIVE', '2025-11-15 02:56:40', '2025-11-15 02:57:50'),
+(2, 1, 1, '2025-11-15', 'COMPLETED', '2025-11-15 02:56:40', '2025-11-15 02:57:50');
+
+--
+-- Triggers `prescription`
+--
+DROP TRIGGER IF EXISTS `prescription_before_insert`;
+DELIMITER $$
+CREATE TRIGGER `prescription_before_insert` BEFORE INSERT ON `prescription` FOR EACH ROW BEGIN
+  IF NEW.prescription_date IS NULL OR NEW.prescription_date = '0000-00-00' THEN
+    SET NEW.prescription_date = CURDATE();
+  END IF;
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `prescriptiondetails`
+--
+
+DROP TABLE IF EXISTS `prescriptiondetails`;
+CREATE TABLE IF NOT EXISTS `prescriptiondetails` (
+  `prescription_id` int NOT NULL,
+  `drug_id` int NOT NULL,
+  `duration` varchar(50) DEFAULT NULL,
+  `dosage` varchar(50) DEFAULT NULL,
+  `frequency` varchar(50) DEFAULT NULL,
+  `special_instructions` text,
+  `refills` int DEFAULT '0',
+  PRIMARY KEY (`prescription_id`,`drug_id`),
+  KEY `fk_details_drug` (`drug_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `prescriptiondetails`
+--
+
+INSERT INTO `prescriptiondetails` (`prescription_id`, `drug_id`, `duration`, `dosage`, `frequency`, `special_instructions`, `refills`) VALUES
+(1, 1, '5 days', '500 mg', 'Every 6 hours', 'Take after meals', 0),
+(1, 3, '3 days', '250 mg', 'Every 8 hours', 'Complete full dosage', 0),
+(2, 2, '7 days', '200 mg', 'Twice a day', 'Avoid alcohol', 0),
+(2, 4, 'As needed', '10 mg', 'Once a day', 'Do not exceed 1 tablet per 24 hours', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE IF NOT EXISTS `users` (
   `user_id` int NOT NULL AUTO_INCREMENT,
   `last_name` varchar(50) NOT NULL,
   `first_name` varchar(50) NOT NULL,
@@ -60,9 +263,13 @@ CREATE TABLE `users` (
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `contactno` (`contactno`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO `users` VALUES
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`user_id`, `last_name`, `first_name`, `role`, `email`, `contactno`, `pass_hash`, `address`, `created_at`) VALUES
 (1, 'Gud', 'Fyll', 'DOCTOR', 'feelgood@gmail.com', '0918514237', '111', 'Goodville', '2025-10-25 03:06:32'),
 (2, 'Doe', 'Jane', 'PATIENT', 'jane.doe@example.com', '0918123456', '222', 'Health Street', '2025-10-25 03:06:32'),
 (3, 'Smith', 'John', 'PHARMACY', 'john.smith@pharma.com', '0918111222', '333', 'Pharma Town', '2025-10-25 03:06:32'),
@@ -70,171 +277,55 @@ INSERT INTO `users` VALUES
 (5, 'White', 'Ella', 'PATIENT', 'ella.white@example.com', '0918777666', '555', 'Wellness Village', '2025-10-25 03:06:32'),
 (6, 'Strong', 'Jack', 'PATIENT', 'jack.strong@example.com', '0918123123', 'hashedpassword006', 'Resilient Avenue', '2025-10-25 03:13:46');
 
--- --------------------------------------------------------
--- Table: admin
--- --------------------------------------------------------
-CREATE TABLE `admin` (
-  `user_id` int NOT NULL,
-  `isAdmin` tinyint(1) DEFAULT '1',
-  PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+--
+-- Constraints for dumped tables
+--
 
-INSERT INTO `admin` VALUES (4,1);
+--
+-- Constraints for table `admin`
+--
+ALTER TABLE `admin`
+  ADD CONSTRAINT `fk_admin_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
--- --------------------------------------------------------
--- Table: patient
--- --------------------------------------------------------
-CREATE TABLE `patient` (
-  `user_id` int NOT NULL,
-  `birth_date` date NOT NULL,
-  PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+--
+-- Constraints for table `doctor`
+--
+ALTER TABLE `doctor`
+  ADD CONSTRAINT `fk_doctor_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
-INSERT INTO `patient` VALUES
-(2, '1995-06-21'),
-(5, '1999-03-10'),
-(6, '1990-09-20');
+--
+-- Constraints for table `medicalrecord`
+--
+ALTER TABLE `medicalrecord`
+  ADD CONSTRAINT `fk_medicalrecord_patient` FOREIGN KEY (`user_id`) REFERENCES `patient` (`user_id`) ON DELETE CASCADE;
 
--- --------------------------------------------------------
--- Table: doctor
--- --------------------------------------------------------
-CREATE TABLE `doctor` (
-  `user_id` int NOT NULL,
-  `birth_date` date NOT NULL,
-  `specialization` varchar(100),
-  `prc_license` varchar(100),
-  `clinic_name` varchar(100),
-  `isVerified` tinyint(1) DEFAULT '0',
-  PRIMARY KEY (`user_id`),
-  UNIQUE KEY `prc_license` (`prc_license`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+--
+-- Constraints for table `patient`
+--
+ALTER TABLE `patient`
+  ADD CONSTRAINT `fk_patient_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
-INSERT INTO `doctor` VALUES
-(1, '1988-10-11', 'General Medicine', 'PRC-0001', 'FeelGood Clinic', 1);
+--
+-- Constraints for table `pharmacy`
+--
+ALTER TABLE `pharmacy`
+  ADD CONSTRAINT `fk_pharmacy_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
--- --------------------------------------------------------
--- Table: pharmacy
--- --------------------------------------------------------
-CREATE TABLE `pharmacy` (
-  `user_id` int NOT NULL,
-  `pharmacy_name` varchar(100),
-  `phar_license` varchar(100),
-  `open_time` time,
-  `close_time` time,
-  `dates_open` varchar(50),
-  PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+--
+-- Constraints for table `prescription`
+--
+ALTER TABLE `prescription`
+  ADD CONSTRAINT `fk_prescription_doctor` FOREIGN KEY (`prescribing_doctor`) REFERENCES `doctor` (`user_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_prescription_record` FOREIGN KEY (`record_id`) REFERENCES `medicalrecord` (`record_id`) ON DELETE CASCADE;
 
-INSERT INTO `pharmacy` VALUES
-(3, 'HealthPlus Pharmacy', 'PHR-00321', '08:00:00', '20:00:00', 'Mon–Sun');
-
--- --------------------------------------------------------
--- Table: drug
--- --------------------------------------------------------
-CREATE TABLE `drug` (
-  `drug_id` int NOT NULL AUTO_INCREMENT,
-  `generic_name` varchar(100) NOT NULL,
-  `brand` varchar(100),
-  `chemical_name` varchar(100),
-  `category` varchar(100),
-  `expiry_date` date,
-  `isControlled` tinyint(1) DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`drug_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-INSERT INTO `drug` (`generic_name`,`brand`,`chemical_name`,`category`,`expiry_date`,`isControlled`) VALUES
-('Paracetamol','Biogesic','Acetaminophen','Analgesic/Antipyretic','2026-05-01',0),
-('Ibuprofen','Advil','Ibuprofen','NSAID','2026-11-10',0),
-('Amoxicillin','Amoxil','Amoxicillin Trihydrate','Antibiotic','2027-02-15',0),
-('Cetirizine','Allerkid','Cetirizine Hydrochloride','Antihistamine','2026-08-20',0),
-('Metformin','Glucophage','Metformin Hydrochloride','Antidiabetic','2027-01-01',0),
-('Losartan','Cozaar','Losartan Potassium','Antihypertensive','2027-06-30',0),
-('Omeprazole','Losec','Omeprazole','PPI','2026-09-14',0),
-('Azithromycin','Zithromax','Azithromycin','Antibiotic','2026-10-05',0),
-('Tramadol','Tramal','Tramadol Hydrochloride','Opioid Analgesic','2027-04-22',1),
-('Hydroxyzine','Atarax','Hydroxyzine Hydrochloride','Anxiolytic','2026-12-11',0);
-
--- --------------------------------------------------------
--- Table: medicalrecord
--- --------------------------------------------------------
-CREATE TABLE `medicalrecord` (
-  `record_id` int NOT NULL AUTO_INCREMENT,
-  `user_id` int NOT NULL,
-  `height` varchar(20),
-  `weight` varchar(20),
-  `allergies` text,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`record_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-INSERT INTO `medicalrecord` VALUES
-(1, 6, '180 cm', '75 kg', 'None', '2025-10-28 12:37:23', '2025-10-28 12:37:23');
-
--- --------------------------------------------------------
--- Table: prescription
--- --------------------------------------------------------
-CREATE TABLE `prescription` (
-  `prescription_id` int NOT NULL AUTO_INCREMENT,
-  `prescribing_doctor` int NOT NULL,
-  `record_id` int NOT NULL,
-  `prescription_date` date NOT NULL,
-  `status` varchar(50),
-  PRIMARY KEY (`prescription_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-DELIMITER $$
-CREATE TRIGGER `prescription_before_insert`
-BEFORE INSERT ON `prescription`
-FOR EACH ROW
-BEGIN
-  IF NEW.prescription_date IS NULL OR NEW.prescription_date = '0000-00-00' THEN
-    SET NEW.prescription_date = CURDATE();
-  END IF;
-END$$
-DELIMITER ;
-
-INSERT INTO `prescription` (`prescribing_doctor`,`record_id`,`status`) VALUES
-(1,1,'ACTIVE'),
-(1,1,'COMPLETED');
-
--- --------------------------------------------------------
--- Table: prescriptiondetails
--- --------------------------------------------------------
-CREATE TABLE `prescriptiondetails` (
-  `prescription_id` int NOT NULL,
-  `drug_id` int NOT NULL,
-  `duration` varchar(50),
-  `dosage` varchar(50),
-  `frequency` varchar(50),
-  `special_instructions` text,
-  `refills` int DEFAULT 0,
-  PRIMARY KEY (`prescription_id`,`drug_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-INSERT INTO `prescriptiondetails` VALUES
-(1,1,'5 days','500 mg','Every 6 hours','Take after meals', 0),
-(1,3,'3 days','250 mg','Every 8 hours','Complete full dosage'),
-(2,2,'7 days','200 mg','Twice a day','Avoid alcohol', 0),
-(2,4,'As needed','10 mg','Once a day','Do not exceed 1 tablet per 24 hours', 0);
-
--- --------------------------------------------------------
--- Foreign Keys
--- --------------------------------------------------------
-
-ALTER TABLE `admin` ADD CONSTRAINT `fk_admin_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
-ALTER TABLE `patient` ADD CONSTRAINT `fk_patient_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
-ALTER TABLE `doctor` ADD CONSTRAINT `fk_doctor_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
-ALTER TABLE `pharmacy` ADD CONSTRAINT `fk_pharmacy_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
-ALTER TABLE `medicalrecord` ADD CONSTRAINT `fk_medicalrecord_patient` FOREIGN KEY (`user_id`) REFERENCES `patient` (`user_id`) ON DELETE CASCADE;
-ALTER TABLE `prescription` ADD CONSTRAINT `fk_prescription_doctor` FOREIGN KEY (`prescribing_doctor`) REFERENCES `doctor` (`user_id`) ON DELETE CASCADE;
-ALTER TABLE `prescription` ADD CONSTRAINT `fk_prescription_record` FOREIGN KEY (`record_id`) REFERENCES `medicalrecord` (`record_id`) ON DELETE CASCADE;
-ALTER TABLE `prescriptiondetails` ADD CONSTRAINT `fk_details_drug` FOREIGN KEY (`drug_id`) REFERENCES `drug` (`drug_id`) ON DELETE CASCADE;
-ALTER TABLE `prescriptiondetails` ADD CONSTRAINT `fk_details_prescription` FOREIGN KEY (`prescription_id`) REFERENCES `prescription` (`prescription_id`) ON DELETE CASCADE;
-
+--
+-- Constraints for table `prescriptiondetails`
+--
+ALTER TABLE `prescriptiondetails`
+  ADD CONSTRAINT `fk_details_drug` FOREIGN KEY (`drug_id`) REFERENCES `drug` (`drug_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_details_prescription` FOREIGN KEY (`prescription_id`) REFERENCES `prescription` (`prescription_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
- /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
- /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
