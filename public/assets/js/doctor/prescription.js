@@ -100,8 +100,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       const res = await api.get(`drugRoutes.php?action=search&search=${encodeURIComponent(q)}`);
       const drugs = res.drugs ?? [];
       drugSuggestions.innerHTML = drugs
-        .map((d) => `<div class="search-item" data-id="${d.drug_id}">${d.generic_name}</div>`)
-        .join("");
+        .map((d) => `<div class="search-item" data-id="${d.drug_id}">${d.brand_name} (${d.generic_name})</div>`)
+        .join("");  
 
       document.querySelectorAll("#drug-suggestions .search-item").forEach((el) => {
         el.addEventListener("click", () => {
