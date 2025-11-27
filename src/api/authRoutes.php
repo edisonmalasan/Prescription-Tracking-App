@@ -1,46 +1,32 @@
 <?php
+require_once __DIR__ . '/../config/bootstrap.php';
+
 header('Content-Type: application/json');
 
-try {
-    require_once '../controllers/authController.php';
+require_once __DIR__ . '/../controllers/authController.php';
 
-    $method = $_SERVER['REQUEST_METHOD'];
-    $action = $_GET['action'] ?? '';
-    $authController = new AuthController();
+$method = $_SERVER['REQUEST_METHOD'];
+$action = $_GET['action'] ?? '';
+$authController = new AuthController();
 
-    // routes
-    switch ($method) {
-        case 'POST':
-            switch ($action) {
-                case 'register':
-                    echo $authController->register();
-                    break;
-                case 'login':
-                    echo $authController->login();
-                    break;
-                default:
-                    http_response_code(404);
-                    echo json_encode(['error' => 'Action not found']);
-                    break;
-            }
-            break;
-        default:
-            http_response_code(405);
-            echo json_encode(['error' => 'Method not allowed']);
-            break;
-    }
-} catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode([
-        'error' => 'Server error: ' . $e->getMessage(),
-        'file' => basename($e->getFile()),
-        'line' => $e->getLine()
-    ]);
-} catch (Error $e) {
-    http_response_code(500);
-    echo json_encode([
-        'error' => 'Server error: ' . $e->getMessage(),
-        'file' => basename($e->getFile()),
-        'line' => $e->getLine()
-    ]);
+// routes
+switch ($method) {
+    case 'POST':
+        switch ($action) {
+            case 'register':
+                echo $authController->register();
+                break;
+            case 'login':
+                echo $authController->login();
+                break;
+            default:
+                http_response_code(404);
+                echo json_encode(['error' => 'Action not found'], JSON_UNESCAPED_UNICODE);
+                break;
+        }
+        break;
+    default:
+           http_response_code(405);
+        echo json_encode(['error' => 'Method not allowed'], JSON_UNESCAPED_UNICODE);
+        break;
 }

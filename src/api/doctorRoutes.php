@@ -1,10 +1,10 @@
 <?php
+header('Content-Type: application/json');
 
-require_once '../controllers/DoctorController.php';
+require_once __DIR__ . '/../controllers/DoctorController.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
-// create instance of controller to handle http requests
 $doctorController = new DoctorController();
 
 switch ($method) {
