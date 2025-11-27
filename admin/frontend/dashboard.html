@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Prescription Tracking System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-50">
+    <!-- navv -->
+    <nav class="bg-white shadow-md">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex items-center">
+            <h1 class="text-xl font-bold text-gray-800">Admin Portal</h1>
+          </div>
+          <div class="flex items-center space-x-4">
+            <a
+              href="users.html"
+              class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+              >Users</a
+            >
+            <a
+              href="database.html"
+              class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+              >Database</a
+            >
+            <a
+              href="verification.html"
+              class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+              >Verification</a
+            >
+            <button
+              onclick="logout()"
+              class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="mb-8">
+        <h2 class="text-3xl font-bold text-gray-900">Dashboard</h2>
+        <p class="text-gray-600 mt-2">
+          Overview of system statistics and activity
+        </p>
+      </div>
+
+      <div id="loadingState" class="text-center py-12">
+        <div
+          class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"
+        ></div>
+        <p class="mt-4 text-gray-600">Loading dashboard data...</p>
+      </div>
+
+      <div
+        id="errorState"
+        class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6"
+      ></div>
+
+      <!-- cards -->
+      <div
+        id="statsContainer"
+        s
+        class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+      >
+        <!-- populated via dashboard sc -->
+      </div>
+
+      <!-- role -->
+      <div
+        id="roleBreakdownContainer"
+        class="hidden bg-white rounded-lg shadow-md p-6 mb-8"
+      >
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">
+          User Role Distribution
+        </h3>
+        <div id="roleBreakdown" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <!--data -->
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Quick Actions</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <a
+            href="users.html"
+            class="block p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition"
+          >
+            <h4 class="font-semibold text-gray-800 mb-2">Manage Users</h4>
+            <p class="text-sm text-gray-600">
+              View, create, and modify user accounts
+            </p>
+          </a>
+          <a
+            href="database.html"
+            class="block p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition"
+          >
+            <h4 class="font-semibold text-gray-800 mb-2">
+              Database Management
+            </h4>
+            <p class="text-sm text-gray-600">View and modify database tables</p>
+          </a>
+          <a
+            href="verification.html"
+            class="block p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition"
+          >
+            <h4 class="font-semibold text-gray-800 mb-2">Verify Credentials</h4>
+            <p class="text-sm text-gray-600">Verify doctors and pharmacies</p>
+          </a>
+        </div>
+      </div>
+    </main>
+
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>
