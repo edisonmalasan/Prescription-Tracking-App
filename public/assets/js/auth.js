@@ -18,8 +18,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const messageElement = document.getElementById(elementId);
     if (messageElement) {
       messageElement.textContent = message;
-      messageElement.style.color = isError ? "red" : "green";
-      messageElement.style.fontWeight = "bold";
+      messageElement.className = `px-4 py-3 rounded-lg text-sm font-medium ${
+        isError
+          ? "bg-red-50 border border-red-200 text-red-700"
+          : "bg-green-50 border border-green-200 text-green-700"
+      }`;
+      messageElement.classList.remove("hidden");
     }
   }
 
@@ -73,7 +77,8 @@ document.addEventListener("DOMContentLoaded", () => {
     } else if (role === "PHARMACY") {
       formData.pharmacy_name = document.getElementById("pharmacyName").value;
       formData.address = document.getElementById("address").value;
-      formData.operating_hours = document.getElementById("operatingHours").value;
+      formData.operating_hours =
+        document.getElementById("operatingHours").value;
     }
 
     console.log("Sending registration data:", formData);
@@ -124,9 +129,6 @@ document.addEventListener("DOMContentLoaded", () => {
               break;
             case "PHARMACY":
               redirectUrl = "../src/views/pharmacy/PharmacyDashboard.php";
-              break;
-            case "ADMIN":
-              redirectUrl = "../src/views/admin/AdminDashboard.php";
               break;
             default:
               redirectUrl = "login.html";
@@ -179,29 +181,40 @@ document.addEventListener("DOMContentLoaded", () => {
       if (response.ok && result.success && result.user) {
         showMessage("loginMessage", "Login successful! Redirecting...", false);
 
-        // Store user data in sessionStorage
+        const role = result.user.role;
+
+        // If admin, redirect to admin frontend and store as admin session
+        if (role === "ADMIN") {
+          // Store admin data in sessionStorage (admin frontend expects 'admin' key)
+          sessionStorage.setItem("admin", JSON.stringify(result.user));
+          // Also store as loggedInUser for consistency
+          sessionStorage.setItem("loggedInUser", JSON.stringify(result.user));
+
+          setTimeout(() => {
+            window.location.href = "/admin/frontend/dashboard.html";
+          }, 1500);
+          return;
+        }
+
+        // For non-admin users, store user data in sessionStorage
         sessionStorage.setItem("loggedInUser", JSON.stringify(result.user));
 
         // redirect depends on role
         setTimeout(() => {
-          const role = result.user.role;
           let redirectUrl;
 
           switch (role) {
             case "PATIENT":
-              redirectUrl = "../src/views/patient/PatientDashboard.php";
+              redirectUrl = "/views/patient/PatientDashboard.php";
               break;
             case "DOCTOR":
-              redirectUrl = "../src/views/doctor/DoctorDashboard.php";
+              redirectUrl = "/views/doctor/DoctorDashboard.php";
               break;
             case "PHARMACY":
-              redirectUrl = "../src/views/pharmacy/PharmacyDashboard.php";
-              break;
-            case "ADMIN":
-              redirectUrl = "../src/views/admin/AdminDashboard.php";
+              redirectUrl = "/views/pharmacy/PharmacyDashboard.php";
               break;
             default:
-              redirectUrl = "../index.html";
+              redirectUrl = "/home";
               break;
           }
           window.location.href = redirectUrl;

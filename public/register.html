@@ -1,137 +1,167 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Register - Prescription Tracking App</title>
-    <link rel="stylesheet" href="./assets/css/register.css" />
-  </head>
-  <body class="registration-page">
-    <div class="registration-container">
-      <h1>Prescription Tracking App</h1>
-      <p class="subtitle">Register</p>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - RxScript PH</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 h-screen overflow-hidden">
+    <div class="h-full flex items-center justify-center px-4 py-4">
+        <div class="max-w-4xl w-full bg-white rounded-2xl shadow-2xl h-full flex flex-col overflow-hidden">
+            <!-- Scrollable Content -->
+            <div class="flex-1 overflow-y-auto p-6">
+                <!-- Header -->
+                <div class="text-center mb-4">
+                    <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-600 rounded-full mb-2">
+                        <span class="text-white text-xl font-bold">Rx</span>
+                    </div>
+                    <h1 class="text-2xl font-bold text-gray-800 mb-1">RxScript PH</h1>
+                    <p class="text-sm text-gray-600">Create Your Account</p>
+                </div>
 
-      <div class="registration-form-container">
-        <form id="registrationForm">
-          <div class="form-section">
-            <h2>Create Your Account</h2>
+                <form id="registrationForm" class="space-y-4">
+                <!-- Basic Information -->
+                <div class="border-b border-gray-200 pb-4">
+                    <h2 class="text-lg font-semibold text-gray-800 mb-3">Basic Information</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label for="firstName" class="block text-xs font-medium text-gray-700 mb-1">First Name</label>
+                            <input type="text" id="firstName" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="First Name">
+                        </div>
+                        <div>
+                            <label for="lastName" class="block text-xs font-medium text-gray-700 mb-1">Last Name</label>
+                            <input type="text" id="lastName" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="Last Name">
+                        </div>
+                        <div>
+                            <label for="regEmail" class="block text-xs font-medium text-gray-700 mb-1">Email</label>
+                            <input type="email" id="regEmail" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="Email">
+                        </div>
+                        <div>
+                            <label for="phoneNumber" class="block text-xs font-medium text-gray-700 mb-1">Phone Number</label>
+                            <input type="tel" id="phoneNumber" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="Phone Number">
+                        </div>
+                        <div>
+                            <label for="regPassword" class="block text-xs font-medium text-gray-700 mb-1">Password</label>
+                            <input type="password" id="regPassword" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="Password">
+                        </div>
+                        <div>
+                            <label for="confirmPassword" class="block text-xs font-medium text-gray-700 mb-1">Confirm Password</label>
+                            <input type="password" id="confirmPassword" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="Confirm Password">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="regRole" class="block text-xs font-medium text-gray-700 mb-1">Register as:</label>
+                            <select id="regRole" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                                <option value="PATIENT">Patient</option>
+                                <option value="DOCTOR">Doctor</option>
+                                <option value="PHARMACY">Pharmacy</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
 
-            <div class="form-group">
-              <label for="firstName">First Name</label>
-              <input type="text" id="firstName" placeholder="First Name" required />
+                <!-- Patient Fields -->
+                <div id="patientFields" class="border-b border-gray-200 pb-4">
+                    <h2 class="text-lg font-semibold text-gray-800 mb-3">Patient Details</h2>
+                    <div>
+                        <label for="patientBirthDate" class="block text-xs font-medium text-gray-700 mb-1">Birth Date</label>
+                        <input type="date" id="patientBirthDate" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                    </div>
+                </div>
+
+                <!-- Doctor Fields -->
+                <div id="doctorFields" class="hidden border-b border-gray-200 pb-4">
+                    <h2 class="text-lg font-semibold text-gray-800 mb-3">Doctor Details</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label for="doctorBirthDate" class="block text-xs font-medium text-gray-700 mb-1">Birth Date</label>
+                            <input type="date" id="doctorBirthDate" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                        </div>
+                        <div>
+                            <label for="doctorSpecialization" class="block text-xs font-medium text-gray-700 mb-1">Specialization</label>
+                            <input type="text" id="doctorSpecialization" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="Specialization">
+                        </div>
+                        <div>
+                            <label for="doctorLicense" class="block text-xs font-medium text-gray-700 mb-1">PRC License</label>
+                            <input type="text" id="doctorLicense" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="PRC License">
+                        </div>
+                        <div>
+                            <label for="clinicName" class="block text-xs font-medium text-gray-700 mb-1">Clinic Name</label>
+                            <input type="text" id="clinicName" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="Clinic Name">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pharmacy Fields -->
+                <div id="pharmacyFields" class="hidden border-b border-gray-200 pb-4">
+                    <h2 class="text-lg font-semibold text-gray-800 mb-3">Pharmacy Details</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label for="pharmacyName" class="block text-xs font-medium text-gray-700 mb-1">Pharmacy Name</label>
+                            <input type="text" id="pharmacyName" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="Pharmacy Name">
+                        </div>
+                        <div>
+                            <label for="address" class="block text-xs font-medium text-gray-700 mb-1">Address</label>
+                            <input type="text" id="address" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="Address">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="operatingHours" class="block text-xs font-medium text-gray-700 mb-1">Operating Hours</label>
+                            <input type="text" id="operatingHours" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="e.g. 9:00 AM - 5:00 PM">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Terms -->
+                <div class="flex items-start">
+                    <input type="checkbox" id="agreeTerms" required class="mt-1 h-3 w-3 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="agreeTerms" class="ml-2 block text-xs text-gray-700">
+                        I agree to the <a href="#" class="text-blue-600 hover:text-blue-800">Terms of Service</a> and <a href="#" class="text-blue-600 hover:text-blue-800">Privacy Policy</a>
+                    </label>
+                </div>
+
+                <!-- Message -->
+                <div id="registrationMessage" class="hidden px-3 py-2 rounded-lg text-xs font-medium"></div>
+            </form>
             </div>
 
-            <div class="form-group">
-              <label for="lastName">Last Name</label>
-              <input type="text" id="lastName" placeholder="Last Name" required />
+            <!-- Fixed Footer -->
+            <div class="border-t border-gray-200 p-4 bg-gray-50">
+                <!-- Buttons -->
+                <div class="flex gap-3 mb-3">
+                    <button type="button" onclick="window.location.href='/'" class="flex-1 px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition">
+                        Cancel
+                    </button>
+                    <button type="submit" form="registrationForm" class="flex-1 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition shadow-md hover:shadow-lg">
+                        Register
+                    </button>
+                </div>
+                <!-- Login Link -->
+                <div class="text-center">
+                    <p class="text-xs text-gray-600">
+                        Already have an account?
+                        <a href="/" class="text-blue-600 hover:text-blue-800 font-medium">Login here</a>
+                    </p>
+                </div>
             </div>
-
-            <div class="form-group">
-              <label for="regEmail">Email</label>
-              <input type="email" id="regEmail" placeholder="Email" required />
-            </div>
-
-            <div class="form-group">
-              <label for="regPassword">Password</label>
-              <input type="password" id="regPassword" placeholder="Password" required />
-            </div>
-
-            <div class="form-group">
-              <label for="confirmPassword">Confirm Password</label>
-              <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
-            </div>
-
-            <div class="form-group">
-              <label for="phoneNumber">Phone Number</label>
-              <input type="tel" id="phoneNumber" placeholder="Phone Number" />
-            </div>
-
-            <div class="form-group">
-              <label for="regRole">Register as:</label>
-              <select id="regRole">
-                <option value="PATIENT">Patient</option>
-                <option value="DOCTOR">Doctor</option>
-                <option value="PHARMACY">Pharmacy</option>
-              </select>
-            </div>
-          </div>
-
-          <hr class="section-divider" />
-
-          <!-- Role-specific fields -->
-          <div class="form-section role-fields" id="patientFields">
-            <h2>Patient Details</h2>
-            <div class="form-group">
-              <label for="patientBirthDate">Birth Date:</label>
-              <input type="date" id="patientBirthDate" />
-            </div>
-          </div>
-
-          <div class="form-section role-fields" id="doctorFields" style="display: none;">
-            <h2>Doctor Details</h2>
-            <div class="form-group">
-              <label for="doctorBirthDate">Birth Date:</label>
-              <input type="date" id="doctorBirthDate" />
-            </div>
-            <div class="form-group">
-              <label for="doctorSpecialization">Specialization:</label>
-              <input type="text" id="doctorSpecialization" placeholder="Specialization" />
-            </div>
-            <div class="form-group">
-              <label for="doctorLicense">PRC License:</label>
-              <input type="text" id="doctorLicense" placeholder="PRC License" />
-            </div>
-            <div class="form-group">
-              <label for="clinicName">Clinic Name:</label>
-              <input type="text" id="clinicName" placeholder="Clinic Name" />
-            </div>
-          </div>
-
-          <div class="form-section role-fields" id="pharmacyFields" style="display: none;">
-            <h2>Pharmacy Details</h2>
-            <div class="form-group">
-              <label for="pharmacyName">Pharmacy Name:</label>
-              <input type="text" id="pharmacyName" placeholder="Pharmacy Name" />
-            </div>
-            <div class="form-group">
-              <label for="address">Address:</label>
-              <input type="text" id="address" placeholder="Address" />
-            </div>
-            <div class="form-group">
-              <label for="operatingHours">Operating Hours:</label>
-              <input type="text" id="operatingHours" placeholder="e.g. 9:00 AM - 5:00 PM" />
-            </div>
-          </div>
-
-          <div class="terms-container">
-            <input type="checkbox" id="agreeTerms" required />
-            <label for="agreeTerms" class="terms-label">I agree to the Terms of Service and Privacy Policy</label>
-          </div>
-
-          <div class="button-group">
-            <button type="button" class="cancel-btn">Cancel</button>
-            <button type="submit" class="register-btn">Register</button>
-          </div>
-        </form>
-        <div id="registrationMessage"></div>
-      </div>
-
-      <div class="form-section" style="text-align: center; margin-top: 20px;">
-        <p>Already have an account? <a href="login.html">Login here</a></p>
-      </div>
+        </div>
     </div>
 
-    <!-- Role switching logic -->
     <script>
-      document.getElementById("regRole").addEventListener("change", function () {
-        document.querySelectorAll(".role-fields").forEach((field) => (field.style.display = "none"));
-        if (this.value === "PATIENT") document.getElementById("patientFields").style.display = "block";
-        if (this.value === "DOCTOR") document.getElementById("doctorFields").style.display = "block";
-        if (this.value === "PHARMACY") document.getElementById("pharmacyFields").style.display = "block";
-      });
+        // Role switching logic
+        document.getElementById("regRole").addEventListener("change", function () {
+            document.getElementById("patientFields").classList.add("hidden");
+            document.getElementById("doctorFields").classList.add("hidden");
+            document.getElementById("pharmacyFields").classList.add("hidden");
+            
+            if (this.value === "PATIENT") {
+                document.getElementById("patientFields").classList.remove("hidden");
+            } else if (this.value === "DOCTOR") {
+                document.getElementById("doctorFields").classList.remove("hidden");
+            } else if (this.value === "PHARMACY") {
+                document.getElementById("pharmacyFields").classList.remove("hidden");
+            }
+        });
     </script>
-
-    <!-- Link to your auth.js -->
     <script src="./assets/js/auth.js"></script>
-  </body>
+</body>
 </html>
