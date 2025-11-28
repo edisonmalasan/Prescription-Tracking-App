@@ -79,7 +79,6 @@ CREATE TABLE IF NOT EXISTS `drug` (
   `brand` varchar(100) DEFAULT NULL,
   `chemical_name` varchar(100) DEFAULT NULL,
   `category` varchar(100) DEFAULT NULL,
-  `expiry_date` date DEFAULT NULL,
   `isControlled` tinyint(1) DEFAULT '0',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`drug_id`)
@@ -89,17 +88,17 @@ CREATE TABLE IF NOT EXISTS `drug` (
 -- Dumping data for table `drug`
 --
 
-INSERT INTO `drug` (`drug_id`, `generic_name`, `brand`, `chemical_name`, `category`, `expiry_date`, `isControlled`, `created_at`) VALUES
-(1, 'Paracetamol', 'Biogesic', 'Acetaminophen', 'Analgesic/Antipyretic', '2026-05-01', 0, '2025-11-15 02:51:10'),
-(2, 'Ibuprofen', 'Advil', 'Ibuprofen', 'NSAID', '2026-11-10', 0, '2025-11-15 02:51:10'),
-(3, 'Amoxicillin', 'Amoxil', 'Amoxicillin Trihydrate', 'Antibiotic', '2027-02-15', 0, '2025-11-15 02:51:10'),
-(4, 'Cetirizine', 'Allerkid', 'Cetirizine Hydrochloride', 'Antihistamine', '2026-08-20', 0, '2025-11-15 02:51:10'),
-(5, 'Metformin', 'Glucophage', 'Metformin Hydrochloride', 'Antidiabetic', '2027-01-01', 0, '2025-11-15 02:51:10'),
-(6, 'Losartan', 'Cozaar', 'Losartan Potassium', 'Antihypertensive', '2027-06-30', 0, '2025-11-15 02:51:10'),
-(7, 'Omeprazole', 'Losec', 'Omeprazole', 'PPI', '2026-09-14', 0, '2025-11-15 02:51:10'),
-(8, 'Azithromycin', 'Zithromax', 'Azithromycin', 'Antibiotic', '2026-10-05', 0, '2025-11-15 02:51:10'),
-(9, 'Tramadol', 'Tramal', 'Tramadol Hydrochloride', 'Opioid Analgesic', '2027-04-22', 1, '2025-11-15 02:51:10'),
-(10, 'Hydroxyzine', 'Atarax', 'Hydroxyzine Hydrochloride', 'Anxiolytic', '2026-12-11', 0, '2025-11-15 02:51:10');
+INSERT INTO `drug` (`drug_id`, `generic_name`, `brand`, `chemical_name`, `category`, `isControlled`, `created_at`) VALUES
+(1, 'Paracetamol', 'Biogesic', 'Acetaminophen', 'Analgesic/Antipyretic', 0, '2025-11-15 02:51:10'),
+(2, 'Ibuprofen', 'Advil', 'Ibuprofen', 'NSAID', 0, '2025-11-15 02:51:10'),
+(3, 'Amoxicillin', 'Amoxil', 'Amoxicillin Trihydrate', 'Antibiotic', 0, '2025-11-15 02:51:10'),
+(4, 'Cetirizine', 'Allerkid', 'Cetirizine Hydrochloride', 'Antihistamine', 0, '2025-11-15 02:51:10'),
+(5, 'Metformin', 'Glucophage', 'Metformin Hydrochloride', 'Antidiabetic', 0, '2025-11-15 02:51:10'),
+(6, 'Losartan', 'Cozaar', 'Losartan Potassium', 'Antihypertensive', 0, '2025-11-15 02:51:10'),
+(7, 'Omeprazole', 'Losec', 'Omeprazole', 'PPI', 0, '2025-11-15 02:51:10'),
+(8, 'Azithromycin', 'Zithromax', 'Azithromycin', 'Antibiotic', 0, '2025-11-15 02:51:10'),
+(9, 'Tramadol', 'Tramal', 'Tramadol Hydrochloride', 'Opioid Analgesic', 1, '2025-11-15 02:51:10'),
+(10, 'Hydroxyzine', 'Atarax', 'Hydroxyzine Hydrochloride', 'Anxiolytic', 0, '2025-11-15 02:51:10');
 
 -- --------------------------------------------------------
 
@@ -163,6 +162,7 @@ CREATE TABLE IF NOT EXISTS `pharmacy` (
   `open_time` time DEFAULT NULL,
   `close_time` time DEFAULT NULL,
   `dates_open` varchar(50) DEFAULT NULL,
+  `isVerified` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -170,8 +170,8 @@ CREATE TABLE IF NOT EXISTS `pharmacy` (
 -- Dumping data for table `pharmacy`
 --
 
-INSERT INTO `pharmacy` (`user_id`, `pharmacy_name`, `phar_license`, `open_time`, `close_time`, `dates_open`) VALUES
-(3, 'HealthPlus Pharmacy', 'PHR-00321', '08:00:00', '20:00:00', 'Mon–Sun');
+INSERT INTO `pharmacy` (`user_id`, `pharmacy_name`, `phar_license`, `open_time`, `close_time`, `dates_open`, `isVerified`) VALUES
+(3, 'HealthPlus Pharmacy', 'PHR-00321', '08:00:00', '20:00:00', 'Mon–Sun', 1);
 
 -- --------------------------------------------------------
 
