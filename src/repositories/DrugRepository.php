@@ -14,7 +14,7 @@ class DrugRepository {
 
     // Create a new drug
     public function create($drug) {
-        $sql = "INSERT INTO " . $this->table_name . " (generic_name, brand, chemical_name, category, expiry_date, isControlled) VALUES (?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO " . $this->table_name . " (generic_name, brand, chemical_name, category, isControlled) VALUES (?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($sql);
         if (! $stmt) {
             return false;
@@ -24,12 +24,10 @@ class DrugRepository {
         $brand = $drug['brand'] ?? '';
         $chemical_name = $drug['chemical_name'] ?? '';
         $category = $drug['category'] ?? '';
-    // ensure expiry_date is a string (mysqli bind_param expects variables)
-    $expiry_date = isset($drug['expiry_date']) && $drug['expiry_date'] !== null ? $drug['expiry_date'] : '';
         $isControlled = isset($drug['isControlled']) ? (int)$drug['isControlled'] : 0;
 
-        // types: generic_name(s), brand(s), chemical_name(s), category(s), expiry_date(s), isControlled(i)
-        $stmt->bind_param('sssssi', $generic_name, $brand, $chemical_name, $category, $expiry_date, $isControlled);
+        // types: generic_name(s), brand(s), chemical_name(s), category(s), isControlled(i)
+        $stmt->bind_param('ssssi', $generic_name, $brand, $chemical_name, $category, $isControlled);
         $ok = $stmt->execute();
 
         if ($ok) {
@@ -108,7 +106,7 @@ class DrugRepository {
 
     // Update drug
     public function update($drug) {
-        $sql = "UPDATE " . $this->table_name . " SET generic_name = ?, brand = ?, chemical_name = ?, category = ?, expiry_date = ?, isControlled = ? WHERE drug_id = ?";
+        $sql = "UPDATE " . $this->table_name . " SET generic_name = ?, brand = ?, chemical_name = ?, category = ?, isControlled = ? WHERE drug_id = ?";
         $stmt = $this->conn->prepare($sql);
         if (! $stmt) {
             return false;
@@ -118,8 +116,6 @@ class DrugRepository {
         $brand = $drug['brand'] ?? '';
         $chemical_name = $drug['chemical_name'] ?? '';
         $category = $drug['category'] ?? '';
-    // ensure expiry_date is a string for binding
-    $expiry_date = isset($drug['expiry_date']) && $drug['expiry_date'] !== null ? $drug['expiry_date'] : '';
         $isControlled = isset($drug['isControlled']) ? (int)$drug['isControlled'] : 0;
         $drug_id = $drug['drug_id'] ?? null;
 
@@ -127,7 +123,7 @@ class DrugRepository {
             return false;
         }
 
-        $stmt->bind_param('sssssii', $generic_name, $brand, $chemical_name, $category, $expiry_date, $isControlled, $drug_id);
+        $stmt->bind_param('ssssii', $generic_name, $brand, $chemical_name, $category, $isControlled, $drug_id);
         $stmt->execute();
         return ($stmt->affected_rows > 0);
     }

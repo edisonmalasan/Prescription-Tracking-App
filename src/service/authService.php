@@ -3,7 +3,6 @@ require_once __DIR__ . '/../repositories/UserRepository.php';
 require_once __DIR__ . '/../repositories/DoctorRepository.php';
 require_once __DIR__ . '/../repositories/PatientRepository.php';
 require_once __DIR__ . '/../repositories/PharmacyRepository.php';
-require_once __DIR__ . '/../repositories/AdminRepository.php';
 require_once __DIR__ . '/../config/db.php';
 
 class AuthService {
@@ -11,7 +10,6 @@ class AuthService {
     private $doctorRepo;
     private $patientRepo;
     private $pharmacyRepo;
-    private $adminRepo;
     private $conn;
 
     public function __construct() {
@@ -20,7 +18,6 @@ class AuthService {
             $this->doctorRepo = new DoctorRepository();
             $this->patientRepo = new PatientRepository();
             $this->pharmacyRepo = new PharmacyRepository();
-            $this->adminRepo = new AdminRepository();
             $database = new Database();
             $this->conn = $database->getConnection();
         } catch (PDOException $e) {
@@ -129,8 +126,6 @@ class AuthService {
                     return $this->patientRepo->create($userId, $data);
                 case 'PHARMACY':
                     return $this->pharmacyRepo->create($userId, $data);
-                case 'ADMIN':
-                    return $this->adminRepo->create($userId);
             }
             return false;
         } catch (Exception $e) {
@@ -146,8 +141,6 @@ class AuthService {
                 return $this->patientRepo->findByUserId($userId) ?: [];
             case 'PHARMACY':
                 return $this->pharmacyRepo->findByUserId($userId) ?: [];
-            case 'ADMIN':
-                return $this->adminRepo->findByUserId($userId) ?: [];
         }
         return [];
     }

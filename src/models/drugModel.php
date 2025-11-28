@@ -6,7 +6,6 @@ class DrugModel {
     public $brand;
     public $chemical_name;
     public $category;
-    public $expiry_date;
     public $isControlled;
 
     public function __construct($data = []) {
@@ -16,7 +15,6 @@ class DrugModel {
             $this->brand = $data['brand'] ?? '';
             $this->chemical_name = $data['chemical_name'] ?? '';
             $this->category = $data['category'] ?? '';
-            $this->expiry_date = $data['expiry_date'] ?? null;
             $this->isControlled = $data['isControlled'] ?? false;
         }
     }
@@ -28,18 +26,8 @@ class DrugModel {
             'brand' => $this->brand,
             'chemical_name' => $this->chemical_name,
             'category' => $this->category,
-            'expiry_date' => $this->expiry_date,
             'isControlled' => $this->isControlled
         ];
-    }
-
-    public function isExpired() {
-        if ($this->expiry_date) {
-            $expiryDate = new DateTime($this->expiry_date);
-            $today = new DateTime();
-            return $today > $expiryDate;
-        }
-        return false;
     }
 }
 ?>
