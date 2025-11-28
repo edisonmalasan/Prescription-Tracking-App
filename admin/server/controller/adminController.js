@@ -4,7 +4,11 @@ const adminService = require("../service/adminService");
 const handleValidation = (req) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    const error = new Error("Validation failed");
+    const errorMessages = errors
+      .array()
+      .map((err) => err.msg)
+      .join(", ");
+    const error = new Error(`Validation failed: ${errorMessages}`);
     error.status = 422;
     error.details = errors.array();
     throw error;
@@ -25,6 +29,15 @@ const getDashboardSummary = async (req, res, next) => {
   try {
     const summary = await adminService.getDashboardSummary();
     res.json({ success: true, summary });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const listPrescriptions = async (req, res, next) => {
+  try {
+    const prescriptions = await adminService.listPrescriptions(req.query);
+    res.json({ success: true, prescriptions });
   } catch (error) {
     next(error);
   }
@@ -108,25 +121,42 @@ const verifyPharmacy = async (req, res, next) => {
   }
 };
 
-const getTableMetadata = async (req, res, next) => {
+const listDrugs = async (req, res, next) => {
   try {
-    const tables = await adminService.getTableMetadata();
-    res.json({ success: true, tables });
+    const drugs = await adminService.listDrugs();
+    res.json({ success: true, drugs });
   } catch (error) {
     next(error);
   }
 };
 
-const getTableRecords = async (req, res, next) => {
+const createDrug = async (req, res, next) => {
   try {
     handleValidation(req);
-    const { tableName } = req.params;
-    const { limit } = req.query;
-    const records = await adminService.getTableRecords(
-      tableName,
-      limit ? Number(limit) : undefined
+    const result = await adminService.createDrug(req.body);
+    res.status(201).json({ success: true, ...result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateDrug = async (req, res, next) => {
+  try {
+    handleValidation(req);
+    const result = await adminService.updateDrug(
+      Number(req.params.drugId),
+      req.body
     );
-    res.json({ success: true, records });
+    res.json({ success: true, ...result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteDrug = async (req, res, next) => {
+  try {
+    const result = await adminService.deleteDrug(Number(req.params.drugId));
+    res.json({ success: true, ...result });
   } catch (error) {
     next(error);
   }
@@ -144,6 +174,7 @@ const deleteUser = async (req, res, next) => {
 module.exports = {
   login,
   getDashboardSummary,
+  listPrescriptions,
   listUsers,
   createUser,
   updateUser,
@@ -151,7 +182,9 @@ module.exports = {
   verifyDoctor,
   listPharmacies,
   verifyPharmacy,
-  getTableMetadata,
-  getTableRecords,
+  listDrugs,
+  createDrug,
+  updateDrug,
+  deleteDrug,
   deleteUser,
 };

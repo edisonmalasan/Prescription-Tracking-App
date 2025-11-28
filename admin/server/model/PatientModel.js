@@ -23,3 +23,6 @@ class PatientModel {
 }
 
 module.exports = PatientModel;
+
+
+

@@ -32,3 +32,6 @@ class DoctorModel {
 }
 
 module.exports = DoctorModel;
+
+
+

@@ -61,6 +61,9 @@ const createUser = async ({
   pass_hash,
   address,
 }) => {
+  const contactnoValue =
+    contactno && contactno.trim() !== "" ? contactno.trim() : null;
+
   const sql = `
     INSERT INTO USERS (last_name, first_name, role, email, contactno, pass_hash, address)
     VALUES (?, ?, ?, ?, ?, ?, ?)`;
@@ -69,7 +72,7 @@ const createUser = async ({
     first_name,
     role,
     email,
-    contactno,
+    contactnoValue,
     pass_hash,
     address,
   ]);
@@ -93,7 +96,13 @@ const updateUser = async (userId, data) => {
   allowed.forEach((field) => {
     if (data[field] !== undefined) {
       fields.push(`${field} = ?`);
-      values.push(data[field]);
+      if (field === "contactno") {
+        values.push(
+          data[field] && data[field].trim() !== "" ? data[field].trim() : null
+        );
+      } else {
+        values.push(data[field]);
+      }
     }
   });
 
@@ -130,4 +139,3 @@ module.exports = {
   deleteUser,
   getRoleCounts,
 };
-

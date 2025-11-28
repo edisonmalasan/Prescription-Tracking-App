@@ -5,8 +5,10 @@ const {
   createUserValidators,
   updateUserValidators,
   verificationValidators,
-  tableRecordValidators,
   userIdParamValidators,
+  drugCreateValidators,
+  drugUpdateValidators,
+  drugIdParamValidators,
 } = require("../middleware/adminMiddleware");
 
 const router = express.Router();
@@ -14,17 +16,10 @@ const router = express.Router();
 router.post("/auth/login", loginValidators, adminController.login);
 
 router.get("/dashboard/summary", adminController.getDashboardSummary);
+router.get("/prescriptions", adminController.listPrescriptions);
 router.get("/users", adminController.listUsers);
 router.get("/doctors", adminController.listDoctors);
 router.get("/pharmacies", adminController.listPharmacies);
-router.get("/database/metadata", adminController.getTableMetadata);
-
-router.get(
-  "/database/records/:tableName",
-  tableRecordValidators,
-  adminController.getTableRecords
-);
-
 router.post("/users", createUserValidators, adminController.createUser);
 
 router.put("/users/:userId", updateUserValidators, adminController.updateUser);
@@ -45,6 +40,19 @@ router.patch(
   "/pharmacies/:userId/verify",
   verificationValidators,
   adminController.verifyPharmacy
+);
+
+router.get("/drugs", adminController.listDrugs);
+router.post("/drugs", drugCreateValidators, adminController.createDrug);
+router.put(
+  "/drugs/:drugId",
+  drugUpdateValidators,
+  adminController.updateDrug
+);
+router.delete(
+  "/drugs/:drugId",
+  drugIdParamValidators,
+  adminController.deleteDrug
 );
 
 module.exports = router;

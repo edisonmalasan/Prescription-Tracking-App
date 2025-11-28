@@ -15,13 +15,14 @@ class UserModel {
     "email",
     "contactno",
     "address",
-    "pass_hash", // will be converted to pass_hash
+    "pass_hash",
   ];
 
   static SUPPORTED_ROLES = new Set(["admin", "doctor", "patient", "pharmacy"]);
 
   static validateRole(role) {
-    if (!this.SUPPORTED_ROLES.has(role)) {
+    const normalizedRole = role?.toLowerCase();
+    if (!this.SUPPORTED_ROLES.has(normalizedRole)) {
       throw new Error(`Unsupported role: ${role}`);
     }
     return true;
@@ -37,9 +38,9 @@ class UserModel {
     return {
       last_name: userData.last_name,
       first_name: userData.first_name,
-      role: userData.role,
+      role: userData.role?.toUpperCase() || userData.role,
       email: userData.email,
-      contactno: userData.contactno,
+      contactno: userData.contactno?.trim() || null,
       pass_hash: userData.password,
       address: userData.address,
     };
@@ -52,6 +53,11 @@ class UserModel {
       if (userData[field] !== undefined) {
         if (field === "password") {
           updatePayload.pass_hash = userData[field];
+        } else if (field === "role") {
+          updatePayload[field] =
+            userData[field]?.toUpperCase() || userData[field];
+        } else if (field === "contactno") {
+          updatePayload[field] = userData[field]?.trim() || null;
         } else {
           updatePayload[field] = userData[field];
         }

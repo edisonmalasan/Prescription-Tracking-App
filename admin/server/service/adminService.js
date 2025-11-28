@@ -2,8 +2,10 @@ const userRepository = require("../repository/userRepository");
 const doctorRepository = require("../repository/doctorRepository");
 const pharmacyRepository = require("../repository/pharmacyRepository");
 const patientRepository = require("../repository/patientRepository");
-const databaseRepository = require("../repository/databaseRepository");
 const adminRepository = require("../repository/adminRepository");
+const statsRepository = require("../repository/statsRepository");
+const prescriptionRepository = require("../repository/prescriptionRepository");
+const drugRepository = require("../repository/drugRepository");
 
 // Models
 const UserModel = require("../model/UserModel");
@@ -29,9 +31,13 @@ const login = async ({ email, password }) => {
 };
 
 const getDashboardSummary = async () => {
-  const counts = await databaseRepository.getEntityCounts();
-  const roleBreakdown = await userRepository.getRoleCounts();
-  return { counts, roleBreakdown };
+  const [counts, roleBreakdown, prescriptions] = await Promise.all([
+    statsRepository.getEntityCounts(),
+    userRepository.getRoleCounts(),
+    prescriptionRepository.getPrescriptionList({ limit: 10 }),
+  ]);
+
+  return { counts, roleBreakdown, prescriptions };
 };
 
 const listUsers = async () => userRepository.getAllUsers();
@@ -44,12 +50,15 @@ const ensureUniqueEmail = async (email, currentUserId = null) => {
 };
 
 const attachRoleProfile = async (role, userId, profile = {}) => {
-  if (role === "admin") {
+  // Normalize role to lowercase for internal logic
+  const normalizedRole = role?.toLowerCase();
+  
+  if (normalizedRole === "admin") {
     await adminRepository.createAdminRecord(userId);
     return;
   }
 
-  const profileData = RoleProfileMapper.prepareProfileData(role, {
+  const profileData = RoleProfileMapper.prepareProfileData(normalizedRole, {
     ...profile,
     user_id: userId,
   });
@@ -58,7 +67,7 @@ const attachRoleProfile = async (role, userId, profile = {}) => {
     return;
   }
 
-  switch (role) {
+  switch (normalizedRole) {
     case "doctor":
       await doctorRepository.createDoctorProfile(profileData);
       break;
@@ -72,7 +81,8 @@ const attachRoleProfile = async (role, userId, profile = {}) => {
 };
 
 const deleteRoleProfile = async (role, userId) => {
-  switch (role) {
+  const normalizedRole = role?.toLowerCase();
+  switch (normalizedRole) {
     case "doctor":
       await doctorRepository.deleteDoctorByUserId(userId);
       break;
@@ -121,16 +131,17 @@ const updateUser = async (userId, { user, profile }) => {
   }
 
   const targetRole = user?.role || existingUser.role;
-  UserModel.validateRole(targetRole);
+  UserModel.validateRole(targetRole?.toLowerCase());
 
-  if (profile && RoleProfileMapper.hasProfile(targetRole)) {
+  const normalizedTargetRole = targetRole?.toLowerCase();
+  if (profile && RoleProfileMapper.hasProfile(normalizedTargetRole)) {
     const profileUpdateData = RoleProfileMapper.prepareUpdateData(
-      targetRole,
+      normalizedTargetRole,
       profile
     );
-    
+
     if (profileUpdateData && Object.keys(profileUpdateData).length) {
-      switch (targetRole) {
+      switch (normalizedTargetRole) {
         case "doctor":
           await doctorRepository.updateDoctorProfile(userId, profileUpdateData);
           break;
@@ -141,13 +152,16 @@ const updateUser = async (userId, { user, profile }) => {
           );
           break;
         case "patient":
-          await patientRepository.updatePatientProfile(userId, profileUpdateData);
+          await patientRepository.updatePatientProfile(
+            userId,
+            profileUpdateData
+          );
           break;
       }
     }
   }
 
-  if (targetRole === "admin" && existingUser.role !== "admin") {
+  if (normalizedTargetRole === "admin" && existingUser.role?.toUpperCase() !== "ADMIN") {
     await adminRepository.createAdminRecord(userId);
   }
 
@@ -155,6 +169,12 @@ const updateUser = async (userId, { user, profile }) => {
 };
 
 const listDoctors = async () => doctorRepository.getAllDoctors();
+
+const listPrescriptions = async ({ limit, offset }) =>
+  prescriptionRepository.getPrescriptionList({
+    limit: limit ? Number(limit) : undefined,
+    offset: offset ? Number(offset) : undefined,
+  });
 
 const verifyDoctor = async (userId, isVerified) => {
   const result = await doctorRepository.setDoctorVerification(
@@ -180,10 +200,28 @@ const verifyPharmacy = async (userId, isVerified) => {
   return { user_id: userId, isVerified };
 };
 
-const getTableRecords = async (tableName, limit) =>
-  databaseRepository.getTableRecords(tableName.toUpperCase(), limit);
+const listDrugs = async () => drugRepository.getAllDrugs();
 
-const getTableMetadata = async () => databaseRepository.getTableMetadata();
+const createDrug = async (payload) => {
+  const insertId = await drugRepository.createDrug(payload);
+  return { drug_id: insertId };
+};
+
+const updateDrug = async (drugId, payload) => {
+  const result = await drugRepository.updateDrug(drugId, payload);
+  if (!result.affectedRows) {
+    throw ServiceError("Drug not found", 404);
+  }
+  return { drug_id: drugId };
+};
+
+const deleteDrug = async (drugId) => {
+  const result = await drugRepository.deleteDrug(drugId);
+  if (!result.affectedRows) {
+    throw ServiceError("Drug not found", 404);
+  }
+  return { drug_id: drugId };
+};
 
 const deleteUser = async (userId) => {
   const existingUser = await userRepository.findById(userId);
@@ -208,10 +246,13 @@ module.exports = {
   createUser,
   updateUser,
   listDoctors,
+  listPrescriptions,
   verifyDoctor,
   listPharmacies,
   verifyPharmacy,
-  getTableRecords,
-  getTableMetadata,
+  listDrugs,
+  createDrug,
+  updateDrug,
+  deleteDrug,
   deleteUser,
 };
