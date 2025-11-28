@@ -20,11 +20,16 @@
               class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
               >Users</a
             >
-            <a
-              href="database.html"
-              class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-              >Database</a
-            >
+          <a
+            href="prescriptions.html"
+            class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+            >Prescriptions</a
+          >
+          <a
+            href="drugs.html"
+            class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+            >Drugs</a
+          >
             <a
               href="verification.html"
               class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
@@ -65,22 +70,75 @@
       <!-- cards -->
       <div
         id="statsContainer"
-        s
         class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
       >
         <!-- populated via dashboard sc -->
       </div>
 
-      <!-- role -->
+      <!-- recent prescriptions -->
       <div
-        id="roleBreakdownContainer"
+        id="prescriptionListContainer"
         class="hidden bg-white rounded-lg shadow-md p-6 mb-8"
       >
-        <h3 class="text-xl font-semibold text-gray-800 mb-4">
-          User Role Distribution
-        </h3>
-        <div id="roleBreakdown" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <!--data -->
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div>
+            <h3 class="text-xl font-semibold text-gray-800">
+              Prescription Activity
+            </h3>
+            <p class="text-sm text-gray-500">
+              Recent prescriptions with doctor and patient details
+            </p>
+          </div>
+          <div class="flex items-center gap-3">
+            <span
+              id="prescriptionListMeta"
+              class="text-sm font-medium text-gray-500"
+            ></span>
+            <a
+              href="prescriptions.html"
+              class="text-sm font-semibold text-blue-600 hover:text-blue-800"
+              >View all</a
+            >
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  #
+                </th>
+                <th
+                  class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Patient
+                </th>
+                <th
+                  class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Doctor
+                </th>
+                <th
+                  class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Date
+                </th>
+                <th
+                  class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Status
+                </th>
+              </tr>
+            </thead>
+            <tbody
+              id="prescriptionListBody"
+              class="bg-white divide-y divide-gray-100"
+            >
+              <!-- rows injected by dashboard.js -->
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -97,25 +155,28 @@
             </p>
           </a>
           <a
-            href="database.html"
-            class="block p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition"
-          >
-            <h4 class="font-semibold text-gray-800 mb-2">
-              Database Management
-            </h4>
-            <p class="text-sm text-gray-600">View and modify database tables</p>
-          </a>
-          <a
             href="verification.html"
             class="block p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition"
           >
             <h4 class="font-semibold text-gray-800 mb-2">Verify Credentials</h4>
             <p class="text-sm text-gray-600">Verify doctors and pharmacies</p>
           </a>
+          <a
+            href="drugs.html"
+            class="block p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition"
+          >
+            <h4 class="font-semibold text-gray-800 mb-2">
+              Manage Drug Catalog
+            </h4>
+            <p class="text-sm text-gray-600">
+              Add, edit, or remove drug information
+            </p>
+          </a>
         </div>
       </div>
     </main>
 
+    <script src="js/config.js"></script>
     <script src="js/dashboard.js"></script>
   </body>
 </html>

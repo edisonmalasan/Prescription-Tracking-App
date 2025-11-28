@@ -1,4 +1,7 @@
-const API_BASE = "http://localhost:4000/api/admin";
+const API_BASE =
+  (typeof getAdminApiBase === "function" && getAdminApiBase()) ||
+  window.ADMIN_API_BASE ||
+  "http://localhost:4000/api/admin";
 
 // auth checker that supports both admin frontend login and PHP login
 let admin = JSON.parse(sessionStorage.getItem("admin") || "null");
@@ -88,6 +91,8 @@ function openCreateModal() {
   document.getElementById("userForm").reset();
   document.getElementById("userId").value = "";
   document.getElementById("modalError").classList.add("hidden");
+  resetRoleFields();
+  handleRoleFields(false);
   document.getElementById("userModal").classList.remove("hidden");
 }
 
@@ -106,6 +111,8 @@ function editUser(userId) {
   document.getElementById("password").value = "";
   document.getElementById("password").required = false;
   document.getElementById("modalError").classList.add("hidden");
+  resetRoleFields();
+  handleRoleFields(true);
   document.getElementById("userModal").classList.remove("hidden");
 }
 
@@ -119,20 +126,28 @@ document.getElementById("userForm").addEventListener("submit", async (e) => {
   errorDiv.classList.add("hidden");
 
   const userId = document.getElementById("userId").value;
+  const roleValue = document.getElementById("role").value;
   const userData = {
     user: {
-      first_name: document.getElementById("firstName").value,
-      last_name: document.getElementById("lastName").value,
-      email: document.getElementById("email").value,
-      role: document.getElementById("role").value,
-      contactno: document.getElementById("contactno").value,
-      address: document.getElementById("address").value,
+      first_name: document.getElementById("firstName").value.trim(),
+      last_name: document.getElementById("lastName").value.trim(),
+      email: document.getElementById("email").value.trim(),
+      role: roleValue,
+      contactno: document.getElementById("contactno").value.trim(),
+      address: document.getElementById("address").value.trim(),
     },
-    profile: {},
   };
 
   if (document.getElementById("password").value) {
     userData.user.password = document.getElementById("password").value;
+  }
+
+  const profilePayload = buildProfilePayload(roleValue, userId, errorDiv);
+  if (profilePayload === null) {
+    return;
+  }
+  if (Object.keys(profilePayload).length) {
+    userData.profile = profilePayload;
   }
 
   try {
@@ -167,7 +182,14 @@ document.getElementById("userForm").addEventListener("submit", async (e) => {
       );
       loadUsers();
     } else {
-      errorDiv.textContent = data.message || "Operation failed";
+      let errorMessage = data.message || "Operation failed";
+      if (data.errors && Array.isArray(data.errors)) {
+        const errorDetails = data.errors
+          .map((err) => err.msg || err.message)
+          .join("\n");
+        errorMessage = `${errorMessage}\n${errorDetails}`;
+      }
+      errorDiv.textContent = errorMessage;
       errorDiv.classList.remove("hidden");
     }
   } catch (error) {
@@ -176,14 +198,33 @@ document.getElementById("userForm").addEventListener("submit", async (e) => {
   }
 });
 
-async function deleteUser(userId) {
-  if (
-    !confirm(
-      "Are you sure you want to delete this user? This action cannot be undone."
-    )
-  ) {
-    return;
-  }
+let userToDelete = null;
+
+function deleteUser(userId) {
+  const user = users.find((u) => u.user_id === userId);
+  if (!user) return;
+
+  userToDelete = userId;
+
+  document.getElementById(
+    "deleteUserName"
+  ).textContent = `${user.first_name} ${user.last_name}`;
+  document.getElementById("deleteUserEmail").textContent = user.email;
+  document.getElementById("deleteUserRole").textContent = user.role;
+
+  document.getElementById("deleteModal").classList.remove("hidden");
+}
+
+function closeDeleteModal() {
+  document.getElementById("deleteModal").classList.add("hidden");
+  userToDelete = null;
+}
+
+async function confirmDeleteUser() {
+  if (!userToDelete) return;
+
+  const userId = userToDelete;
+  closeDeleteModal();
 
   try {
     const response = await fetch(`${API_BASE}/users/${userId}`, {
@@ -220,5 +261,148 @@ function logout() {
   window.location.href = "/";
 }
 
-// Load users on page load
+document.getElementById("role").addEventListener("change", () =>
+  handleRoleFields(Boolean(document.getElementById("userId").value))
+);
+
+function handleRoleFields(isEditMode = false) {
+  const role = document.getElementById("role").value;
+  const patientFields = document.getElementById("patientFields");
+  const doctorFields = document.getElementById("doctorFields");
+  const pharmacyFields = document.getElementById("pharmacyFields");
+
+  patientFields.classList.add("hidden");
+  doctorFields.classList.add("hidden");
+  pharmacyFields.classList.add("hidden");
+
+  const setRequired = (id, required) => {
+    const el = document.getElementById(id);
+    if (el) el.required = required;
+  };
+
+  // reset required
+  [
+    "patientBirthDate",
+    "doctorBirthDate",
+    "doctorPRCLicense",
+    "pharmacyName",
+    "pharmacyLicense",
+  ].forEach((id) => setRequired(id, false));
+
+  const isCreate = !isEditMode;
+
+  if (role === "PATIENT") {
+    patientFields.classList.remove("hidden");
+    setRequired("patientBirthDate", isCreate);
+  } else if (role === "DOCTOR") {
+    doctorFields.classList.remove("hidden");
+    setRequired("doctorBirthDate", isCreate);
+    setRequired("doctorPRCLicense", isCreate);
+  } else if (role === "PHARMACY") {
+    pharmacyFields.classList.remove("hidden");
+    setRequired("pharmacyName", isCreate);
+    setRequired("pharmacyLicense", isCreate);
+  }
+}
+
+function resetRoleFields() {
+  [
+    "patientBirthDate",
+    "doctorBirthDate",
+    "doctorPRCLicense",
+    "doctorSpecialization",
+    "doctorClinicName",
+    "pharmacyName",
+    "pharmacyLicense",
+    "pharmacyOpenTime",
+    "pharmacyCloseTime",
+    "pharmacyDatesOpen",
+  ].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+
+  ["doctorIsVerified", "pharmacyIsVerified"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.checked = false;
+  });
+}
+
+function buildProfilePayload(role, userId, errorDiv) {
+  const profile = {};
+  const isEdit = Boolean(userId);
+
+  const showError = (message) => {
+    errorDiv.textContent = message;
+    errorDiv.classList.remove("hidden");
+  };
+
+  if (role === "PATIENT") {
+    const birthDate = document.getElementById("patientBirthDate").value;
+    if (!isEdit && !birthDate) {
+      showError("Birth date is required for patients");
+      return null;
+    }
+    if (birthDate) profile.birth_date = birthDate;
+  } else if (role === "DOCTOR") {
+    const birthDate = document.getElementById("doctorBirthDate").value;
+    const license = document
+      .getElementById("doctorPRCLicense")
+      .value.trim();
+    const specialization = document
+      .getElementById("doctorSpecialization")
+      .value.trim();
+    const clinic = document
+      .getElementById("doctorClinicName")
+      .value.trim();
+    const isVerified = document.getElementById("doctorIsVerified").checked
+      ? 1
+      : 0;
+
+    if (!isEdit && !birthDate) {
+      showError("Birth date is required for doctors");
+      return null;
+    }
+    if (!isEdit && !license) {
+      showError("PRC license is required for doctors");
+      return null;
+    }
+
+    if (birthDate) profile.birth_date = birthDate;
+    if (license) profile.prc_license = license;
+    if (specialization) profile.specialization = specialization;
+    if (clinic) profile.clinic_name = clinic;
+    profile.isVerified = isVerified;
+  } else if (role === "PHARMACY") {
+    const name = document.getElementById("pharmacyName").value.trim();
+    const license = document.getElementById("pharmacyLicense").value.trim();
+    const openTime = document.getElementById("pharmacyOpenTime").value;
+    const closeTime = document.getElementById("pharmacyCloseTime").value;
+    const datesOpen = document
+      .getElementById("pharmacyDatesOpen")
+      .value.trim();
+    const isVerified = document.getElementById("pharmacyIsVerified").checked
+      ? 1
+      : 0;
+
+    if (!isEdit && !name) {
+      showError("Pharmacy name is required");
+      return null;
+    }
+    if (!isEdit && !license) {
+      showError("Pharmacy license is required");
+      return null;
+    }
+
+    if (name) profile.pharmacy_name = name;
+    if (license) profile.phar_license = license;
+    if (openTime) profile.open_time = openTime;
+    if (closeTime) profile.close_time = closeTime;
+    if (datesOpen) profile.dates_open = datesOpen;
+    profile.isVerified = isVerified;
+  }
+
+  return profile;
+}
+
 loadUsers();

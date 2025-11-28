@@ -20,14 +20,19 @@
               >Dashboard</a
             >
             <a
+              href="prescriptions.html"
+              class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+              >Prescriptions</a
+            >
+            <a
+              href="drugs.html"
+              class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+              >Drugs</a
+            >
+            <a
               href="users.html"
               class="text-blue-600 font-semibold px-3 py-2 rounded-md text-sm font-medium"
               >Users</a
-            >
-            <a
-              href="database.html"
-              class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-              >Database</a
             >
             <a
               href="verification.html"
@@ -120,6 +125,66 @@
         </div>
       </div>
     </main>
+
+    <!-- delete confirmation modal -->
+    <div
+      id="deleteModal"
+      class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
+      onclick="if(event.target === this) closeDeleteModal()"
+    >
+      <div class="relative top-20 mx-auto p-5 border w-11/12 max-w-md shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+          <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
+            <svg
+              class="w-6 h-6 text-red-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              ></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 text-center mb-2">
+            Delete User
+          </h3>
+          <div class="mt-2 px-4 py-3">
+            <p class="text-sm text-gray-500 text-center mb-4">
+              Are you sure you want to delete this user? This action cannot be undone.
+            </p>
+            <div class="bg-gray-50 rounded-lg p-4 mb-4">
+              <p class="text-sm font-medium text-gray-900">
+                <span id="deleteUserName"></span>
+              </p>
+              <p class="text-xs text-gray-500 mt-1">
+                <span id="deleteUserEmail"></span>
+              </p>
+              <p class="text-xs text-gray-500">
+                Role: <span id="deleteUserRole"></span>
+              </p>
+            </div>
+          </div>
+          <div class="flex justify-center space-x-3 px-4 py-3">
+            <button
+              onclick="closeDeleteModal()"
+              class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              onclick="confirmDeleteUser()"
+              class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- create/edit  -->
     <div
@@ -252,6 +317,158 @@
               class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm"
             ></div>
 
+            <!-- Patient fields -->
+            <div
+              id="patientFields"
+              class="hidden border-t border-gray-200 pt-4 mt-4 space-y-4"
+            >
+              <h4 class="text-sm font-semibold text-gray-700">Patient Info</h4>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Birth Date <span class="text-red-500">*</span></label
+                >
+                <input
+                  type="date"
+                  id="patientBirthDate"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+
+            <!-- Doctor fields -->
+            <div
+              id="doctorFields"
+              class="hidden border-t border-gray-200 pt-4 mt-4 space-y-4"
+            >
+              <h4 class="text-sm font-semibold text-gray-700">Doctor Info</h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >Birth Date <span class="text-red-500">*</span></label
+                  >
+                  <input
+                    type="date"
+                    id="doctorBirthDate"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >PRC License <span class="text-red-500">*</span></label
+                  >
+                  <input
+                    type="text"
+                    id="doctorPRCLicense"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Specialization</label
+                >
+                <input
+                  type="text"
+                  id="doctorSpecialization"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Clinic Name</label
+                >
+                <input
+                  type="text"
+                  id="doctorClinicName"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="doctorIsVerified"
+                  class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                />
+                <label for="doctorIsVerified" class="ml-2 text-sm text-gray-700">
+                  Verified Doctor
+                </label>
+              </div>
+            </div>
+
+            <!-- Pharmacy fields -->
+            <div
+              id="pharmacyFields"
+              class="hidden border-t border-gray-200 pt-4 mt-4 space-y-4"
+            >
+              <h4 class="text-sm font-semibold text-gray-700">Pharmacy Info</h4>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Pharmacy Name <span class="text-red-500">*</span></label
+                >
+                <input
+                  type="text"
+                  id="pharmacyName"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Pharmacy License <span class="text-red-500">*</span></label
+                >
+                <input
+                  type="text"
+                  id="pharmacyLicense"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >Open Time</label
+                  >
+                  <input
+                    type="time"
+                    id="pharmacyOpenTime"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >Close Time</label
+                  >
+                  <input
+                    type="time"
+                    id="pharmacyCloseTime"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Days Open</label
+                >
+                <input
+                  type="text"
+                  id="pharmacyDatesOpen"
+                  placeholder="e.g., Mon-Sat"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="pharmacyIsVerified"
+                  class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                />
+                <label
+                  for="pharmacyIsVerified"
+                  class="ml-2 text-sm text-gray-700"
+                >
+                  Verified Pharmacy
+                </label>
+              </div>
+            </div>
+
             <div class="flex justify-end space-x-3 pt-4">
               <button
                 type="button"
@@ -272,6 +489,7 @@
       </div>
     </div>
 
+    <script src="js/config.js"></script>
     <script src="js/users.js"></script>
   </body>
 </html>

@@ -1,4 +1,7 @@
-const API_BASE = "http://localhost:4000/api/admin";
+const API_BASE =
+  (typeof getAdminApiBase === "function" && getAdminApiBase()) ||
+  window.ADMIN_API_BASE ||
+  "http://localhost:4000/api/admin";
 
 // auth checker that supports both admin frontend login and PHP login
 let admin = JSON.parse(sessionStorage.getItem("admin") || "null");
@@ -18,8 +21,8 @@ async function loadDashboard() {
   const loadingState = document.getElementById("loadingState");
   const errorState = document.getElementById("errorState");
   const statsContainer = document.getElementById("statsContainer");
-  const roleBreakdownContainer = document.getElementById(
-    "roleBreakdownContainer"
+  const prescriptionListContainer = document.getElementById(
+    "prescriptionListContainer"
   );
 
   try {
@@ -28,10 +31,10 @@ async function loadDashboard() {
 
     if (data.success) {
       displayStats(data.summary);
-      displayRoleBreakdown(data.summary.roleBreakdown);
+      displayPrescriptionList(data.summary.prescriptions || []);
       loadingState.classList.add("hidden");
       statsContainer.classList.remove("hidden");
-      roleBreakdownContainer.classList.remove("hidden");
+      prescriptionListContainer.classList.remove("hidden");
     } else {
       throw new Error(data.message || "Failed to load dashboard");
     }
@@ -78,32 +81,94 @@ function displayStats(summary) {
     .join("");
 }
 
-function displayRoleBreakdown(roleBreakdown) {
-  const roleBreakdownDiv = document.getElementById("roleBreakdown");
-  if (!roleBreakdown || Object.keys(roleBreakdown).length === 0) {
-    roleBreakdownDiv.innerHTML =
-      '<p class="text-gray-600">No role data available</p>';
+function displayPrescriptionList(prescriptions) {
+  const tableBody = document.getElementById("prescriptionListBody");
+  const metaLabel = document.getElementById("prescriptionListMeta");
+
+  if (!prescriptions.length) {
+    metaLabel.textContent = "No prescriptions found";
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="5" class="px-4 py-6 text-center text-gray-500">
+          No prescription data available yet.
+        </td>
+      </tr>
+    `;
     return;
   }
 
-  const roles = [
-    { key: "ADMIN", label: "Admins", color: "red" },
-    { key: "DOCTOR", label: "Doctors", color: "green" },
-    { key: "PATIENT", label: "Patients", color: "blue" },
-    { key: "PHARMACY", label: "Pharmacies", color: "orange" },
-  ];
+  metaLabel.textContent = `${prescriptions.length} recent ${
+    prescriptions.length === 1 ? "prescription" : "prescriptions"
+  }`;
 
-  roleBreakdownDiv.innerHTML = roles
-    .map((role) => {
-      const count = roleBreakdown[role.key] || 0;
+  tableBody.innerHTML = prescriptions
+    .map((item) => {
+      const dateLabel = formatDate(item.prescription_date || item.created_at);
+      const status = formatStatus(item.status);
       return `
-                    <div class="bg-${role.color}-50 border border-${role.color}-200 rounded-lg p-4">
-                        <p class="text-${role.color}-600 text-sm font-medium">${role.label}</p>
-                        <p class="text-2xl font-bold text-${role.color}-800 mt-2">${count}</p>
-                    </div>
-                `;
+        <tr class="hover:bg-gray-50">
+          <td class="px-4 py-3 whitespace-nowrap text-sm font-semibold text-gray-900">
+            #${item.prescription_id}
+          </td>
+          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+            ${item.patient_name || "Unknown patient"}
+          </td>
+          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+            ${item.doctor_name || "Unknown doctor"}
+          </td>
+          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+            ${dateLabel}
+          </td>
+          <td class="px-4 py-3 whitespace-nowrap">
+            <span class="${status.className}">${status.label}</span>
+          </td>
+        </tr>
+      `;
     })
     .join("");
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "N/A";
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) {
+    return dateString;
+  }
+  return date.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function formatStatus(status = "") {
+  const normalized = status.toUpperCase();
+  const baseClass =
+    "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold";
+
+  switch (normalized) {
+    case "ACTIVE":
+      return {
+        label: "Active",
+        className: `${baseClass} bg-green-100 text-green-800`,
+      };
+    case "COMPLETED":
+      return {
+        label: "Completed",
+        className: `${baseClass} bg-blue-100 text-blue-800`,
+      };
+    case "CANCELLED":
+    case "CANCELED":
+      return {
+        label: "Cancelled",
+        className: `${baseClass} bg-red-100 text-red-800`,
+      };
+    default:
+      return {
+        label: normalized || "Unknown",
+        className: `${baseClass} bg-gray-100 text-gray-700`,
+      };
+  }
 }
 
 function logout() {

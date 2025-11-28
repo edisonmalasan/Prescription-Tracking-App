@@ -1,4 +1,7 @@
-const API_BASE = "http://localhost:4000/api/admin";
+const API_BASE =
+  (typeof getAdminApiBase === "function" && getAdminApiBase()) ||
+  window.ADMIN_API_BASE ||
+  "http://localhost:4000/api/admin";
 
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -8,7 +11,6 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   const errorDiv = document.getElementById("errorMessage");
   const submitBtn = e.target.querySelector('button[type="submit"]');
 
-  // Clear previous errors
   errorDiv.classList.add("hidden");
   submitBtn.disabled = true;
   submitBtn.textContent = "Signing in...";
