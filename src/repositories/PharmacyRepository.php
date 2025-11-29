@@ -23,7 +23,7 @@ class PharmacyRepository {
             $data = $pharmacy->toArray();
         }
 
-        $sql = "INSERT INTO " . $this->table_name . " (user_id, pharmacy_name, phar_license, open_time, close_time, dates_open) VALUES (?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO " . $this->table_name . " (user_id, pharmacy_name, phar_license, open_time, close_time, dates_open, isVerified) VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($sql);
         if (! $stmt) {
             return false;
@@ -34,8 +34,9 @@ class PharmacyRepository {
         $open_time = $data['open_time'] ?? null;
         $close_time = $data['close_time'] ?? null;
         $dates_open = $data['dates_open'] ?? null;
+        $isVerified = isset($data['isVerified']) ? (int)$data['isVerified'] : 0;
 
-        $stmt->bind_param('isssss', $userId, $pharmacy_name, $phar_license, $open_time, $close_time, $dates_open);
+        $stmt->bind_param('isssssi', $userId, $pharmacy_name, $phar_license, $open_time, $close_time, $dates_open, $isVerified);
         $ok = $stmt->execute();
 
         if ($ok && $stmt->affected_rows > 0) {

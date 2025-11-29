@@ -146,6 +146,48 @@
         </div>
     </div>
 
+    <!-- Verification Modal -->
+    <div
+      id="verificationModal"
+      class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
+    >
+      <div class="relative top-20 mx-auto p-6 border w-11/12 max-w-md shadow-lg rounded-md bg-white">
+        <div class="mt-3 text-center">
+          <div class="flex items-center justify-center w-16 h-16 mx-auto bg-yellow-100 rounded-full mb-4">
+            <svg
+              class="w-8 h-8 text-yellow-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              ></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">
+            Account Verification Required
+          </h3>
+          <div class="mt-2 px-4 py-3">
+            <p class="text-sm text-gray-500">
+              Your account has been created successfully! However, your account is waiting for admin verification. Please wait for the admin to verify your account before you can access the dashboard.
+            </p>
+          </div>
+          <div class="flex justify-center mt-4">
+            <button
+              onclick="closeVerificationModal()"
+              class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
         // Role switching logic
         document.getElementById("regRole").addEventListener("change", function () {
@@ -162,6 +204,8 @@
             }
         });
     </script>
-    <script src="./assets/js/auth.js"></script>
+    <!-- Load scripts in order: utils first, then register -->
+    <script src="./auth/utils.js"></script>
+    <script src="./auth/register.js"></script>
 </body>
 </html>

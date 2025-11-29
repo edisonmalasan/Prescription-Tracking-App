@@ -101,7 +101,6 @@
               <input id="prc_license" placeholder="PRC License Number" disabled class="px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" />
               <input id="specialization" placeholder="Specialization" disabled class="px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" />
               <input id="clinic_name" placeholder="Hospital/Clinic" disabled class="px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" />
-              <input id="address" placeholder="Hospital/Clinic Address" disabled class="px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" />
             </div>
             <div class="flex gap-4">
               <button type="button" id="cancel-profile" class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 font-semibold transition-all duration-200">

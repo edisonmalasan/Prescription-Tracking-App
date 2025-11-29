@@ -63,7 +63,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 async function loadDoctorProfile(doctorId) {
-  const res = await api.get(`doctorRoutes.php?action=profile&user_id=${doctorId}`);
+  const res = await api.get(
+    `doctorRoutes.php?action=profile&user_id=${doctorId}`
+  );
 
   if (!res || !res.success || !res.doctor) {
     throw new Error("Invalid response from server");
@@ -72,12 +74,22 @@ async function loadDoctorProfile(doctorId) {
   const d = res.doctor;
 
   //display refs
-  document.getElementById("profile-name").textContent = `Dr. ${d.first_name} ${d.last_name}`;
-  document.getElementById("profile-special").textContent = `Specialization: ${d.specialization ?? "—"}`;
-  document.getElementById("profile-prc").textContent = `PRC License: ${d.prc_license ?? "—"}`;
-  document.getElementById("profile-contact").textContent = `Contact: ${d.contactno ?? "—"}`;
-  document.getElementById("profile-email").textContent = `Email: ${d.email ?? "—"}`;
-  document.getElementById("profile-clinic").textContent = `Clinic: ${d.clinic_name ?? "—"}`;
+  document.getElementById(
+    "profile-name"
+  ).textContent = `Dr. ${d.first_name} ${d.last_name}`;
+  document.getElementById("profile-special").textContent = `${
+    d.specialization ?? "—"
+  }`;
+  document.getElementById("profile-prc").textContent = `${
+    d.prc_license ?? "—"
+  }`;
+  document.getElementById("profile-contact").textContent = `${
+    d.contactno ?? "—"
+  }`;
+  document.getElementById("profile-email").textContent = `${d.email ?? "—"}`;
+  document.getElementById("profile-clinic").textContent = `${
+    d.clinic_name ?? "—"
+  }`;
 
   //form refs
   profileForm.querySelector("#first_name").value = d.first_name ?? "";
@@ -93,7 +105,7 @@ async function loadDoctorProfile(doctorId) {
 
 function toggleForm(editMode) {
   profileForm.querySelectorAll("input").forEach((inp) => {
-    const alwaysDisabled = ["first_name", "last_name", "contactno", "email", "address"];
+    const alwaysDisabled = ["first_name", "last_name", "contactno", "email"];
     inp.disabled = alwaysDisabled.includes(inp.id) || !editMode;
   });
 
@@ -126,7 +138,10 @@ async function saveProfile(e) {
   };
 
   try {
-    const res = await api.put(`doctorRoutes.php?action=profile&user_id=${user.user_id}`, updated);
+    const res = await api.put(
+      `doctorRoutes.php?action=profile&user_id=${user.user_id}`,
+      updated
+    );
     if (res.success) {
       alert("Profile updated successfully!");
       await loadDoctorProfile(user.user_id);
