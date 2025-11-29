@@ -12,6 +12,7 @@
     $activePage = 'prescriptions';
     include '../components/DoctorSidebar.php';
     ?>
+    
 
     <div class="ml-64 flex-1 min-h-screen">
       <header class="bg-white shadow-md p-6">
