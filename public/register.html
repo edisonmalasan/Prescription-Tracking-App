@@ -27,35 +27,42 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                             <label for="firstName" class="block text-xs font-medium text-gray-700 mb-1">First Name</label>
-                            <input type="text" id="firstName" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="First Name">
+                            <input type="text" id="firstName" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors" placeholder="First Name">
+                            <div id="firstNameError" class="hidden text-xs text-red-600 mt-1"></div>
                         </div>
                         <div>
                             <label for="lastName" class="block text-xs font-medium text-gray-700 mb-1">Last Name</label>
-                            <input type="text" id="lastName" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="Last Name">
+                            <input type="text" id="lastName" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors" placeholder="Last Name">
+                            <div id="lastNameError" class="hidden text-xs text-red-600 mt-1"></div>
                         </div>
                         <div>
                             <label for="regEmail" class="block text-xs font-medium text-gray-700 mb-1">Email</label>
-                            <input type="email" id="regEmail" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="Email">
+                            <input type="email" id="regEmail" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors" placeholder="Email">
+                            <div id="regEmailError" class="hidden text-xs text-red-600 mt-1"></div>
                         </div>
                         <div>
                             <label for="phoneNumber" class="block text-xs font-medium text-gray-700 mb-1">Phone Number</label>
-                            <input type="tel" id="phoneNumber" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="Phone Number">
+                            <input type="tel" id="phoneNumber" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors" placeholder="Phone Number">
+                            <div id="phoneNumberError" class="hidden text-xs text-red-600 mt-1"></div>
                         </div>
                         <div>
                             <label for="regPassword" class="block text-xs font-medium text-gray-700 mb-1">Password</label>
-                            <input type="password" id="regPassword" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="Password">
+                            <input type="password" id="regPassword" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors" placeholder="Password">
+                            <div id="regPasswordError" class="hidden text-xs text-red-600 mt-1"></div>
                         </div>
                         <div>
                             <label for="confirmPassword" class="block text-xs font-medium text-gray-700 mb-1">Confirm Password</label>
-                            <input type="password" id="confirmPassword" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="Confirm Password">
+                            <input type="password" id="confirmPassword" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors" placeholder="Confirm Password">
+                            <div id="confirmPasswordError" class="hidden text-xs text-red-600 mt-1"></div>
                         </div>
                         <div class="md:col-span-2">
                             <label for="regRole" class="block text-xs font-medium text-gray-700 mb-1">Register as:</label>
-                            <select id="regRole" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                            <select id="regRole" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors">
                                 <option value="PATIENT">Patient</option>
                                 <option value="DOCTOR">Doctor</option>
                                 <option value="PHARMACY">Pharmacy</option>
                             </select>
+                            <div id="regRoleError" class="hidden text-xs text-red-600 mt-1"></div>
                         </div>
                     </div>
                 </div>
@@ -65,7 +72,8 @@
                     <h2 class="text-lg font-semibold text-gray-800 mb-3">Patient Details</h2>
                     <div>
                         <label for="patientBirthDate" class="block text-xs font-medium text-gray-700 mb-1">Birth Date</label>
-                        <input type="date" id="patientBirthDate" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                        <input type="date" id="patientBirthDate" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors">
+                        <div id="patientBirthDateError" class="hidden text-xs text-red-600 mt-1"></div>
                     </div>
                 </div>
 
@@ -75,19 +83,23 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                             <label for="doctorBirthDate" class="block text-xs font-medium text-gray-700 mb-1">Birth Date</label>
-                            <input type="date" id="doctorBirthDate" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                            <input type="date" id="doctorBirthDate" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors">
+                            <div id="doctorBirthDateError" class="hidden text-xs text-red-600 mt-1"></div>
                         </div>
                         <div>
                             <label for="doctorSpecialization" class="block text-xs font-medium text-gray-700 mb-1">Specialization</label>
-                            <input type="text" id="doctorSpecialization" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="Specialization">
+                            <input type="text" id="doctorSpecialization" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors" placeholder="Specialization">
+                            <div id="doctorSpecializationError" class="hidden text-xs text-red-600 mt-1"></div>
                         </div>
                         <div>
                             <label for="doctorLicense" class="block text-xs font-medium text-gray-700 mb-1">PRC License</label>
-                            <input type="text" id="doctorLicense" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="PRC License">
+                            <input type="text" id="doctorLicense" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors" placeholder="PRC License">
+                            <div id="doctorLicenseError" class="hidden text-xs text-red-600 mt-1"></div>
                         </div>
                         <div>
                             <label for="clinicName" class="block text-xs font-medium text-gray-700 mb-1">Clinic Name</label>
-                            <input type="text" id="clinicName" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="Clinic Name">
+                            <input type="text" id="clinicName" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors" placeholder="Clinic Name">
+                            <div id="clinicNameError" class="hidden text-xs text-red-600 mt-1"></div>
                         </div>
                     </div>
                 </div>
@@ -98,15 +110,18 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                             <label for="pharmacyName" class="block text-xs font-medium text-gray-700 mb-1">Pharmacy Name</label>
-                            <input type="text" id="pharmacyName" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="Pharmacy Name">
+                            <input type="text" id="pharmacyName" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors" placeholder="Pharmacy Name">
+                            <div id="pharmacyNameError" class="hidden text-xs text-red-600 mt-1"></div>
                         </div>
                         <div>
                             <label for="address" class="block text-xs font-medium text-gray-700 mb-1">Address</label>
-                            <input type="text" id="address" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="Address">
+                            <input type="text" id="address" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors" placeholder="Address">
+                            <div id="addressError" class="hidden text-xs text-red-600 mt-1"></div>
                         </div>
                         <div class="md:col-span-2">
                             <label for="operatingHours" class="block text-xs font-medium text-gray-700 mb-1">Operating Hours</label>
-                            <input type="text" id="operatingHours" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="e.g. 9:00 AM - 5:00 PM">
+                            <input type="text" id="operatingHours" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors" placeholder="e.g. 9:00 AM - 5:00 PM">
+                            <div id="operatingHoursError" class="hidden text-xs text-red-600 mt-1"></div>
                         </div>
                     </div>
                 </div>
@@ -118,9 +133,7 @@
                         I agree to the <a href="#" class="text-blue-600 hover:text-blue-800">Terms of Service</a> and <a href="#" class="text-blue-600 hover:text-blue-800">Privacy Policy</a>
                     </label>
                 </div>
-
-                <!-- Message -->
-                <div id="registrationMessage" class="hidden px-3 py-2 rounded-lg text-xs font-medium"></div>
+                <div id="agreeTermsError" class="hidden text-xs text-red-600 mt-1"></div>
             </form>
             </div>
 
@@ -128,10 +141,7 @@
             <div class="border-t border-gray-200 p-4 bg-gray-50">
                 <!-- Buttons -->
                 <div class="flex gap-3 mb-3">
-                    <button type="button" onclick="window.location.href='/'" class="flex-1 px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition">
-                        Cancel
-                    </button>
-                    <button type="submit" form="registrationForm" class="flex-1 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition shadow-md hover:shadow-lg">
+                    <button type="submit" form="registrationForm" class="w-full px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition shadow-md hover:shadow-lg">
                         Register
                     </button>
                 </div>
