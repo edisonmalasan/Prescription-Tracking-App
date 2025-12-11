@@ -75,10 +75,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     .querySelector(".close-modal")
     .addEventListener("click", () => hideModal("patient-modal"));
 
-  document.getElementById("add-patient-btn").addEventListener("click", () => {
-    console.log("BUTTON CLICKED");
-    showModal("add-patient-modal");
-  });
+  // document.getElementById("add-patient-btn").addEventListener("click", () => {
+  //   console.log("BUTTON CLICKED");
+  //   showModal("add-patient-modal");
+  // });
 
   document
     .getElementById("save-patient-btn")
@@ -340,70 +340,70 @@ async function openPatientModal(userId) {
   }
 }
 
-async function saveNewPatient() {
-  const user = JSON.parse(sessionStorage.getItem("loggedInUser"));
+// async function saveNewPatient() {
+//   const user = JSON.parse(sessionStorage.getItem("loggedInUser"));
 
-  const payload = {
-    first_name: document.getElementById("new-first-name").value.trim(),
-    last_name: document.getElementById("new-last-name").value.trim(),
-    email: `patient_${Date.now()}@temp.com`,
-    password: "temp123",
-    birth_date: document.getElementById("new-birthdate").value,
-    contactno: " " + document.getElementById("new-contact").value.trim(),
-    address: document.getElementById("new-address").value.trim(),
-  };
+//   const payload = {
+//     first_name: document.getElementById("new-first-name").value.trim(),
+//     last_name: document.getElementById("new-last-name").value.trim(),
+//     email: `patient_${Date.now()}@temp.com`,
+//     password: "temp123",
+//     birth_date: document.getElementById("new-birthdate").value,
+//     contactno: " " + document.getElementById("new-contact").value.trim(),
+//     address: document.getElementById("new-address").value.trim(),
+//   };
 
-  if (!payload.first_name || !payload.last_name) {
-    return alert("First and last name are required.");
-  }
+//   if (!payload.first_name || !payload.last_name) {
+//     return alert("First and last name are required.");
+//   }
 
-  try {
-    const response = await api.post(
-      "patientRoutes.php?action=register",
-      payload
-    );
-    if (response.success) {
-      const medResponse = await api.post(
-        `patientRoutes.php?action=medical-record&user_id=${response.user_id}`,
-        {
-          allergies: "N/A",
-          medications: "N/A",
-          height: null,
-          weight: null,
-        }
-      );
+//   try {
+//     const response = await api.post(
+//       "patientRoutes.php?action=register",
+//       payload
+//     );
+//     if (response.success) {
+//       const medResponse = await api.post(
+//         `patientRoutes.php?action=medical-record&user_id=${response.user_id}`,
+//         {
+//           allergies: "N/A",
+//           medications: "N/A",
+//           height: null,
+//           weight: null,
+//         }
+//       );
 
-      console.log("MEDICAL RECORD RESPONSE:", medResponse);
+//       console.log("MEDICAL RECORD RESPONSE:", medResponse);
 
-      //create blank prescription for linking patient -> doctor
-      const prescripResponse = await api.post(
-        `prescriptionRoutes.php?action=create`,
-        {
-          prescribing_doctor: user.user_id, // logged-in doctor
-          record_id: medResponse.record_id, // link to the new record if available
-          prescription_date: new Date().toISOString().split("T")[0],
-          status: "pending", // or "draft"
-          details: [], // no drugs yet
-        }
-      );
+//       //create blank prescription for linking patient -> doctor
+//       const prescripResponse = await api.post(
+//         `prescriptionRoutes.php?action=create`,
+//         {
+//           prescribing_doctor: user.user_id, // logged-in doctor
+//           record_id: medResponse.record_id, // link to the new record if available
+//           prescription_date: new Date().toISOString().split("T")[0],
+//           status: "pending", // or "draft"
+//           details: [], // no drugs yet
+//         }
+//       );
 
-      console.log("Sending patient data:", payload);
+//       console.log("Sending patient data:", payload);
 
-      if (!response.success) {
-        console.error("Register patient response:", response);
-        return alert("Failed to add patient.");
-      }
+//       if (!response.success) {
+//         console.error("Register patient response:", response);
+//         return alert("Failed to add patient.");
+//       }
 
-      hideModal("add-patient-modal");
-      alert("Patient added successfully!");
+//       hideModal("add-patient-modal");
+//       alert("Patient added successfully!");
 
-      loadPatients(user.user_id);
-    }
-  } catch (err) {
-    console.error("Error adding patient:", err);
-    alert("Server error while adding patient.");
-  }
-}
+//       loadPatients(user.user_id);
+//     }
+//   } catch (err) {
+//     console.error("Error adding patient:", err);
+//     alert("Server error while adding patient.");
+//   }
+// }
 
 function showModal(id) {
   const el = document.getElementById(id);

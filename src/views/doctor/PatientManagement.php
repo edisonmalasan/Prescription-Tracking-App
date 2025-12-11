@@ -118,9 +118,8 @@
   </div>
 
   <!-- Add Patient Modal -->
-  <div id="add-patient-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50 backdrop-blur-sm">
+  <!-- <div id="add-patient-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50 backdrop-blur-sm">
     <div class="relative top-10 mx-auto p-0 w-11/12 max-w-2xl shadow-2xl rounded-2xl bg-white overflow-hidden">
-      <!-- Modal Header -->
       <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between">
         <h3 class="text-2xl font-bold text-white flex items-center gap-3">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,7 +132,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
         </button>
-      </div>
+      </div> -->
       
       <!-- Modal Content -->
       <div class="p-6">
