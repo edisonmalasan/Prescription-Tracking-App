@@ -48,11 +48,11 @@ const durationInput = document.getElementById("duration");
 const refillsInput = document.getElementById("refills");
 const instructionsInput = document.getElementById("instructions");
 
-const createBtn = document.getElementById("create-presc");
 const cancelBtn = document.getElementById("cancel-presc");
 
 let addItemBtn = null;
 let itemsTable = null;
+let finalCreateBtn = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
   const user = JSON.parse(sessionStorage.getItem("loggedInUser"));
@@ -80,8 +80,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       patientResults.innerHTML = matches
         .map(
           (p) => `
-          <div class="search-item cursor-pointer p-2 hover:bg-gray-100" data-id="${p.user_id}">
-            ${p.first_name} ${p.last_name}
+          <div class="search-item cursor-pointer px-4 py-2 hover:bg-blue-50 hover:text-blue-700 transition-colors border-b border-gray-100 last:border-0" data-id="${p.user_id}">
+            <div class="font-medium">${p.first_name} ${p.last_name}</div>
           </div>`
         )
         .join("");
@@ -106,8 +106,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       drugSuggestions.innerHTML = drugs
         .map(
           (d) =>
-            `<div class="search-item p-2 cursor-pointer hover:bg-gray-100" data-id="${d.drug_id}">
-              ${d.brand} (${d.generic_name})
+            `<div class="search-item px-4 py-2 cursor-pointer hover:bg-blue-50 hover:text-blue-700 border-b border-gray-100 last:border-0 transition-colors" data-id="${d.drug_id}">
+              <span class="font-bold">${d.brand}</span> <span class="text-sm text-gray-500">(${d.generic_name})</span>
             </div>`
         )
         .join("");
@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         .querySelectorAll("#drug-suggestions .search-item")
         .forEach((el) =>
           el.addEventListener("click", () => {
-            selectedDrug = { drug_id: el.dataset.id, name: el.textContent };
+            selectedDrug = { drug_id: el.dataset.id, name: el.textContent.trim() };
             medInput.value = selectedDrug.name;
             drugSuggestions.innerHTML = "";
           })
@@ -127,48 +127,55 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   addItemBtn.addEventListener("click", addItemToList);
-  createBtn.addEventListener("click", () => createPrescription(user));
-  cancelBtn.addEventListener("click", resetForm);
+  if(cancelBtn) cancelBtn.addEventListener("click", resetForm);
 });
 
-//multi item ui injecxtion
+//multi item ui injection - UPDATED UI STRINGS
 function injectMultiItemUI() {
-  const detailsCard = medInput.closest(".bg-white");
+  const detailsContainer = document.querySelector(".pt-4.border-t");
 
+  // Create wrapper
   const wrapper = document.createElement("div");
+  wrapper.className = "w-full";
+  
   wrapper.innerHTML = `
-      <button id="add-item-btn"
-        class="mt-4 w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">
-        Add Item to Prescription
-      </button>
+      <div class="flex justify-end mb-6">
+        <button id="add-item-btn"
+          class="bg-gray-800 text-white px-5 py-2.5 rounded-lg hover:bg-gray-900 transition-colors font-medium text-sm flex items-center gap-2 shadow-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          Add to Prescription
+        </button>
+      </div>
 
-      <table class="mt-4 w-full text-left border">
-        <thead class="bg-gray-100">
-          <tr>
-            <th class="p-2">Drug</th>
-            <th class="p-2">Dosage</th>
-            <th class="p-2">Frequency</th>
-            <th class="p-2">Duration</th>
-            <th class="p-2">Refills</th>
-            <th class="p-2">Instructions</th>
-            <th class="p-2">Action</th>
-          </tr>
-        </thead>
-        <tbody id="items-table"></tbody>
-      </table>
+      <div class="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden mb-6 hidden" id="table-container">
+        <table class="w-full text-left">
+          <thead class="bg-gray-100 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-200">
+            <tr>
+              <th class="px-4 py-3">Drug</th>
+              <th class="px-4 py-3">Dosage</th>
+              <th class="px-4 py-3">Freq</th>
+              <th class="px-4 py-3">Dur</th>
+              <th class="px-4 py-3">Notes</th>
+              <th class="px-4 py-3 text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody id="items-table" class="bg-white divide-y divide-gray-100 text-sm"></tbody>
+        </table>
+      </div>
 
-      <!-- Create Rx button (HIDDEN until items exist) -->
       <button id="final-create-btn"
-        class="mt-6 w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition hidden">
-        Create Prescription
+        class="w-full bg-blue-600 text-white py-4 rounded-xl hover:bg-blue-700 transition-all font-bold text-lg shadow-lg shadow-blue-200 hidden transform hover:-translate-y-0.5">
+        Issue Prescription
       </button>
   `;
 
-  detailsCard.appendChild(wrapper);
+  const cardBody = document.querySelector(".bg-white .p-6.space-y-5");
+  if(cardBody) {
+      cardBody.appendChild(wrapper);
+  }
 
   addItemBtn = document.getElementById("add-item-btn");
   itemsTable = document.getElementById("items-table");
-
   finalCreateBtn = document.getElementById("final-create-btn");
 
   finalCreateBtn.addEventListener("click", () => {
@@ -176,7 +183,6 @@ function injectMultiItemUI() {
     createPrescription(user);
   });
 }
-
 
 //select patient
 async function selectPatient(patientId) {
@@ -189,13 +195,31 @@ async function selectPatient(patientId) {
     selectedPatient = profileRes.patient ?? {};
     const record = recordRes.medical_record ?? {};
 
+    // Updated UI for selected box
     selectedPatientBox.innerHTML = `
-      <strong>${selectedPatient.first_name} ${selectedPatient.last_name}</strong><br/>
-      ${selectedPatient.contactno ?? ""}
+      <div class="flex items-center justify-between">
+        <div>
+            <div class="font-bold text-lg text-blue-900">${selectedPatient.first_name} ${selectedPatient.last_name}</div>
+            <div class="text-xs text-blue-600">ID: ${selectedPatient.user_id}</div>
+        </div>
+        <div class="text-right">
+             <div class="text-xs text-blue-500 uppercase font-bold">Contact</div>
+             <div class="text-blue-800 font-medium">${selectedPatient.contactno ?? "N/A"}</div>
+        </div>
+      </div>
     `;
+    selectedPatientBox.classList.remove("bg-blue-50", "border-blue-100");
+    selectedPatientBox.classList.add("bg-blue-50", "border-blue-200", "shadow-inner");
 
-    allergiesBox.textContent = record.allergies ?? "—";
-    medicationsBox.textContent = record.medications ?? "—";
+    // Sidebar update
+    allergiesBox.textContent = record.allergies ?? "None Reported";
+    if((record.allergies || "").toLowerCase().includes("none")) {
+         allergiesBox.className = "p-3 bg-green-50 border border-green-100 rounded-lg text-green-800 text-sm font-medium";
+    } else {
+         allergiesBox.className = "p-3 bg-red-50 border border-red-100 rounded-lg text-red-800 text-sm font-medium";
+    }
+
+    medicationsBox.textContent = record.medications ?? "None";
 
     patientResults.innerHTML = "";
     searchInput.value = `${selectedPatient.first_name} ${selectedPatient.last_name}`;
@@ -232,18 +256,21 @@ function addItemToList() {
 }
 
 function renderItemsTable() {
+  const container = document.getElementById("table-container");
+  
   itemsTable.innerHTML = prescriptionItems
     .map(
       (item, i) => `
-      <tr class="border-t">
-        <td class="p-2">${item.name}</td>
-        <td class="p-2">${item.dosage}</td>
-        <td class="p-2">${item.frequency}</td>
-        <td class="p-2">${item.duration}</td>
-        <td class="p-2">${item.refills}</td>
-        <td class="p-2">${item.special_instructions}</td>
-        <td class="p-2">
-          <button class="text-red-600 hover:underline" onclick="removeItem(${i})">Remove</button>
+      <tr class="hover:bg-blue-50 transition-colors group">
+        <td class="px-4 py-3 font-medium text-gray-900">${item.name}</td>
+        <td class="px-4 py-3 text-gray-600">${item.dosage}</td>
+        <td class="px-4 py-3 text-gray-600">${item.frequency}</td>
+        <td class="px-4 py-3 text-gray-600">${item.duration}</td>
+        <td class="px-4 py-3 text-gray-500 italic truncate max-w-xs">${item.special_instructions || "-"}</td>
+        <td class="px-4 py-3 text-right">
+          <button class="text-red-400 hover:text-red-600 transition-colors text-xs font-bold uppercase" onclick="removeItem(${i})">
+            Remove
+          </button>
         </td>
       </tr>
     `
@@ -251,10 +278,12 @@ function renderItemsTable() {
     .join("");
 
     if (prescriptionItems.length > 0) {
-    finalCreateBtn.classList.remove("hidden");
-  } else {
-    finalCreateBtn.classList.add("hidden");
-  }
+      finalCreateBtn.classList.remove("hidden");
+      container.classList.remove("hidden");
+    } else {
+      finalCreateBtn.classList.add("hidden");
+      container.classList.add("hidden");
+    }
 }
 
 window.removeItem = function (index) {
@@ -308,8 +337,13 @@ function resetForm() {
   prescriptionItems = [];
 
   searchInput.value = "";
-  selectedPatientBox.textContent = "No patient selected";
+  
+  // Reset UI Box
+  selectedPatientBox.innerHTML = `<span class="text-blue-400 italic">No patient selected yet.</span>`;
+  selectedPatientBox.className = "mt-4 p-4 bg-blue-50 border border-blue-100 rounded-lg text-blue-900 text-sm";
+  
   allergiesBox.textContent = "—";
+  allergiesBox.className = "p-3 bg-red-50 border border-red-100 rounded-lg text-red-800 text-sm font-medium"; // default
   medicationsBox.textContent = "—";
 
   medInput.value = "";
@@ -320,4 +354,6 @@ function resetForm() {
   instructionsInput.value = "";
 
   itemsTable.innerHTML = "";
+  document.getElementById("table-container").classList.add("hidden");
+  document.getElementById("final-create-btn").classList.add("hidden");
 }
