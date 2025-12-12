@@ -58,7 +58,7 @@ async function loadPatientProfile(patientId) {
 }
 
 async function loadPrescriptions(patientId) {
-  const res = await api.get(`prescriptionRoutes.php?action=by-patient&patient_id=${patientId}`);
+  const res = await api.get(`prescriptionRoutes.php?action=by-patient-doctor&patient_id=${patientId}`);
 
   if (!res.success || !Array.isArray(res.prescriptions)) {
     tableBody.innerHTML = `
@@ -151,7 +151,7 @@ function renderPrescriptionAccordion(list) {
             <div>
               <div class="font-bold text-lg text-gray-800">Prescription #${rx.prescription_id}</div>
               <div class="text-sm text-gray-600">
-                Dr. ${rx.doctor_name ?? "—"} &middot; ${formatDate(rx.prescription_date)}
+                Dr. ${rx.doctor_first_name ?? "—"} ${rx.doctor_last_name ?? "—"}  &middot; ${formatDate(rx.prescription_date)}
               </div>
             </div>
 

@@ -31,7 +31,7 @@ let selectedPatient = null;
 let selectedDrug = null;
 let prescriptionItems = []; //for multiple prescrips
 
-//dDOM refs
+//DOM refs
 const searchInput = document.getElementById("presc-search-patient");
 const patientResults = document.getElementById("patient-search-results");
 const selectedPatientBox = document.getElementById("selected-patient");
@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         .map(
           (d) =>
             `<div class="search-item p-2 cursor-pointer hover:bg-gray-100" data-id="${d.drug_id}">
-              ${d.brand_name} (${d.generic_name})
+              ${d.brand} (${d.generic_name})
             </div>`
         )
         .join("");
