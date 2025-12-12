@@ -3,151 +3,135 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Pharmacy Dashboard</title>
+  <title>Pharmacy Workflow Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
     body { font-family: 'Inter', sans-serif; }
-    #prescriptions-table tbody tr:not(:first-child):hover {
-      background-color: #eff6ff;
-      transition: background-color 0.15s ease;
-    }
-    #prescriptions-table tbody td {
-      padding: 1rem 1.5rem;
-      font-size: 0.875rem;
-      color: #374151;
-      font-weight: 500;
-    }
-    #prescriptions-table tbody tr:not(:first-child) {
-      border-bottom: 1px solid #e5e7eb;
-    }
+    .scroller::-webkit-scrollbar { width: 6px; height: 6px; }
+    .scroller::-webkit-scrollbar-track { background: #f1f1f1; }
+    .scroller::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
   </style>
 </head>
-<body class="bg-gradient-to-br from-gray-50 to-gray-100">
-  <div class="flex">
+<body class="bg-gray-50 text-gray-800">
+  <div class="flex h-screen overflow-hidden">
     <?php
     $activePage = 'dashboard';
     include '../components/PharmacySidebar.php';
     ?>
 
-    <div class="ml-64 flex-1 min-h-screen">
-      <header class="bg-white shadow-lg border-b border-gray-200 p-6">
-        <div class="flex justify-between items-center">
-          <div>
-            <div id="pharmacy-name" class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">Welcome, —</div>
-            <div id="pharmacy-address" class="text-sm text-gray-500 mt-1 flex items-center gap-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-              </svg>
-              Address: <span id="pharmacy-address-value">—</span>
-            </div>
+    <div class="ml-64 flex-1 flex flex-col h-screen overflow-hidden">
+      
+      <header class="bg-white border-b border-gray-200 px-8 py-5 flex justify-between items-center shrink-0 z-10">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Pharmacy Operations</h1>
+          <div class="text-sm text-gray-500 mt-1 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            <span id="pharmacy-name">Loading Pharmacy...</span>
           </div>
         </div>
       </header>
 
-      <section class="p-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-xl p-8 text-white transform hover:scale-105 transition-all duration-200">
-            <div class="flex items-center justify-between mb-4">
-              <div class="bg-white bg-opacity-20 rounded-xl p-3">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-              </div>
+      <main class="flex-1 p-8 overflow-y-auto scroller flex flex-col">
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 shrink-0">
+            
+            <div class="bg-white border border-blue-100 rounded-2xl shadow-sm p-6 relative overflow-hidden group hover:shadow-md transition-all">
+                <div class="absolute right-0 top-0 h-full w-1 bg-blue-500"></div>
+                <div class="flex items-center justify-between mb-4">
+                    <div class="bg-blue-50 rounded-lg p-3 text-blue-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <span class="text-xs font-bold text-blue-500 uppercase tracking-wider bg-blue-50 px-2 py-1 rounded">Intake</span>
+                </div>
+                <h4 class="text-gray-500 text-sm font-medium">Orders to Fill</h4>
+                <div id="stat-pending-orders" class="text-3xl font-bold text-gray-800 mt-1">0</div>
             </div>
-            <h4 class="text-blue-100 text-sm font-medium mb-2">Total Prescriptions</h4>
-            <div id="stat-total-prescriptions" class="text-4xl font-bold">0</div>
-          </div>
-          
-          <div class="bg-white border-2 border-blue-200 rounded-2xl shadow-xl p-8 transform hover:scale-105 transition-all duration-200">
-            <div class="flex items-center justify-between mb-4">
-              <div class="bg-blue-100 rounded-xl p-3">
-                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-              </div>
+            
+            <div id="card-ready-orders" class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-lg shadow-blue-200 p-6 text-white transform transition-all hover:-translate-y-1 hidden">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="bg-white/20 rounded-lg p-3 backdrop-blur-sm">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <span class="text-xs font-bold text-white/80 uppercase tracking-wider bg-white/20 px-2 py-1 rounded">Action Required</span>
+                </div>
+                <h4 class="text-blue-100 text-sm font-medium">Ready for Pickup</h4>
+                <div id="stat-ready-orders" class="text-3xl font-bold mt-1">0</div>
             </div>
-            <h4 class="text-gray-600 text-sm font-medium mb-2">Pending Prescriptions</h4>
-            <div id="stat-pending-prescriptions" class="text-4xl font-bold text-blue-600">0</div>
-          </div>
-          
-          <div class="bg-gradient-to-br from-blue-400 to-blue-500 rounded-2xl shadow-xl p-8 text-white transform hover:scale-105 transition-all duration-200">
-            <div class="flex items-center justify-between mb-4">
-              <div class="bg-white bg-opacity-20 rounded-xl p-3">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-              </div>
+
+            <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 group hover:shadow-md transition-all">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="bg-gray-100 rounded-lg p-3 text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                    </div>
+                </div>
+                <h4 class="text-gray-500 text-sm font-medium">Total History</h4>
+                <div id="stat-total-prescriptions" class="text-3xl font-bold text-gray-800 mt-1">0</div>
             </div>
-            <h4 class="text-blue-100 text-sm font-medium mb-2">Filled Prescriptions</h4>
-            <div id="stat-filled-prescriptions" class="text-4xl font-bold">0</div>
-          </div>
+        </div>
+        
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 shrink-0">
+            <div class="bg-gray-100 p-1.5 rounded-xl flex shadow-inner w-full md:w-auto">
+                <button class="tab-btn flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium transition-all shadow-sm bg-white text-blue-700" data-tab="pending">
+                    1. Intake Queue
+                </button>
+                <button class="tab-btn flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium transition-all text-gray-500 hover:text-gray-700 hover:bg-gray-200/50" data-tab="filled">
+                    2. Ready for Pickup
+                </button>
+                <button class="tab-btn flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium transition-all text-gray-500 hover:text-gray-700 hover:bg-gray-200/50" data-tab="history">
+                    History
+                </button>
+            </div>
+
+            <div class="relative w-full md:w-72">
+                <input type="text" id="global-filter" placeholder="Search patient name..." 
+                       class="pl-4 px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm w-full shadow-sm">
+            </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-          <div class="flex items-center justify-between mb-6">
-            <h3 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
-              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
-              </svg>
-              All Prescriptions
-            </h3>
-          </div>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-              </div>
-              <input type="text" id="patient-name-filter" placeholder="Filter by Patient Name..." class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm flex-1 overflow-hidden flex flex-col min-h-[400px]">
+            <div class="overflow-x-auto scroller flex-1">
+                <table id="prescriptions-table" class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50 sticky top-0 z-10 text-xs uppercase font-semibold text-gray-500">
+                        <tr>
+                            <th class="px-6 py-4 text-left tracking-wider">Order ID / Date</th>
+                            <th class="px-6 py-4 text-left tracking-wider">Patient Info</th>
+                            <th class="px-6 py-4 text-left tracking-wider">Medications List</th>
+                            <th class="px-6 py-4 text-right tracking-wider">Workflow Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-100 text-sm" id="table-body">
+                        </tbody>
+                </table>
             </div>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-              </div>
-              <input type="text" id="drug-name-filter" placeholder="Filter by Drug Name..." class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
-            </div>
-          </div>
-          
-          <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
-            <table id="prescriptions-table" class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gradient-to-r from-blue-600 to-blue-700">
-                <tr>
-                  <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">Patient Name</th>
-                  <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">Doctor Name</th>
-                  <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">Drug Name</th>
-                  <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">Dosage</th>
-                  <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">Duration</th>
-                  <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">Date Prescribed</th>
-                  <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">Notes</th>
-                  <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">Status</th>
-                  <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">Action</th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-100">
-                <tr class="hover:bg-blue-50 transition-colors duration-150">
-                  <td colspan="9" class="px-6 py-8 text-center text-gray-500">
-                    <div class="flex flex-col items-center justify-center">
-                      <svg class="w-12 h-12 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
-                      </svg>
-                      <p class="text-sm">No prescriptions found</p>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
         </div>
-      </section>
+      </main>
     </div>
   </div>
 
+  <div id="verify-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden items-center justify-center z-50 transition-opacity">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden transform transition-all scale-100">
+          <div class="bg-gray-900 px-8 py-5 flex justify-between items-center">
+              <div><h3 class="text-white font-bold text-lg">Order Verification</h3><p class="text-gray-400 text-xs mt-1">Order #<span id="m-order-id"></span></p></div>
+              <button id="close-modal" class="text-white opacity-60 hover:opacity-100 text-2xl">&times;</button>
+          </div>
+          <div class="p-8 max-h-[60vh] overflow-y-auto scroller">
+              <div class="flex justify-between items-start mb-6 pb-6 border-b border-gray-100">
+                  <div><p class="text-xs text-gray-400 uppercase font-bold tracking-wider">Patient</p><p id="m-patient" class="font-bold text-gray-800 text-lg">-</p></div>
+                  <div class="text-right"><p class="text-xs text-gray-400 uppercase font-bold tracking-wider">Prescribing Doctor</p><p id="m-doctor" class="text-gray-700">-</p></div>
+              </div>
+              <h4 class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-3">Medications to Fill</h4>
+              <div id="m-med-list" class="space-y-3"></div>
+          </div>
+          <div class="bg-gray-50 px-8 py-5 flex justify-between items-center border-t border-gray-200">
+              <span class="text-xs text-gray-500">Ensure label matches dosage instructions.</span>
+              <div class="flex gap-3">
+                <button id="btn-cancel-modal" class="px-5 py-2.5 text-gray-600 font-medium hover:bg-gray-200 rounded-lg transition-colors">Cancel</button>
+                <button id="btn-confirm-fill" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-0.5">Confirm Order Filled</button>
+              </div>
+          </div>
+      </div>
+  </div>
   <script src="../../../public/assets/js/pharmacy/dashboard.js"></script>
 </body>
 </html>
