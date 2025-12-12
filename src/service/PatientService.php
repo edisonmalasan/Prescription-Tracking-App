@@ -90,6 +90,14 @@ class PatientService {
         ];
     }
 
+    public function getAllPatientsWithFields() {
+        $patients = $this->patientRepository->findAllPatientsWithFields();
+        return [
+            'success' => true,
+            'patients' => $patients
+        ];
+    }
+
     public function getPatientsByDoctor($userId) {
     if (empty($userId)) {
         return ['error' => 'User ID is required'];

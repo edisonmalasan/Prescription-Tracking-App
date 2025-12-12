@@ -110,5 +110,20 @@ class PatientRepository {
     return $result->fetch_all(MYSQLI_ASSOC);
 }
 
+public function findAllPatientsWithFields() {
+    $sql = "SELECT 
+                u.user_id,
+                u.first_name,
+                u.last_name,
+                u.contactno,
+                p.birth_date
+            FROM patient p
+            JOIN users u ON p.user_id = u.user_id";
+
+    $res = $this->conn->query($sql);
+    return $res ? $res->fetch_all(MYSQLI_ASSOC) : [];
+}
+
+
 }
 ?>

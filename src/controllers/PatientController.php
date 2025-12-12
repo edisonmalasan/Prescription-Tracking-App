@@ -67,6 +67,13 @@ class PatientController {
         return json_encode($result);
     }
 
+    public function getAllPatientsWithFields() {
+        $result = $this->patientService->getAllPatientsWithFields();
+        
+        header('Content-Type: application/json');
+        return json_encode($result);
+    }
+
     public function createMedicalRecord() {
         $userId = $_GET['user_id'] ?? null;
         
@@ -152,7 +159,7 @@ class PatientController {
     header('Content-Type: application/json');
     http_response_code(isset($result['error']) ? 400 : 200);
     return json_encode($result);
-}
+    }   
 
 }
 ?>

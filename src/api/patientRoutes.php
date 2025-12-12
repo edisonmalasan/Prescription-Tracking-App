@@ -30,6 +30,9 @@ switch ($method) {
             case 'all':
                 echo $patientController->getAllPatients();
                 break;
+            case 'all-fields':
+                echo $patientController->getAllPatientsWithFields();
+            break;
             case 'medical-record':
                 echo $patientController->getMedicalRecord();
                 break;
