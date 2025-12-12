@@ -77,37 +77,28 @@ $patient_id = $_SESSION['patient_id'] ?? null;
       </div>
 
       <div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-        <div class="flex items-center justify-between mb-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
           <h3 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
             <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
             </svg>
-            Recent Prescriptions
+            My Prescriptions
           </h3>
+
+          <div class="flex bg-gray-100 p-1 rounded-lg">
+            <button id="tab-active" class="px-4 py-2 text-sm font-medium rounded-md bg-white text-blue-600 shadow-sm transition-all duration-200">
+              Active
+            </button>
+            <button id="tab-history" class="px-4 py-2 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all duration-200">
+              History
+            </button>
+          </div>
         </div>
+
         <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
           <table id="recent-prescriptions" class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gradient-to-r from-blue-600 to-blue-700">
-              <tr>
-                <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">Prescription ID</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">Doctor</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">Date</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">Status</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">Action</th>
-              </tr>
-            </thead>
             <tbody class="bg-white divide-y divide-gray-100">
-              <tr class="hover:bg-blue-50 transition-colors duration-150">
-                <td colspan="5" class="px-6 py-8 text-center text-gray-500">
-                  <div class="flex flex-col items-center justify-center">
-                    <svg class="w-12 h-12 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                    </svg>
-                    <p class="text-sm">No prescriptions found</p>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
+              </tbody>
           </table>
         </div>
       </div>
