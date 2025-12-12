@@ -81,7 +81,7 @@ function setupTabs() {
   });
 }
 
-// --- Data Loading ---
+//data loading
 async function loadPatientProfile(patientId) {
   const res = await api.get(`patientRoutes.php?action=profile&user_id=${patientId}`);
   if (!res.success || !res.patient) throw new Error(res.error || "Profile not found");
@@ -174,8 +174,7 @@ function renderPrescriptions() {
 
     const item = document.createElement("tr");
     
-    // Only show "Mark as Completed" button if we are in the Active tab
-    const markCompletedBtn = currentTab === "active" 
+    const markCompletedBtn = (currentTab === "active" && rx.status !== "pending" && rx.status !== "filled")
       ? `<button class="mt-4 mr-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition mark-complete-btn shadow-sm" data-id="${rx.prescription_id}">
            Mark as Completed
          </button>` 
