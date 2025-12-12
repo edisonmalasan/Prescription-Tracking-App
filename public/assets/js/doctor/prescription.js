@@ -1,4 +1,4 @@
-console.log("Prescription Management JS loaded");
+console.log("Prescription Management JS loaded — MULTI ITEM ENABLED");
 
 const API_BASE = "../../../src/api";
 
@@ -7,8 +7,8 @@ const apiCall = async (url, options = {}) => {
     headers: { "Content-Type": "application/json", ...options.headers },
     ...options,
   });
-  const text = await response.text();
 
+  const text = await response.text();
   const jsonStart = text.indexOf("{");
   const cleanText = jsonStart >= 0 ? text.slice(jsonStart) : text;
 
@@ -26,13 +26,16 @@ const api = {
     apiCall(`${API_BASE}/${endpoint}`, { method: "POST", body: JSON.stringify(data) }),
 };
 
+//state vars
 let selectedPatient = null;
 let selectedDrug = null;
+let prescriptionItems = []; //for multiple prescrips
 
-//DOM refs
+//dDOM refs
 const searchInput = document.getElementById("presc-search-patient");
 const patientResults = document.getElementById("patient-search-results");
 const selectedPatientBox = document.getElementById("selected-patient");
+
 const allergiesBox = document.getElementById("patient-allergies");
 const medicationsBox = document.getElementById("current-medications");
 
@@ -48,6 +51,9 @@ const instructionsInput = document.getElementById("instructions");
 const createBtn = document.getElementById("create-presc");
 const cancelBtn = document.getElementById("cancel-presc");
 
+let addItemBtn = null;
+let itemsTable = null;
+
 document.addEventListener("DOMContentLoaded", async () => {
   const user = JSON.parse(sessionStorage.getItem("loggedInUser"));
   if (!user || user.role !== "DOCTOR") {
@@ -55,167 +61,263 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  //patient search
+  //inject dynamic UI (button + table)
+  injectMultiItemUI();
+
+  //patient saerch
   searchInput.addEventListener("input", async (e) => {
     const q = e.target.value.trim();
-    if (!q) {
-      patientResults.innerHTML = "";
-      return;
-    }
+    if (!q) return (patientResults.innerHTML = "");
 
     try {
-      const res = await api.get(`patientRoutes.php?action=by-doctor&user_id=${user.user_id}`);
-      
+      const res = await api.get(`patientRoutes.php?action=all-fields`);
       const allPatients = res.patients ?? [];
-      const matches = allPatients.filter(p =>
+
+      const matches = allPatients.filter((p) =>
         `${p.first_name} ${p.last_name}`.toLowerCase().includes(q.toLowerCase())
       );
 
       patientResults.innerHTML = matches
         .map(
-          (p) =>
-            `<div class="search-item" data-id="${p.user_id}">
-              ${p.first_name} ${p.last_name} — ${p.contactno ?? ""}
-            </div>`
+          (p) => `
+          <div class="search-item cursor-pointer p-2 hover:bg-gray-100" data-id="${p.user_id}">
+            ${p.first_name} ${p.last_name}
+          </div>`
         )
         .join("");
 
-      document.querySelectorAll(".search-item").forEach((el) => {
-        el.addEventListener("click", () => selectPatient(el.dataset.id, user));
-      });
+      document.querySelectorAll(".search-item").forEach((el) =>
+        el.addEventListener("click", () => selectPatient(el.dataset.id))
+      );
     } catch (err) {
       console.error("Error searching patients:", err);
     }
   });
 
-  //drug auto
+  //drug search
   medInput.addEventListener("input", async (e) => {
     const q = e.target.value.trim();
-    if (!q) {
-      drugSuggestions.innerHTML = "";
-      return;
-    }
+    if (!q) return (drugSuggestions.innerHTML = "");
 
     try {
       const res = await api.get(`drugRoutes.php?action=search&search=${encodeURIComponent(q)}`);
       const drugs = res.drugs ?? [];
-      drugSuggestions.innerHTML = drugs
-        .map((d) => `<div class="search-item" data-id="${d.drug_id}">${d.brand_name} (${d.generic_name})</div>`)
-        .join("");  
 
-      document.querySelectorAll("#drug-suggestions .search-item").forEach((el) => {
-        el.addEventListener("click", () => {
-          selectedDrug = { drug_id: el.dataset.id, name: el.textContent };
-          medInput.value = selectedDrug.name;
-          drugSuggestions.innerHTML = "";
-        });
-      });
+      drugSuggestions.innerHTML = drugs
+        .map(
+          (d) =>
+            `<div class="search-item p-2 cursor-pointer hover:bg-gray-100" data-id="${d.drug_id}">
+              ${d.brand_name} (${d.generic_name})
+            </div>`
+        )
+        .join("");
+
+      document
+        .querySelectorAll("#drug-suggestions .search-item")
+        .forEach((el) =>
+          el.addEventListener("click", () => {
+            selectedDrug = { drug_id: el.dataset.id, name: el.textContent };
+            medInput.value = selectedDrug.name;
+            drugSuggestions.innerHTML = "";
+          })
+        );
     } catch (err) {
       console.error("Error fetching drugs:", err);
     }
   });
 
-  //event listeners
+  addItemBtn.addEventListener("click", addItemToList);
   createBtn.addEventListener("click", () => createPrescription(user));
   cancelBtn.addEventListener("click", resetForm);
 });
 
-//patients
-async function selectPatient(patientId, doctor) {
+//multi item ui injecxtion
+function injectMultiItemUI() {
+  const detailsCard = medInput.closest(".bg-white");
+
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = `
+      <button id="add-item-btn"
+        class="mt-4 w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">
+        Add Item to Prescription
+      </button>
+
+      <table class="mt-4 w-full text-left border">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="p-2">Drug</th>
+            <th class="p-2">Dosage</th>
+            <th class="p-2">Frequency</th>
+            <th class="p-2">Duration</th>
+            <th class="p-2">Refills</th>
+            <th class="p-2">Instructions</th>
+            <th class="p-2">Action</th>
+          </tr>
+        </thead>
+        <tbody id="items-table"></tbody>
+      </table>
+
+      <!-- Create Rx button (HIDDEN until items exist) -->
+      <button id="final-create-btn"
+        class="mt-6 w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition hidden">
+        Create Prescription
+      </button>
+  `;
+
+  detailsCard.appendChild(wrapper);
+
+  addItemBtn = document.getElementById("add-item-btn");
+  itemsTable = document.getElementById("items-table");
+
+  finalCreateBtn = document.getElementById("final-create-btn");
+
+  finalCreateBtn.addEventListener("click", () => {
+    const user = JSON.parse(sessionStorage.getItem("loggedInUser"));
+    createPrescription(user);
+  });
+}
+
+
+//select patient
+async function selectPatient(patientId) {
   try {
     const [profileRes, recordRes] = await Promise.all([
       api.get(`patientRoutes.php?action=profile&user_id=${patientId}`),
       api.get(`patientRoutes.php?action=medical-record&user_id=${patientId}`),
     ]);
 
-    const profile = profileRes.patient ?? {};
+    selectedPatient = profileRes.patient ?? {};
     const record = recordRes.medical_record ?? {};
 
-    selectedPatient = profile;
-
     selectedPatientBox.innerHTML = `
-      <strong>${profile.first_name ?? "Unknown"} ${profile.last_name ?? ""}</strong><br/>
-      ${profile.contactno ?? ""}
+      <strong>${selectedPatient.first_name} ${selectedPatient.last_name}</strong><br/>
+      ${selectedPatient.contactno ?? ""}
     `;
 
     allergiesBox.textContent = record.allergies ?? "—";
     medicationsBox.textContent = record.medications ?? "—";
 
     patientResults.innerHTML = "";
-    searchInput.value = `${profile.first_name} ${profile.last_name}`;
+    searchInput.value = `${selectedPatient.first_name} ${selectedPatient.last_name}`;
   } catch (err) {
     console.error("Error selecting patient:", err);
-    alert("Failed to load patient info");
   }
 }
 
-async function createPrescription(user) {
-  if (!selectedPatient) {
-    return alert("Please select a patient first.");
-  }
+//adding item to prescrip description
+function addItemToList() {
+  if (!selectedDrug) return alert("Please select a medication first.");
 
-  if (!selectedDrug) {
-    return alert("Please select a medication.");
+  const item = {
+    drug_id: selectedDrug.drug_id,
+    name: selectedDrug.name,
+    dosage: dosageInput.value,
+    frequency: freqInput.value,
+    duration: durationInput.value,
+    refills: parseInt(refillsInput.value) || 0,
+    special_instructions: instructionsInput.value,
+  };
+
+  prescriptionItems.push(item);
+  renderItemsTable();
+
+  // clear fields
+  medInput.value = "";
+  dosageInput.value = "";
+  freqInput.value = "";
+  durationInput.value = "";
+  refillsInput.value = 0;
+  instructionsInput.value = "";
+  selectedDrug = null;
+}
+
+function renderItemsTable() {
+  itemsTable.innerHTML = prescriptionItems
+    .map(
+      (item, i) => `
+      <tr class="border-t">
+        <td class="p-2">${item.name}</td>
+        <td class="p-2">${item.dosage}</td>
+        <td class="p-2">${item.frequency}</td>
+        <td class="p-2">${item.duration}</td>
+        <td class="p-2">${item.refills}</td>
+        <td class="p-2">${item.special_instructions}</td>
+        <td class="p-2">
+          <button class="text-red-600 hover:underline" onclick="removeItem(${i})">Remove</button>
+        </td>
+      </tr>
+    `
+    )
+    .join("");
+
+    if (prescriptionItems.length > 0) {
+    finalCreateBtn.classList.remove("hidden");
+  } else {
+    finalCreateBtn.classList.add("hidden");
   }
+}
+
+window.removeItem = function (index) {
+  prescriptionItems.splice(index, 1);
+  renderItemsTable();
+};
+
+//creating prescrip
+async function createPrescription(user) {
+  if (!selectedPatient) return alert("Select a patient first.");
+  if (prescriptionItems.length === 0) return alert("Add at least one prescription item.");
 
   try {
-    //get record for linking
+    // fetch record_id
     const recordRes = await api.get(
       `patientRoutes.php?action=medical-record&user_id=${selectedPatient.user_id}`
     );
-    const record = recordRes.medical_record ?? null;
-    if (!record) {
-      return alert("No medical record found for this patient.");
-    }
+    const record = recordRes.medical_record;
 
     const payload = {
       prescribing_doctor: user.user_id,
       record_id: record.record_id,
       prescription_date: new Date().toISOString().split("T")[0],
       status: "pending",
-      details: [
-        {
-          drug_id: selectedDrug.drug_id,
-          dosage: dosageInput.value.trim(),
-          frequency: freqInput.value.trim(),
-          duration: durationInput.value.trim(),
-          refills: parseInt(refillsInput.value) || 0,
-          special_instructions: instructionsInput.value.trim(),
-        },
-      ],
+      details: prescriptionItems.map((item) => ({
+        drug_id: item.drug_id,
+        dosage: item.dosage,
+        frequency: item.frequency,
+        duration: item.duration,
+        refills: item.refills,
+        special_instructions: item.special_instructions,
+      })),
     };
 
-    const response = await api.post("prescriptionRoutes.php?action=create", payload);
+    const res = await api.post("prescriptionRoutes.php?action=create", payload);
 
-    if (response.success) {
+    if (res.success) {
       alert("Prescription created successfully!");
       resetForm();
     } else {
-      console.error("Prescription error:", response);
-      alert("Failed to create prescription.");
+      alert(res.error || "Failed to create prescription.");
     }
   } catch (err) {
     console.error("Error creating prescription:", err);
-    alert("Server error while creating prescription.");
   }
 }
 
-// === Reset Form ===
 function resetForm() {
   selectedPatient = null;
   selectedDrug = null;
+  prescriptionItems = [];
 
   searchInput.value = "";
-  patientResults.innerHTML = "";
   selectedPatientBox.textContent = "No patient selected";
   allergiesBox.textContent = "—";
   medicationsBox.textContent = "—";
 
   medInput.value = "";
-  drugSuggestions.innerHTML = "";
   dosageInput.value = "";
   freqInput.value = "";
   durationInput.value = "";
   refillsInput.value = 0;
   instructionsInput.value = "";
+
+  itemsTable.innerHTML = "";
 }

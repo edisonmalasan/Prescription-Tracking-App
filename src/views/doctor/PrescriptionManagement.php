@@ -69,9 +69,9 @@
                 <button id="cancel-presc" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition">
                   Cancel
                 </button>
-                <button id="create-presc" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition">
+                <!-- <button id="create-presc" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition">
                   Create Prescription
-                </button>
+                </button> -->
               </div>
             </div>
           </div>
