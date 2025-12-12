@@ -135,9 +135,25 @@ class PatientService {
                 'success' => true,
                 'medical_record' => $medicalRecord
             ];
-        } else {
-            return ['error' => 'Medical record not found'];
         }
+
+        //make new record if missing
+        $newRecordId = $this->medicalRecordRepository->create([
+            'user_id' => $userId,
+            'height' => null,
+            'weight' => null,
+            'allergies' => ''
+        ]);
+
+        if ($newRecordId) {
+            return [
+                'success' => true,
+                'medical_record' => $this->medicalRecordRepository->findById($newRecordId)
+            ];
+        }
+
+        return ['error' => 'Medical record not found'];
+        
     }
 
     public function updateMedicalRecord($recordId, $medicalRecordData) {
