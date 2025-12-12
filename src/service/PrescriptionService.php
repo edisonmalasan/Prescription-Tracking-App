@@ -63,6 +63,15 @@ class PrescriptionService {
         ];
     }
 
+    public function getPrescriptionsByPatientWithDoctorDetails($patientId) {
+        $prescriptions = $this->prescriptionRepository->findByPatientWithDoctorFields($patientId);
+        
+        return [
+            'success' => true,
+            'prescriptions' => $prescriptions
+        ];
+    }
+
     public function getPrescriptionsByDoctor($doctorId) {
         $prescriptions = $this->prescriptionRepository->findByDoctor($doctorId);
         

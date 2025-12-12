@@ -52,6 +52,20 @@ class PrescriptionController {
         return json_encode($result);
     }
 
+    public function getPrescriptionsByPatientWithDoctorDetails() {
+        $patientId = $_GET['patient_id'] ?? null;
+        
+        if (!$patientId) {
+            http_response_code(400);
+            return json_encode(['error' => 'Patient ID is required']);
+        }
+        
+        $result = $this->prescriptionService->getPrescriptionsByPatientWithDoctorDetails($patientId);
+        
+        header('Content-Type: application/json');
+        return json_encode($result);
+    }
+
     public function getPrescriptionsByDoctor() {
         $doctorId = $_GET['doctor_id'] ?? null;
         

@@ -31,6 +31,9 @@ switch ($method) {
             case 'by-patient':
                 echo $prescriptionController->getPrescriptionsByPatient();
                 break;
+            case 'by-patient-doctor':
+                echo $prescriptionController->getPrescriptionsByPatientWithDoctorDetails();
+            break;
             case 'by-doctor':
                 echo $prescriptionController->getPrescriptionsByDoctor();
                 break;

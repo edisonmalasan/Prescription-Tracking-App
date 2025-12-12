@@ -125,6 +125,29 @@ class PrescriptionRepository {
         return [];
     }
 
+    public function findByPatientWithDoctorFields($patientId) {
+    $sql = "SELECT 
+                p.*,
+                u.first_name AS doctor_first_name,
+                u.last_name AS doctor_last_name
+            FROM prescription p
+            JOIN medicalrecord m ON p.record_id = m.record_id
+            JOIN users u ON p.prescribing_doctor = u.user_id
+            WHERE m.user_id = ?";
+    
+    $stmt = $this->conn->prepare($sql);
+    if (! $stmt) {
+        return [];
+    }
+
+    $stmt->bind_param('i', $patientId);
+    $stmt->execute();
+    $res = $stmt->get_result();
+
+    return $res ? $res->fetch_all(MYSQLI_ASSOC) : [];
+    }
+
+
     // Get prescriptions by doctor
     public function findByDoctor($doctorId) {
         $sql = "SELECT * FROM " . $this->table_name . " WHERE prescribing_doctor = ?";
