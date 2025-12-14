@@ -1,0 +1,52 @@
+
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_DATABASE=wium_lie_demo
+    depends_on:
+      - db
+    networks:
+      - prescription-network
+
+  api:
+    build: ./admin/server
+    ports:
+      - "4000:4000"
+    environment:
+      - ADMIN_PORT=4000
+      - ADMIN_APP_ORIGIN=http://localhost:8000
+      - MYSQL_HOST=db
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_DATABASE=wium_lie_demo
+    depends_on:
+      - db
+    networks:
+      - prescription-network
+
+  db:
+    image: mysql:8.0
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=wium_lie_demo
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database/wium_lie_demo.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - prescription-network
+
+networks:
+  prescription-network:
+    driver: bridge
+
+volumes:
+  db_data:
