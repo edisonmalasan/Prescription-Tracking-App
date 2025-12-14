@@ -27,10 +27,8 @@ class PharmacyController {
         $userId = $_GET['user_id'] ?? null;
         
         if (!$userId) {
-            // For now, let's assume a logged-in pharmacy. 
-        
-            
-            $userId = 1; 
+            http_response_code(400);
+            return json_encode(['error' => 'User ID is required']);
         }
         
         $result = $this->pharmacyService->getPharmacyProfile($userId);
@@ -40,17 +38,16 @@ class PharmacyController {
         return json_encode($result);
     }
 
-    public function updateProfile() {
+     public function updateProfile() {
         $userId = $_GET['user_id'] ?? null;
         
         if (!$userId) {
-            // For now, let's assume a logged-in pharmacy. 
-            
-            $userId = 1; 
+            http_response_code(400);
+            return json_encode(['error' => 'User ID is required']);
         }
-        
+                
         $data = json_decode(file_get_contents("php://input"), true);
-        
+
         if (empty($data)) {
             $data = $_POST;
         }
