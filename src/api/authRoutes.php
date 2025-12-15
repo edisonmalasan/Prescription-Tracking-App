@@ -1,5 +1,6 @@
 <?php
 
+session_start();
 header('Content-Type: application/json');
 require_once __DIR__ . '/../controllers/authController.php';
 
@@ -16,6 +17,9 @@ switch ($method) {
                 break;
             case 'login':
                 echo $authController->login();
+                break;
+            case 'logout':
+                echo $authController->logout();
                 break;
             default:
                 http_response_code(404);
