@@ -234,7 +234,7 @@ function renderPrescriptions() {
     item.querySelector(".view-full-btn").addEventListener("click", (e) => {
       const id = e.target.dataset.id;
       sessionStorage.setItem("selectedPrescriptionId", id);
-      window.location.href = `./myprescription.php?prescription_id=${id}`;
+      window.location.href = `./MyPrescription.php?prescription_id=${id}`;
     });
 
     //listener for Mark Complete only if button exists
