@@ -1,7 +1,7 @@
 <?php
 
-require_once '../config/db.php';
-require_once '../models/medicalRecordModel.php';
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../models/medicalRecordModel.php';
 
 class MedicalRecordRepository {
     private $conn;

@@ -23,8 +23,8 @@ const mapResult = (rows) =>
 const findAdminByEmail = async (email) => {
   const sql = `
     SELECT u.*, a.isAdmin
-    FROM USERS u
-    INNER JOIN ADMIN a ON a.user_id = u.user_id
+    FROM users u
+    INNER JOIN admin a ON a.user_id = u.user_id
     WHERE u.email = ?
     LIMIT 1`;
   const rows = await db.query(sql, [email]);
@@ -32,13 +32,13 @@ const findAdminByEmail = async (email) => {
 };
 
 const findByEmail = async (email) => {
-  const sql = `SELECT * FROM USERS WHERE email = ? LIMIT 1`;
+  const sql = `SELECT * FROM users WHERE email = ? LIMIT 1`;
   const rows = await db.query(sql, [email]);
   return rows[0];
 };
 
 const findById = async (userId) => {
-  const sql = `SELECT * FROM USERS WHERE user_id = ? LIMIT 1`;
+  const sql = `SELECT * FROM users WHERE user_id = ? LIMIT 1`;
   const rows = await db.query(sql, [userId]);
   return rows[0];
 };
@@ -46,7 +46,7 @@ const findById = async (userId) => {
 const getAllUsers = async () => {
   const sql = `
     SELECT ${baseUserFields.join(", ")}
-    FROM USERS
+    FROM users
     ORDER BY created_at DESC`;
   const rows = await db.query(sql);
   return mapResult(rows);
@@ -65,7 +65,7 @@ const createUser = async ({
     contactno && contactno.trim() !== "" ? contactno.trim() : null;
 
   const sql = `
-    INSERT INTO USERS (last_name, first_name, role, email, contactno, pass_hash, address)
+    INSERT INTO users (last_name, first_name, role, email, contactno, pass_hash, address)
     VALUES (?, ?, ?, ?, ?, ?, ?)`;
   const result = await db.query(sql, [
     last_name,
@@ -112,19 +112,19 @@ const updateUser = async (userId, data) => {
 
   values.push(userId);
 
-  const sql = `UPDATE USERS SET ${fields.join(", ")} WHERE user_id = ?`;
+  const sql = `UPDATE users SET ${fields.join(", ")} WHERE user_id = ?`;
   return db.query(sql, values);
 };
 
 const deleteUser = async (userId) => {
-  const sql = `DELETE FROM USERS WHERE user_id = ? LIMIT 1`;
+  const sql = `DELETE FROM users WHERE user_id = ? LIMIT 1`;
   return db.query(sql, [userId]);
 };
 
 const getRoleCounts = async () => {
   const sql = `
     SELECT role, COUNT(*) as count
-    FROM USERS
+    FROM users
     GROUP BY role`;
   return db.query(sql);
 };

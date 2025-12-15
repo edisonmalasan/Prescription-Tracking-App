@@ -13,8 +13,8 @@ const pharmacySelect = `
     p.close_time,
     p.dates_open,
     p.isVerified
-  FROM PHARMACY p
-  INNER JOIN USERS u ON u.user_id = p.user_id
+  FROM pharmacy p
+  INNER JOIN users u ON u.user_id = p.user_id
 `;
 
 const getAllPharmacies = async () => {
@@ -38,7 +38,7 @@ const createPharmacyProfile = async ({
   isVerified = 0,
 }) => {
   const sql = `
-    INSERT INTO PHARMACY (
+    INSERT INTO pharmacy (
       user_id,
       pharmacy_name,
       phar_license,
@@ -85,17 +85,17 @@ const updatePharmacyProfile = async (userId, data) => {
 
   values.push(userId);
 
-  const sql = `UPDATE PHARMACY SET ${fields.join(", ")} WHERE user_id = ?`;
+  const sql = `UPDATE pharmacy SET ${fields.join(", ")} WHERE user_id = ?`;
   return db.query(sql, values);
 };
 
 const setPharmacyVerification = async (userId, isVerified) => {
-  const sql = `UPDATE PHARMACY SET isVerified = ? WHERE user_id = ?`;
+  const sql = `UPDATE phharmacy SET isVerified = ? WHERE user_id = ?`;
   return db.query(sql, [isVerified, userId]);
 };
 
 const deletePharmacyByUserId = async (userId) => {
-  const sql = `DELETE FROM PHARMACY WHERE user_id = ? LIMIT 1`;
+  const sql = `DELETE FROM pharmacy WHERE user_id = ? LIMIT 1`;
   return db.query(sql, [userId]);
 };
 

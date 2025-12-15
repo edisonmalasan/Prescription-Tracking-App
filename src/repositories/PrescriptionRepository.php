@@ -1,8 +1,8 @@
 <?php
 
-require_once '../config/db.php';
-require_once '../models/prescriptionModel.php';
-require_once '../models/prescriptionDetailModel.php';
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../models/prescriptionModel.php';
+require_once __DIR__ . '/../models/prescriptionDetailModel.php';
 
 class PrescriptionRepository {
     private $conn;

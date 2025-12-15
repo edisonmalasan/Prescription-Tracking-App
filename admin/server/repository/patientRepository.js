@@ -9,13 +9,13 @@ const patientSelect = `
     u.contactno,
     p.birth_date,
     p.medical_records
-  FROM PATIENT p
-  INNER JOIN USERS u ON u.user_id = p.user_id
+  FROM patient p
+  INNER JOIN users u ON u.user_id = p.user_id
 `;
 
 const createPatientProfile = async ({ user_id, birth_date, medical_records }) => {
   const sql = `
-    INSERT INTO PATIENT (user_id, birth_date, medical_records)
+    INSERT INTO patient (user_id, birth_date, medical_records)
     VALUES (?, ?, ?)`;
   return db.query(sql, [user_id, birth_date, medical_records || null]);
 };
@@ -37,7 +37,7 @@ const updatePatientProfile = async (userId, data) => {
   }
 
   values.push(userId);
-  const sql = `UPDATE PATIENT SET ${fields.join(", ")} WHERE user_id = ?`;
+  const sql = `UPDATE patient SET ${fields.join(", ")} WHERE user_id = ?`;
   return db.query(sql, values);
 };
 
@@ -47,7 +47,7 @@ const getAllPatients = async () => {
 };
 
 const deletePatientByUserId = async (userId) => {
-  const sql = `DELETE FROM PATIENT WHERE user_id = ? LIMIT 1`;
+  const sql = `DELETE FROM patient WHERE user_id = ? LIMIT 1`;
   return db.query(sql, [userId]);
 };
 

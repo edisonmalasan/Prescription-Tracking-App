@@ -1,7 +1,7 @@
 <?php
 
-require_once '../config/db.php';
-require_once '../models/doctorModel.php';
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../models/doctorModel.php';
 require_once 'UserRepository.php';
 
 class DoctorRepository {
