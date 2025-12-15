@@ -1,10 +1,10 @@
 <?php
 
-require_once '../repositories/PrescriptionRepository.php';
-require_once '../repositories/DrugRepository.php';
-require_once '../repositories/MedicalRecordRepository.php';
-require_once '../models/prescriptionModel.php';
-require_once '../models/prescriptionDetailModel.php';
+require_once __DIR__ . '../repositories/PrescriptionRepository.php';
+require_once __DIR__ . '../repositories/DrugRepository.php';
+require_once __DIR__ . '../repositories/MedicalRecordRepository.php';
+require_once __DIR__ . '../models/prescriptionModel.php';
+require_once __DIR__ . '../models/prescriptionDetailModel.php';
 
 class PrescriptionService {
     private $prescriptionRepository;

@@ -1,5 +1,5 @@
 <?php
-require_once '../service/PrescriptionService.php';
+require_once __DIR__ . '../service/PrescriptionService.php';
 
 class PrescriptionController {
     private $prescriptionService;

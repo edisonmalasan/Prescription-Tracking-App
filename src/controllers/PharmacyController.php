@@ -1,6 +1,6 @@
 <?php
 
-require_once '../service/PharmacyService.php';
+require_once __DIR__ . '../service/PharmacyService.php';
 
 class PharmacyController {
     private $pharmacyService;
