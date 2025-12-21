@@ -94,6 +94,10 @@
                         <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Refills</label>
                         <input id="refills" type="number" value="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
                     </div>
+                    <div class="md:col-span-1">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Quantity</label>
+                        <input type="number" id="quantity" type="number" value="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="e.g. 30">
+                    </div>
                     <div class="md:col-span-3">
                         <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Special Instructions</label>
                         <input id="instructions" placeholder="e.g. Take with food..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />

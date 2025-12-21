@@ -8,7 +8,7 @@ class Database {
     private $conn;
 
     public function __construct() {
-        $this->host = getenv('MYSQL_HOST') ?: 'localhost';
+        $this->host = getenv('MYSQL_HOST') ?: 'mysql';
         $this->db_name = getenv('MYSQL_DATABASE') ?: 'wium_lie_demo';
         $this->username = getenv('MYSQL_USER') ?: 'root';
         $this->password = getenv('MYSQL_PASSWORD') ?: '';

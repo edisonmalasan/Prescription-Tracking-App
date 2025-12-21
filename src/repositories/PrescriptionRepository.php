@@ -52,7 +52,7 @@ class PrescriptionRepository {
 
             // Insert details if any
             if (!empty($details)) {
-                $detailSql = "INSERT INTO " . $this->details_table . " (prescription_id, drug_id, duration, dosage, frequency, refills, special_instructions) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                $detailSql = "INSERT INTO " . $this->details_table . " (prescription_id, drug_id, duration, dosage, frequency, refills, special_instructions, quantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
                 $dStmt = $this->conn->prepare($detailSql);
                 if (! $dStmt) {
                     error_log("PrescriptionRepository.create detail prepare failed: " . $this->conn->error);
@@ -68,8 +68,9 @@ class PrescriptionRepository {
                     $frequency = $d['frequency'] ?? $d->frequency ?? '';
                     $refills = isset($d['refills']) ? (int)$d['refills'] : 0;
                     $special_instructions = $d['special_instructions'] ?? $d->special_instructions ?? '';
+                    $quantity = isset($d['quantity']) ? (int)$d['quantity'] : 0;
 
-                    $dStmt->bind_param('iisssis', $prescription_id, $drug_id, $duration, $dosage, $frequency, $refills, $special_instructions);
+                    $dStmt->bind_param('iisssisi', $prescription_id, $drug_id, $duration, $dosage, $frequency, $refills, $special_instructions, $quantity);
                     if (! $dStmt->execute()) {
                         error_log("PrescriptionRepository.create detail execute failed: " . $dStmt->error);
                         echo "[DEBUG] detail execute failed: " . $dStmt->error . "\n";
@@ -175,6 +176,7 @@ class PrescriptionRepository {
                     pd.dosage,
                     pd.duration,
                     pd.frequency,
+                    pd.quantity,
                     dr.generic_name AS medication_name,
                     pd.special_instructions AS notes
                 FROM prescription p
@@ -268,7 +270,7 @@ class PrescriptionRepository {
     }
 
     public function addPrescriptionDetail($detail) {
-        $sql = "INSERT INTO " . $this->details_table . " (prescription_id, drug_id, duration, dosage, frequency, refills, special_instructions) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO " . $this->details_table . " (prescription_id, drug_id, duration, dosage, frequency, refills, special_instructions, quantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($sql);
         if (! $stmt) {
             return false;
@@ -281,8 +283,10 @@ class PrescriptionRepository {
         $frequency = $detail['frequency'] ?? '';
         $refills = isset($detail['refills']) ? (int)$detail['refills'] : 0;
         $special_instructions = $detail['special_instructions'] ?? '';
+        $quantity = isset($detail['quantity']) ? (int)$detail['quantity'] : 0;
 
-        $stmt->bind_param('iisssis', $prescription_id, $drug_id, $duration, $dosage, $frequency, $refills, $special_instructions);
+
+        $stmt->bind_param('iisssisi', $prescription_id, $drug_id, $duration, $dosage, $frequency, $refills, $special_instructions, $quantity);
         $stmt->execute();
         return ($stmt->affected_rows > 0);
     }
@@ -301,6 +305,35 @@ class PrescriptionRepository {
             return $res->fetch_all(MYSQLI_ASSOC);
         }
         return [];
+    }
+
+    public function dispenseQuantity($prescriptionId, $drugId, $amount) {
+        // Prevent negative quantity with GREATEST(0, ...)
+        $sql = "UPDATE " . $this->details_table . " 
+                SET quantity = GREATEST(0, quantity - ?) 
+                WHERE prescription_id = ? AND drug_id = ?";
+        
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) return false;
+
+        $stmt->bind_param('iii', $amount, $prescriptionId, $drugId);
+        $stmt->execute();
+        return ($stmt->affected_rows >= 0);
+    }
+
+    public function isPrescriptionFullyDispensed($prescriptionId) {
+        $sql = "SELECT SUM(quantity) as remaining 
+                FROM " . $this->details_table . " 
+                WHERE prescription_id = ?";
+        
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param('i', $prescriptionId);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $row = $res->fetch_assoc();
+        
+        // If remaining is 0 (or null), it's fully dispensed
+        return ($row['remaining'] <= 0);
     }
 }
 

@@ -196,5 +196,22 @@ class PrescriptionController {
         header('Content-Type: application/json');
         return json_encode($result);
     }
+
+    public function dispense() {
+        $data = json_decode(file_get_contents("php://input"), true);
+        
+        $prescriptionId = $data['prescription_id'] ?? null;
+        $items = $data['items'] ?? [];
+
+        if (!$prescriptionId || empty($items)) {
+            http_response_code(400);
+            return json_encode(['error' => 'Prescription ID and dispense items are required']);
+        }
+
+        $result = $this->prescriptionService->dispensePrescription($prescriptionId, $items);
+        
+        header('Content-Type: application/json');
+        return json_encode($result);
+    }
 }
 ?>

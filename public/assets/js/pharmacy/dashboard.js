@@ -106,10 +106,12 @@ function processData() {
             };
         }
         groups[id].items.push({
+            drug_id: row.drug_id,
             drug: row.medication_name,
             dosage: row.dosage,
             freq: row.frequency,
-            instructions: row.special_instructions
+            instructions: row.special_instructions,
+            quantity: row.quantity,
         });
     });
 
@@ -128,7 +130,6 @@ function updateStats() {
     document.getElementById("stat-ready-orders").textContent = ready;
     document.getElementById("stat-total-prescriptions").textContent = groupedOrders.length;
 
-    // --- LOGIC TO TOGGLE THE READY CARD ---
     if (readyCard) {
         if (ready > 0) {
             readyCard.classList.remove("hidden");
@@ -144,10 +145,6 @@ const isFilled = (s) => (s || "").toLowerCase() === "filled";
 const isHistory = (s) => !isPending(s) && !isFilled(s);
 
 function renderView() {
-    // Only re-render if the search input is not focused to avoid typing interruption?
-    // Actually, with standard inputs, replacing table HTML doesn't kill focus on the search box.
-    // However, it's good practice. But for this requirement, we just render.
-    
     const query = globalFilter.value.toLowerCase();
     const dataset = groupedOrders.filter(order => {
         let matchTab = false;
@@ -213,23 +210,45 @@ window.openVerifyModal = (id) => {
     document.getElementById("m-doctor").textContent = order.doctor;
 
     const listEl = document.getElementById("m-med-list");
-    listEl.innerHTML = order.items.map(item => `
-        <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 flex justify-between items-center">
-            <div>
-                <p class="font-bold text-blue-900 text-lg">${item.drug}</p>
-                <p class="text-sm text-blue-700">${item.dosage} | ${item.freq}</p>
-                <p class="text-xs text-gray-500 italic mt-1">${item.instructions || "Use as directed"}</p>
+    
+    listEl.innerHTML = order.items.map(item => {
+        const isFinished = item.quantity <= 0;
+        
+        return `
+        <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 flex flex-col gap-3">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="font-bold text-blue-900 text-lg">${item.drug}</p>
+                    <p class="text-sm text-blue-700">${item.dosage} | ${item.freq}</p>
+                    <p class="text-xs text-gray-500 italic mt-1">${item.instructions || "Use as directed"}</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs font-bold uppercase tracking-wide text-gray-500">Remaining</span>
+                    <div class="text-2xl font-bold ${isFinished ? 'text-gray-400' : 'text-blue-600'}">
+                        ${item.quantity}
+                    </div>
+                </div>
             </div>
-            <div class="h-8 w-8 bg-white rounded-full flex items-center justify-center text-green-500 shadow-sm">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            
+            ${!isFinished ? `
+            <div class="flex items-center gap-4 border-t border-blue-200 pt-3 mt-1">
+                <label class="text-sm font-medium text-gray-700">Dispense Qty:</label>
+                <input type="number" 
+                       id="input-dispense-${item.drug_id}" 
+                       data-drug-id="${item.drug_id}"
+                       data-max="${item.quantity}"
+                       class="dispense-input w-24 px-3 py-1.5 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none"
+                       value="${item.quantity}" 
+                       min="0" 
+                       max="${item.quantity}">
             </div>
+            ` : `<div class="text-sm text-green-600 font-bold border-t border-blue-200 pt-2">✓ Fully Dispensed</div>`}
         </div>
-    `).join("");
+    `}).join("");
 
     modal.classList.remove("hidden");
     modal.classList.add("flex");
 };
-
 function hideModal() {
     modal.classList.add("hidden");
     modal.classList.remove("flex");
@@ -238,13 +257,47 @@ function hideModal() {
 
 async function confirmFillOrder() {
     if(!selectedOrderId) return;
+    
+    const inputs = document.querySelectorAll('.dispense-input');
+    const dispenseItems = [];
+    let hasError = false;
+
+    inputs.forEach(input => {
+        const val = parseInt(input.value);
+        const max = parseInt(input.dataset.max);
+        const drugId = input.dataset.drugId;
+
+        if (val < 0 || val > max) {
+            alert(`Invalid quantity for one of the items. Max available: ${max}`);
+            hasError = true;
+            return;
+        }
+
+        if (val > 0) {
+            dispenseItems.push({
+                drug_id: drugId,
+                amount: val
+            });
+        }
+    });
+
+    if (hasError) return;
+    if (dispenseItems.length === 0) {
+        alert("Please set a quantity to dispense for at least one item.");
+        return;
+    }
+
     try {
-        const res = await api.put(`prescriptionRoutes.php?action=update&prescription_id=${selectedOrderId}`, { status: "filled" });
+        const res = await api.put(`prescriptionRoutes.php?action=dispense`, { 
+            prescription_id: selectedOrderId,
+            items: dispenseItems
+        });
+
         if(res.success) {
             hideModal();
-            loadData(); // Force immediate reload
+            loadData(); // Force immediate reload to see updated quantities or status change
         } else {
-            alert("Error: " + res.error);
+            alert("Error: " + (res.error || "Failed to dispense"));
         }
     } catch(e) { console.error(e); }
 }

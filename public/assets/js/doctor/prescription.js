@@ -46,6 +46,7 @@ const dosageInput = document.getElementById("dosage");
 const freqInput = document.getElementById("frequency");
 const durationInput = document.getElementById("duration");
 const refillsInput = document.getElementById("refills");
+const quantityInput = document.getElementById("quantity");
 const instructionsInput = document.getElementById("instructions");
 
 const cancelBtn = document.getElementById("cancel-presc");
@@ -237,6 +238,7 @@ function addItemToList() {
     name: selectedDrug.name,
     dosage: dosageInput.value,
     frequency: freqInput.value,
+    quantity: quantityInput.value,
     duration: durationInput.value,
     refills: parseInt(refillsInput.value) || 0,
     special_instructions: instructionsInput.value,
@@ -266,6 +268,7 @@ function renderItemsTable() {
         <td class="px-4 py-3 text-gray-600">${item.dosage}</td>
         <td class="px-4 py-3 text-gray-600">${item.frequency}</td>
         <td class="px-4 py-3 text-gray-600">${item.duration}</td>
+        <td class="px-4 py-3 text-gray-600">${item.quantity}</td>
         <td class="px-4 py-3 text-gray-500 italic truncate max-w-xs">${item.special_instructions || "-"}</td>
         <td class="px-4 py-3 text-right">
           <button class="text-red-400 hover:text-red-600 transition-colors text-xs font-bold uppercase" onclick="removeItem(${i})">
@@ -315,6 +318,7 @@ async function createPrescription(user) {
         duration: item.duration,
         refills: item.refills,
         special_instructions: item.special_instructions,
+        quantity: item.quantity
       })),
     };
 
@@ -351,6 +355,7 @@ function resetForm() {
   freqInput.value = "";
   durationInput.value = "";
   refillsInput.value = 0;
+  quantityInput.value = 0;
   instructionsInput.value = "";
 
   itemsTable.innerHTML = "";
