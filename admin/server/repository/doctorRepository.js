@@ -12,8 +12,8 @@ const doctorSelect = `
     d.prc_license,
     d.clinic_name,
     d.isVerified
-  FROM DOCTOR d
-  INNER JOIN USERS u ON u.user_id = d.user_id
+  FROM doctor d
+  INNER JOIN users u ON u.user_id = d.user_id
 `;
 
 const getAllDoctors = async () => {
@@ -36,7 +36,7 @@ const createDoctorProfile = async ({
   isVerified = 0,
 }) => {
   const sql = `
-    INSERT INTO DOCTOR (
+    INSERT INTO doctor (
       user_id,
       birth_date,
       specialization,
@@ -79,17 +79,17 @@ const updateDoctorProfile = async (userId, data) => {
 
   values.push(userId);
 
-  const sql = `UPDATE DOCTOR SET ${fields.join(", ")} WHERE user_id = ?`;
+  const sql = `UPDATE doctor SET ${fields.join(", ")} WHERE user_id = ?`;
   return db.query(sql, values);
 };
 
 const setDoctorVerification = async (userId, isVerified) => {
-  const sql = `UPDATE DOCTOR SET isVerified = ? WHERE user_id = ?`;
+  const sql = `UPDATE doctor SET isVerified = ? WHERE user_id = ?`;
   return db.query(sql, [isVerified, userId]);
 };
 
 const deleteDoctorByUserId = async (userId) => {
-  const sql = `DELETE FROM DOCTOR WHERE user_id = ? LIMIT 1`;
+  const sql = `DELETE FROM doctor WHERE user_id = ? LIMIT 1`;
   return db.query(sql, [userId]);
 };
 

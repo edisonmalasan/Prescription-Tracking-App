@@ -1,7 +1,7 @@
 const API_BASE =
   (typeof getAdminApiBase === "function" && getAdminApiBase()) ||
   window.ADMIN_API_BASE ||
-  "http://localhost:4000/api/admin";
+  "/api/admin";
 
 // auth checker that supports both admin frontend login and PHP login
 let admin = JSON.parse(sessionStorage.getItem("admin") || "null");

@@ -1,9 +1,9 @@
 <?php
 
-require_once __DIR__ . '../repositories/PatientRepository.php';
-require_once __DIR__ . '../repositories/UserRepository.php';
-require_once __DIR__ . '../repositories/MedicalRecordRepository.php';
-require_once __DIR__ . '../models/patientModel.php';
+require_once __DIR__ . '/../repositories/PatientRepository.php';
+require_once __DIR__ . '/../repositories/UserRepository.php';
+require_once __DIR__ . '/../repositories/MedicalRecordRepository.php';
+require_once __DIR__ . '/../models/patientModel.php';
 
 class PatientService {
     private $patientRepository;

@@ -1,10 +1,10 @@
 <?php
 
 class Database {
-    private $host;
-    private $db_name;
-    private $username;
-    private $password;
+    private $host = 'db';
+    private $db_name = 'wium_lie_demo';
+    private $username = 'root';
+    private $password = '';
     private $conn;
 
     public function __construct() {

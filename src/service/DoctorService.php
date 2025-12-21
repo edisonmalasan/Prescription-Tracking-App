@@ -1,8 +1,8 @@
 <?php
 
-require_once __DIR__ . '../repositories/DoctorRepository.php';
-require_once __DIR__ . '../repositories/UserRepository.php';
-require_once __DIR__ . '../models/doctorModel.php';
+require_once __DIR__ . '/../repositories/DoctorRepository.php';
+require_once __DIR__ . '/../repositories/UserRepository.php';
+require_once __DIR__ . '/../models/doctorModel.php';
 
 class DoctorService {
     private $doctorRepository;

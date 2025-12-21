@@ -1,7 +1,7 @@
 <?php
 
-require_once __DIR__ . '../repositories/DrugRepository.php';
-require_once __DIR__ . '../models/drugModel.php';
+require_once __DIR__ . '/../repositories/DrugRepository.php';
+require_once __DIR__ . '/../models/drugModel.php';
 
 class DrugService {
     private $drugRepository;

@@ -1,6 +1,8 @@
 <?php
 error_reporting(E_ALL);
-ini_set('display_errors', 0);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+
 
 require_once __DIR__ . '/../service/authService.php';
 
@@ -62,6 +64,17 @@ class AuthController {
         
         try {
             $result = $this->authService->login($data);
+            
+            if (isset($result['success']) && $result['success']) {
+                if (session_status() === PHP_SESSION_NONE) {
+                    session_start();
+                }
+                $_SESSION['user_id'] = $result['user']['user_id'];
+                $_SESSION['role'] = $result['user']['role'];
+                $_SESSION['email'] = $result['user']['email'];
+                $_SESSION['logged_in'] = true;
+            }
+
             http_response_code(isset($result['error']) ? 401 : 200);
             return json_encode($result, JSON_UNESCAPED_UNICODE);
         } catch (Exception $e) {
@@ -71,6 +84,30 @@ class AuthController {
             http_response_code(500);
             return json_encode(['error' => 'Login failed: ' . $e->getMessage()], JSON_UNESCAPED_UNICODE);
         }
+    }
+
+
+    public function logout() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        $_SESSION = array();
+        
+        if (ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 10800,
+                $params["path"], $params["domain"],
+                $params["secure"], $params["httponly"]
+            );
+        }
+        
+        session_destroy();
+        
+        return json_encode([
+            'success' => true, 
+            'message' => 'Logged out successfully'
+        ]);
     }
 }
 ?>

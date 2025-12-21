@@ -24,11 +24,11 @@ const getPrescriptionList = async ({ limit = 10, offset = 0 } = {}) => {
       CONCAT(docUser.first_name, ' ', docUser.last_name) AS doctorName,
       patUser.user_id AS patientId,
       CONCAT(patUser.first_name, ' ', patUser.last_name) AS patientName
-    FROM PRESCRIPTION p
-    INNER JOIN USERS docUser ON docUser.user_id = p.prescribing_doctor
-    LEFT JOIN MEDICALRECORD mr ON mr.record_id = p.record_id
-    LEFT JOIN PATIENT pat ON pat.user_id = mr.user_id
-    LEFT JOIN USERS patUser ON patUser.user_id = pat.user_id
+    FROM prescription p
+    INNER JOIN users docUser ON docUser.user_id = p.prescribing_doctor
+    LEFT JOIN medicalrecord mr ON mr.record_id = p.record_id
+    LEFT JOIN patient pat ON pat.user_id = mr.user_id
+    LEFT JOIN users patUser ON patUser.user_id = pat.user_id
     ORDER BY p.prescription_id DESC
     LIMIT ${limitNum}${offsetNum > 0 ? ` OFFSET ${offsetNum}` : ""}
   `;

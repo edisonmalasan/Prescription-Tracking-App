@@ -1,8 +1,8 @@
 <?php
 
-require_once __DIR__ . '../repositories/PharmacyRepository.php';
-require_once __DIR__ . '../repositories/UserRepository.php';
-require_once __DIR__ . '../models/pharmacyModel.php';
+require_once __DIR__ . '/../repositories/PharmacyRepository.php';
+require_once __DIR__ . '/../repositories/UserRepository.php';
+require_once __DIR__ . '/../models/pharmacyModel.php';
 
 class PharmacyService {
     private $pharmacyRepository;

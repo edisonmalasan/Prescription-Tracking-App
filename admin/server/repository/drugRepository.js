@@ -9,7 +9,7 @@ const baseSelect = `
     category,
     isControlled,
     created_at
-  FROM DRUG
+  FROM drug
 `;
 
 const getAllDrugs = async () => {
@@ -25,7 +25,7 @@ const createDrug = async ({
   isControlled = 0,
 }) => {
   const sql = `
-    INSERT INTO DRUG (
+    INSERT INTO drug (
       generic_name,
       brand,
       chemical_name,
@@ -73,12 +73,12 @@ const updateDrug = async (
   }
 
   params.push(drugId);
-  const sql = `UPDATE DRUG SET ${fields.join(", ")} WHERE drug_id = ?`;
+  const sql = `UPDATE drug SET ${fields.join(", ")} WHERE drug_id = ?`;
   return db.query(sql, params);
 };
 
 const deleteDrug = async (drugId) => {
-  const sql = `DELETE FROM DRUG WHERE drug_id = ? LIMIT 1`;
+  const sql = `DELETE FROM drug WHERE drug_id = ? LIMIT 1`;
   return db.query(sql, [drugId]);
 };
 
