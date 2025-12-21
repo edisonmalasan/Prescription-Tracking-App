@@ -226,6 +226,7 @@ CREATE TABLE IF NOT EXISTS `prescriptiondetails` (
   `drug_id` int NOT NULL,
   `duration` varchar(50) DEFAULT NULL,
   `dosage` varchar(50) DEFAULT NULL,
+  `quantity` int DEFAULT '0',
   `frequency` varchar(50) DEFAULT NULL,
   `special_instructions` text,
   `refills` int DEFAULT '0',
@@ -237,11 +238,11 @@ CREATE TABLE IF NOT EXISTS `prescriptiondetails` (
 -- Dumping data for table `prescriptiondetails`
 --
 
-INSERT INTO `prescriptiondetails` (`prescription_id`, `drug_id`, `duration`, `dosage`, `frequency`, `special_instructions`, `refills`) VALUES
-(1, 1, '5 days', '500 mg', 'Every 6 hours', 'Take after meals', 0),
-(1, 3, '3 days', '250 mg', 'Every 8 hours', 'Complete full dosage', 0),
-(2, 2, '7 days', '200 mg', 'Twice a day', 'Avoid alcohol', 0),
-(2, 4, 'As needed', '10 mg', 'Once a day', 'Do not exceed 1 tablet per 24 hours', 0);
+INSERT INTO `prescriptiondetails` (`prescription_id`, `drug_id`, `duration`, `dosage`, `quantity`, `frequency`, `special_instructions`, `refills`) VALUES
+(1, 1, '5 days', '500 mg', 10, 'Every 6 hours', 'Take after meals', 0),
+(1, 3, '3 days', '250 mg', 5, 'Every 8 hours', 'Complete full dosage', 0),
+(2, 2, '7 days', '200 mg', 14, 'Twice a day', 'Avoid alcohol', 0),
+(2, 4, 'As needed', '10 mg', 7, 'Once a day', 'Do not exceed 1 tablet per 24 hours', 0);
 
 -- --------------------------------------------------------
 
