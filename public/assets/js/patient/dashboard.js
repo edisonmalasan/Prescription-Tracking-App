@@ -104,7 +104,9 @@ async function loadPrescriptions(patientId) {
 
   //update Stats
   totalEl.textContent = prescriptions.length;
-  activeEl.textContent = prescriptions.filter(p => p.status === "active").length;
+  activeEl.textContent = prescriptions.filter(p => 
+      ["active", "partial"].includes(p.status)
+  ).length;
 
   //fetch deets
   allPrescriptions = await Promise.all(
@@ -135,12 +137,11 @@ function renderPrescriptions() {
   const container = document.querySelector("#recent-prescriptions tbody");
   container.innerHTML = "";
 
-  //filter logic
-  //active Tab: status is 'active' or 'pending'
-  //history Tab: status is 'completed', 'filled', or 'cancelled'
   const filteredList = allPrescriptions.filter(rx => {
-    if (currentTab === "active") return rx.status === "active" || rx.status === "pending";
-    return rx.status === "completed" || rx.status === "filled" || rx.status === "cancelled";
+    if (currentTab === "active") {
+        return ["active", "pending", "partial", "partial-pending"].includes(rx.status);
+    }
+    return ["completed", "cancelled"].includes(rx.status);
   });
 
   if (!filteredList.length) {
@@ -154,11 +155,17 @@ function renderPrescriptions() {
   }
 
   filteredList.forEach((rx) => {
-    // Styling status badges
+    //calculate Total Remaining Quantity
+    const totalRemaining = rx.details.reduce((sum, d) => sum + (parseInt(d.quantity) || 0), 0);
+
+    //styling status badges
     let statusColor = "text-gray-600 bg-gray-200";
     if (rx.status === "active") statusColor = "text-green-600 bg-green-100";
     if (rx.status === "completed" || rx.status === "filled") statusColor = "text-blue-600 bg-blue-100";
+    if (rx.status === "partial") statusColor = "text-amber-700 bg-amber-100 border border-amber-200";
+    if (rx.status === "partial-pending") statusColor = "text-amber-700 bg-amber-100 border border-amber-200";
 
+    //render Details List
     const detailsHTML = rx.details
       .map(d => `
         <div class="border-b py-3 last:border-0">
@@ -167,18 +174,46 @@ function renderPrescriptions() {
             <span class="font-medium">Dosage:</span> ${d.dosage ?? "—"} &middot; 
             <span class="font-medium">Freq:</span> ${d.frequency ?? "—"} &middot; 
             <span class="font-medium">Dur:</span> ${d.duration ?? "—"} days
+            <span class="mx-2">&bull;</span>
+            <span class="font-medium ${rx.status === 'partial' ? 'text-amber-600 font-bold' : ''}">
+                Qty Left: ${d.quantity}
+            </span>
           </div>
           <div class="text-sm text-gray-500 italic mt-1">${d.special_instructions ?? ""}</div>
         </div>`)
       .join("");
 
+    //LOGIC: Action Buttons vs Info Banner
+    let actionUI = "";
+
+    if (currentTab === "active") {
+        if ((rx.status === "partial" || rx.status === "partial-pending") && totalRemaining > 0) {
+            // UI Element for PARTIAL: Show message, hide Complete button
+            actionUI = `
+            <div class="mt-4 bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
+                <svg class="w-5 h-5 text-amber-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <div>
+                    <p class="text-sm font-bold text-amber-800">Prescription In Progress</p>
+                    <p class="text-xs text-amber-700 mt-1">
+                        You have <strong>${totalRemaining} units</strong> remaining to pick up. 
+                        Please visit the pharmacy to complete this prescription.
+                    </p>
+                </div>
+            </div>`;
+        } 
+        else if (rx.status !== "pending") {
+            // UI Element for ACTIVE/FILLED: Show Complete button
+            actionUI = `
+            <button class="mt-4 mr-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition mark-complete-btn shadow-sm flex items-center gap-2" data-id="${rx.prescription_id}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                Mark as Completed
+            </button>`;
+        }
+    }
+
     const item = document.createElement("tr");
-    
-    const markCompletedBtn = (currentTab === "active" && rx.status !== "pending" && rx.status !== "filled")
-      ? `<button class="mt-4 mr-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition mark-complete-btn shadow-sm" data-id="${rx.prescription_id}">
-           Mark as Completed
-         </button>` 
-      : "";
 
     item.innerHTML = `
       <td colspan="5" class="p-0">
@@ -208,9 +243,8 @@ function renderPrescriptions() {
               <div class="bg-white rounded-lg border border-gray-200 px-4">${detailsHTML}</div>
             </div>
             
-            <div class="flex flex-wrap gap-2">
-              ${markCompletedBtn}
-              <button class="mt-4 px-4 py-2 border border-blue-600 text-blue-600 bg-white rounded-lg hover:bg-blue-50 transition view-full-btn shadow-sm" data-id="${rx.prescription_id}">
+            <div class="flex flex-col sm:flex-row gap-2">
+              ${actionUI} <button class="mt-4 px-4 py-2 border border-blue-600 text-blue-600 bg-white rounded-lg hover:bg-blue-50 transition view-full-btn shadow-sm" data-id="${rx.prescription_id}">
                 View Details
               </button>
             </div>
@@ -221,7 +255,7 @@ function renderPrescriptions() {
 
     container.appendChild(item);
 
-    //event Listeners
+    // --- Event Listeners ---
     const toggleBtn = item.querySelector(".toggle-btn");
     const body = item.querySelector(".accordion-body");
     const icon = item.querySelector(".accordion-icon");
@@ -237,10 +271,9 @@ function renderPrescriptions() {
       window.location.href = `./MyPrescription.php?prescription_id=${id}`;
     });
 
-    //listener for Mark Complete only if button exists
     const completeBtn = item.querySelector(".mark-complete-btn");
     if (completeBtn) {
-      completeBtn.addEventListener("click", (e) => markAsCompleted(e.target.dataset.id));
+      completeBtn.addEventListener("click", (e) => markAsCompleted(e.target.closest('button').dataset.id));
     }
   });
 }

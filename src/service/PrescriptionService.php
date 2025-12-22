@@ -170,5 +170,38 @@ class PrescriptionService {
             'prescriptions' => $prescriptions
         ];
     }
+
+    public function dispensePrescription($prescriptionId, $dispenseItems) {
+        // $dispenseItems is an array: [['drug_id' => 1, 'amount' => 10], ...]
+        if (empty($dispenseItems)) {
+            return ['error' => 'No items selected for dispensing'];
+        }
+
+        foreach ($dispenseItems as $item) {
+            $drugId = $item['drug_id'];
+            $amount = $item['amount'];
+            
+            //decrement the quantity for the specific drug
+            $this->prescriptionRepository->dispenseQuantity($prescriptionId, $drugId, $amount);
+        }
+
+        //check if the entire prescription is now finished
+        $isComplete = $this->prescriptionRepository->isPrescriptionFullyDispensed($prescriptionId);
+
+        if ($isComplete) {
+            $this->prescriptionRepository->update([
+                'prescription_id' => $prescriptionId, 
+                'status' => 'filled'
+            ]);
+            return ['success' => true, 'message' => 'Prescription fully filled', 'status' => 'filled'];
+        } else {
+             $this->prescriptionRepository->update([
+            'prescription_id' => $prescriptionId, 
+            'status' => 'partial'
+        ]);
+    
+            return ['success' => true, 'message' => 'Prescription partially filled', 'status' => 'partial'];
+        }
+    }
 }
 ?>

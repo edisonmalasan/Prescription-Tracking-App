@@ -47,7 +47,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   loadPharmacyProfile(user.user_id);
   await loadData();
 
-  // --- AUTOMATIC UPDATES (POLLING) ---
   setInterval(async () => {
     // Only refresh data if the user isn't currently in the modal
     if (modal && modal.classList.contains("hidden")) {
@@ -110,7 +109,7 @@ function processData() {
             drug: row.medication_name,
             dosage: row.dosage,
             freq: row.frequency,
-            instructions: row.special_instructions,
+            instructions: row.notes,
             quantity: row.quantity,
         });
     });
@@ -140,8 +139,8 @@ function updateStats() {
 }
 
 // Helpers
-const isPending = (s) => ["pending", "active"].includes((s || "").toLowerCase());
-const isFilled = (s) => (s || "").toLowerCase() === "filled";
+const isPending = (s) => ["pending", "active", "partial-pending"].includes((s || "").toLowerCase());
+const isFilled = (s) => ["filled", "partial"].includes((s || "").toLowerCase());
 const isHistory = (s) => !isPending(s) && !isFilled(s);
 
 function renderView() {
@@ -177,9 +176,17 @@ function renderView() {
 
         let btnHtml = "";
         if (currentTab === "pending") {
-            btnHtml = `<button onclick="openVerifyModal(${order.id})" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-md transition-all">Review & Fill</button>`;
+            const btnText = (order.status === 'partial-pending') ? "Fill Remaining" : "Review & Fill";
+            
+            btnHtml = `<button onclick="openVerifyModal('${order.id}')" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-md transition-all">
+                ${btnText}
+            </button>`;
         } else if (currentTab === "filled") {
-            btnHtml = `<button onclick="markDispensed(${order.id})" class="w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold shadow-md transition-all">Dispense</button>`;
+            if (order.status === 'partial') {
+                btnHtml = `<button onclick="markDispensed('${order.id}')" class="w-full py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-bold shadow-md transition-all">Handout Partial</button>`;
+            } else {
+                btnHtml = `<button onclick="markDispensed('${order.id}')" class="w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold shadow-md transition-all">Dispense / Complete</button>`;
+            }        
         } else {
             btnHtml = `<span class="px-3 py-1 bg-gray-100 text-gray-500 rounded text-xs font-semibold">${order.status}</span>`;
         }
@@ -212,7 +219,9 @@ window.openVerifyModal = (id) => {
     const listEl = document.getElementById("m-med-list");
     
     listEl.innerHTML = order.items.map(item => {
-        const isFinished = item.quantity <= 0;
+        const qty = Number(item.quantity);
+        const isFinished = !Number.isFinite(qty) || qty <= 0;
+
         
         return `
         <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 flex flex-col gap-3">
@@ -249,6 +258,7 @@ window.openVerifyModal = (id) => {
     modal.classList.remove("hidden");
     modal.classList.add("flex");
 };
+
 function hideModal() {
     modal.classList.add("hidden");
     modal.classList.remove("flex");
@@ -303,13 +313,34 @@ async function confirmFillOrder() {
 }
 
 window.markDispensed = async (id) => {
-    if(!confirm("Complete order and hand to patient?")) return;
-    try {
-        const res = await api.put(`prescriptionRoutes.php?action=update&prescription_id=${id}`, { status: "active" });
-        if(res.success) {
-            loadData(); // Force immediate reload
-        }
-    } catch(e) { console.error(e); }
+    const order = groupedOrders.find(o => o.id == id);
+    if (!order) return;
+
+    //partial presc
+    if (order.status === 'partial') {
+        const msg = `Hand over available items to patient?\n\nThis order has remaining items. It will be moved back to the INTAKE QUEUE so you can fill the rest later.`;
+        
+        if(!confirm(msg)) return;
+
+        try {
+            const res = await api.put(`prescriptionRoutes.php?action=update&prescription_id=${id}`, { 
+                status: "partial-pending" 
+            });
+
+            if(res.success) {
+                loadData(); 
+            } else {
+                alert("Error moving to queue: " + (res.error || "Unknown error"));
+            }
+        } catch(e) { console.error(e); }
+    } 
+    else {
+        if(!confirm("Complete order and hand to patient? This will close the ticket.")) return;
+        try {
+            const res = await api.put(`prescriptionRoutes.php?action=update&prescription_id=${id}`, { status: "active" });
+            if(res.success) loadData(); 
+        } catch(e) { console.error(e); }
+    }
 }
 
 function formatDate(d) {

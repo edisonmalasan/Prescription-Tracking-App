@@ -173,6 +173,7 @@ class PrescriptionRepository {
                     p.status,
                     CONCAT(u.first_name, ' ', u.last_name) AS patient_name,
                     CONCAT(d_user.first_name, ' ', d_user.last_name) AS doctor_name,
+                    pd.drug_id,
                     pd.dosage,
                     pd.duration,
                     pd.frequency,

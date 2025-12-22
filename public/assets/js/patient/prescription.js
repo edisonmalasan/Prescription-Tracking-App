@@ -125,6 +125,12 @@ function renderPrescriptionCard(items) {
               </div>
             </div>
 
+            <div>
+                <p class="text-gray-500">Quantity</p>
+                <p class="font-medium">${d.quantity ?? 0}</p>
+              </div>
+            </div>
+
             <div class="mt-3">
               <p class="text-gray-500">Special Instructions</p>
               <p class="font-medium">${d.special_instructions || "None"}</p>
