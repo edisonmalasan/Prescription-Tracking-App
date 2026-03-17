@@ -1,4 +1,4 @@
-# Prescription Tracking App 💊
+# Prescription Tracking App 
 
 > A comprehensive tracking system to efficiently manage, verify, and monitor prescriptions.
 
@@ -12,13 +12,25 @@
 - **RESTful API:** Robust Node.js backend for secure administrative tasks.
 - **Dockerized Setup:** Simple, consistent configuration using Docker and Docker Compose.
 
-## Tech Stack
-- **Frontend:** HTML5, Vanilla JavaScript, CSS
-- **Backend (Public):** PHP 
-- **Backend (Admin):** Node.js, Express.js
-- **Database:** MySQL
-- **Proxy/Web Server:** Nginx
-- **Containerization:** Docker & Docker Compose
+## 💻 Tech Stack
+
+### Frontend
+![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)
+![JavaScript](https://img.shields.io/badge/javascript-%23F7DF1E.svg?style=for-the-badge&logo=javascript&logoColor=black)
+![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white)
+
+### Backend
+![PHP](https://img.shields.io/badge/php-%23777BB4.svg?style=for-the-badge&logo=php&logoColor=white)
+![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)
+![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB)
+
+### Database & Web Server
+![MySQL](https://img.shields.io/badge/mysql-%2300f.svg?style=for-the-badge&logo=mysql&logoColor=white)
+![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white)
+
+### Deployment & Containerization
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
+![Docker Compose](https://img.shields.io/badge/docker_compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
 ## Getting Started
 
